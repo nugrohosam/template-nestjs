@@ -1,4 +1,4 @@
-# POLKAPARTY
+# Polkaparty API
 
 # Spec Requirement
 ## Requirements :
