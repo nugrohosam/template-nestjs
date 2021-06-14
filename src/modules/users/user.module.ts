@@ -1,9 +1,9 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from '../../common/guards/JwtStrategy';
-import { UserController } from './controller/UserController';
-import { UserService } from './service/UserService';
+import { JwtStrategy } from '../../common/guards/jwt.strategy';
+import { UserController } from './controller/user.controller';
+import { UserService } from './service/user.service';
 
 @Module({
     imports: [

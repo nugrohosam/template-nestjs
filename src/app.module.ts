@@ -1,11 +1,11 @@
 import { HttpException, Module } from '@nestjs/common';
 import { APP_FILTER, APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
 import { RavenInterceptor, RavenModule } from 'nest-raven';
-import { HttpExceptionFilter } from './common/filters/HttpExceptionFilter';
-import { ResponseInterceptor } from './common/interceptors/ResponseInterceptor';
-import { ValidationPipe } from './common/pipes/ValidationPipe';
-import { DatabaseModule } from './infrastructure/database/DatabaseModules';
-import { UserModule } from './modules/users/UserModule';
+import { HttpExceptionFilter } from './common/filters/http-exeception.filter';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { ValidationPipe } from './common/pipes/validation.pipe';
+import { DatabaseModule } from './infrastructure/database/database.module';
+import { UserModule } from './modules/users/user.module';
 
 @Module({
     imports: [DatabaseModule, RavenModule, UserModule],

@@ -6,7 +6,7 @@ import {
     CreatedAt,
     UpdatedAt,
 } from 'sequelize-typescript';
-import { UserTypeEnum } from 'src/common/enums/UserEnum';
+import { UserTypeEnum } from 'src/common/enums/user.enum';
 
 export interface IUserModel {
     id?: number;

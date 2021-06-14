@@ -1,11 +1,11 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Utils } from 'src/common/utils/Utils';
+import { Utils } from 'src/common/utils/util';
 import { UserModel } from 'src/entities/dblocaltest';
-import { LoginRequestDto, LoginResponseDto } from '../dto/LoginDto';
-import { RegisterRequestDto, RegisterResponseDto } from '../dto/RegisterDto';
+import { LoginRequestDto, LoginResponseDto } from '../dto/login.dto';
+import { RegisterRequestDto, RegisterResponseDto } from '../dto/register.dto';
 import { SignOptions } from 'jsonwebtoken';
-import { IUnprocessableResponse } from 'src/common/interface/ResponseInterface';
+import { IUnprocessableResponse } from 'src/common/interface/response.interface';
 
 @Injectable()
 export class UserService {

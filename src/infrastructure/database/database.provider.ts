@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import { UserModel } from 'src/entities/dblocaltest';
-import { databaseConfig } from './DatabaseConfig';
+import { databaseConfig } from './database.config';
 
 class DatabaseProviders {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

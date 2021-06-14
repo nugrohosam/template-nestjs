@@ -7,8 +7,8 @@ import {
     MaxLength,
     MinLength,
 } from 'class-validator';
-import { UserTypeEnum } from 'src/common/enums/UserEnum';
-import { UserEmailUnique } from 'src/common/rules/UserEmailUnique';
+import { UserTypeEnum } from 'src/common/enums/user.enum';
+import { UserEmailUnique } from 'src/common/rules/user-email-unique.rule';
 import { UserModel } from 'src/entities/dblocaltest';
 
 export class RegisterRequestDto {

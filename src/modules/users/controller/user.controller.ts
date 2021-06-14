@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiExtraModels } from '@nestjs/swagger';
-import { ApiSuccessResponse } from '../../../common/utils/SwaggerUtil';
-import { TJwtRequest } from 'src/common/guards/JwtStrategy';
-import { LoginRequestDto, LoginResponseDto } from '../dto/LoginDto';
-import { UserService } from '../service/UserService';
-import { RegisterRequestDto, RegisterResponseDto } from '../dto/RegisterDto';
-import { IApiResponse } from 'src/common/interface/ResponseInterface';
+import { ApiSuccessResponse } from '../../../common/utils/swagger.util';
+import { TJwtRequest } from 'src/common/guards/jwt.strategy';
+import { LoginRequestDto, LoginResponseDto } from '../dto/login.dto';
+import { UserService } from '../service/user.service';
+import { RegisterRequestDto, RegisterResponseDto } from '../dto/register.dto';
+import { IApiResponse } from 'src/common/interface/response.interface';
 
 @Controller('v1/user')
 @ApiExtraModels(LoginResponseDto, RegisterResponseDto)
