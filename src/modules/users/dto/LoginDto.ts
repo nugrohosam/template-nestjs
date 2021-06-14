@@ -1,5 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty } from 'class-validator';
+import { UserModel } from 'src/entities/dblocaltest';
 
 export class LoginRequestDto {
     @IsEmail()
@@ -10,6 +11,15 @@ export class LoginRequestDto {
     @IsNotEmpty()
     @ApiProperty()
     password!: string;
+
+    generate(user: UserModel, accesToken: string): LoginResponseDto {
+        return {
+            name: user.name,
+            email: user.email,
+            userType: user.userType,
+            accessToken: accesToken,
+        };
+    }
 }
 
 export class LoginResponseDto {
@@ -19,9 +29,9 @@ export class LoginResponseDto {
     @ApiProperty()
     email!: string;
 
-    @ApiProperty({ name: "user_type"})
+    @ApiProperty({ name: 'user_type' })
     userType!: string;
 
-    @ApiProperty({ name: "access_token"})
+    @ApiProperty({ name: 'access_token' })
     accessToken!: string;
 }

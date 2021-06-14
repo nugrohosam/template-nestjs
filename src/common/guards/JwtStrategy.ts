@@ -1,7 +1,7 @@
-import { PassportStrategy } from "@nestjs/passport";
-import { Strategy, ExtractJwt } from "passport-jwt";
-import { UserModel } from "../../entities/dblocaltest";
-import * as dotenv from "dotenv";
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy, ExtractJwt } from 'passport-jwt';
+import { UserModel } from '../../entities/dblocaltest';
+import * as dotenv from 'dotenv';
 
 interface IPayload {
     sub?: string;
@@ -14,7 +14,7 @@ type TJwtGuard = {
 dotenv.config();
 
 export type TJwtRequest = TJwtGuard & ParameterDecorator;
-export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     constructor() {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

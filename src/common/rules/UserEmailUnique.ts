@@ -4,11 +4,11 @@ import {
     ValidationOptions,
     ValidatorConstraint,
     ValidatorConstraintInterface,
-} from "class-validator";
-import { Injectable } from "@nestjs/common";
-import { UserModel } from "src/entities/dblocaltest";
+} from 'class-validator';
+import { Injectable } from '@nestjs/common';
+import { UserModel } from 'src/entities/dblocaltest';
 
-@ValidatorConstraint({ name: "", async: true })
+@ValidatorConstraint({ name: '', async: true })
 @Injectable()
 class UserEmailUniqueConstraint implements ValidatorConstraintInterface {
     async validate(value: string) {
@@ -30,7 +30,7 @@ export function UserEmailUnique(
 ): (object?: any, propertyName?: string) => void {
     return function (object?: any, propertyName?: string) {
         registerDecorator({
-            name: "UserEmailUnique",
+            name: 'UserEmailUnique',
             target: object.constructor,
             propertyName: propertyName,
             options: validationOptions,

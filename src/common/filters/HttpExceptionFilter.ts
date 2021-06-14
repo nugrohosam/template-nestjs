@@ -4,8 +4,8 @@ import {
     ArgumentsHost,
     HttpException,
     UnprocessableEntityException,
-} from "@nestjs/common";
-import { Response } from "express";
+} from '@nestjs/common';
+import { Response } from 'express';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -20,8 +20,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
         }
         response.status(status).json({
             code: status,
-            message: exception.getResponse()["message"],
-            data: exception.getResponse()["error"],
+            message: exception.getResponse()['message'],
+            data: exception.getResponse()['error'],
         });
     }
 }

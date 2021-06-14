@@ -3,10 +3,10 @@ import {
     Injectable,
     ArgumentMetadata,
     UnprocessableEntityException,
-} from "@nestjs/common";
-import { validate, ValidationError } from "class-validator";
-import { plainToClass } from "class-transformer";
-import * as _ from "lodash";
+} from '@nestjs/common';
+import { validate, ValidationError } from 'class-validator';
+import { plainToClass } from 'class-transformer';
+import * as _ from 'lodash';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform {
@@ -22,7 +22,7 @@ export class ValidationPipe implements PipeTransform {
         const errors = await validate(object);
         if (errors.length > 0) {
             throw new UnprocessableEntityException({
-                message: "Data Not Valid",
+                message: 'Data Not Valid',
                 data: this.flattenValidation(errors).map(
                     (data: {
                         parentName: string;
@@ -55,7 +55,7 @@ export class ValidationPipe implements PipeTransform {
      * @param data
      * @param parentName
      */
-    private flattenValidation(data: ValidationError[], parentName = ""): any {
+    private flattenValidation(data: ValidationError[], parentName = ''): any {
         return data.reduce(
             (r: { parentName: string }[], { children, ...rest }: any) => {
                 const addParentName = isNaN(rest.property) // removing index on array data

@@ -1,4 +1,4 @@
 export enum UserTypeEnum {
-    Biasa = "biasa",
-    LuarBiasa = "luar_biasa",
+    Biasa = 'biasa',
+    LuarBiasa = 'luar_biasa',
 }

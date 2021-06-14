@@ -1,16 +1,16 @@
-import { HttpModule, Module } from "@nestjs/common";
-import { JwtModule } from "@nestjs/jwt";
-import { PassportModule } from "@nestjs/passport";
-import { JwtStrategy } from "../../common/guards/JwtStrategy";
-import { UserController } from "./controller/UserController";
-import { UserService } from "./service/UserService";
+import { HttpModule, Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from '../../common/guards/JwtStrategy';
+import { UserController } from './controller/UserController';
+import { UserService } from './service/UserService';
 
 @Module({
     imports: [
         HttpModule,
         PassportModule.register({
-            defaultStrategy: "jwt",
-            property: "user",
+            defaultStrategy: 'jwt',
+            property: 'user',
             session: false,
         }),
         JwtModule.register({
@@ -20,12 +20,7 @@ import { UserService } from "./service/UserService";
             },
         }),
     ],
-    controllers: [
-        UserController
-    ],
-    providers: [
-        JwtStrategy,
-        UserService,
-    ],
+    controllers: [UserController],
+    providers: [JwtStrategy, UserService],
 })
 export class UserModule {}

@@ -1,5 +1,5 @@
-import { applyDecorators, Type } from "@nestjs/common";
-import { ApiBody, ApiOkResponse, getSchemaPath } from "@nestjs/swagger";
+import { applyDecorators, Type } from '@nestjs/common';
+import { ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ApiSuccessResponse = <TModel extends Type<unknown>>(
@@ -10,7 +10,7 @@ export const ApiSuccessResponse = <TModel extends Type<unknown>>(
     ref = model ? { $ref: getSchemaPath(model) } : null;
     if (isArray) {
         ref = {
-            type: "array",
+            type: 'array',
             items: {
                 $ref: getSchemaPath(model),
             },
@@ -24,7 +24,7 @@ export const ApiSuccessResponse = <TModel extends Type<unknown>>(
                         properties: {
                             data: ref,
                             message: {
-                                type: "string",
+                                type: 'string',
                             },
                         },
                     },
@@ -47,21 +47,21 @@ export const PaginationSuccessResponse = <TModel extends Type<unknown>>(
                             data: {
                                 properties: {
                                     items: {
-                                        type: "array",
+                                        type: 'array',
                                         items: {
                                             $ref: getSchemaPath(model),
                                         },
                                     },
-                                    page: { type: "number" },
-                                    per_page: { type: "number" },
-                                    total_items: { type: "number" },
-                                    total_pages: { type: "number" },
-                                    next_page_link: { type: "string" },
-                                    previous_page_link: { type: "string" },
+                                    page: { type: 'number' },
+                                    per_page: { type: 'number' },
+                                    total_items: { type: 'number' },
+                                    total_pages: { type: 'number' },
+                                    next_page_link: { type: 'string' },
+                                    previous_page_link: { type: 'string' },
                                 },
                             },
                             message: {
-                                type: "string",
+                                type: 'string',
                             },
                         },
                     },

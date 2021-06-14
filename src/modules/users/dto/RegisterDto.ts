@@ -1,9 +1,15 @@
-import { ApiProperty, OmitType } from "@nestjs/swagger";
-import { Expose } from "class-transformer";
-import { IsEmail, IsEnum, IsNotEmpty, MaxLength, MinLength } from "class-validator";
-import { UserTypeEnum } from "src/common/enums/UserEnum";
-import { UserEmailUnique } from "src/common/rules/UserEmailUnique";
-import { UserModel } from "src/entities/dblocaltest";
+import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+import {
+    IsEmail,
+    IsEnum,
+    IsNotEmpty,
+    MaxLength,
+    MinLength,
+} from 'class-validator';
+import { UserTypeEnum } from 'src/common/enums/UserEnum';
+import { UserEmailUnique } from 'src/common/rules/UserEmailUnique';
+import { UserModel } from 'src/entities/dblocaltest';
 
 export class RegisterRequestDto {
     @ApiProperty()
@@ -22,10 +28,10 @@ export class RegisterRequestDto {
     @MinLength(8)
     password!: string;
 
-    @ApiProperty({ name: "user_type" })
+    @ApiProperty({ name: 'user_type' })
     @IsNotEmpty()
     @MaxLength(32)
-    @Expose({ name: "user_type" })
+    @Expose({ name: 'user_type' })
     @IsEnum(UserTypeEnum)
     userType!: UserTypeEnum;
 
@@ -35,7 +41,7 @@ export class RegisterRequestDto {
             name: user.name,
             email: user.email,
             userType: user.userType,
-        }
+        };
     }
 }
 
@@ -49,6 +55,6 @@ export class RegisterResponseDto {
     @ApiProperty()
     email!: string;
 
-    @ApiProperty({ name: "user_type" })
+    @ApiProperty({ name: 'user_type' })
     userType!: UserTypeEnum;
 }

@@ -16,7 +16,7 @@ import { UserModule } from './modules/users/UserModule';
             useClass: HttpExceptionFilter,
         },
         {
-            // Validation formatting response   
+            // Validation formatting response
             provide: APP_PIPE,
             useClass: ValidationPipe,
         },

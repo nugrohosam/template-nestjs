@@ -3,10 +3,10 @@ import {
     ExecutionContext,
     Injectable,
     NestInterceptor,
-} from "@nestjs/common";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { Utils } from "../utils/Utils";
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Utils } from '../utils/Utils';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {

@@ -1,9 +1,9 @@
-import * as _ from "lodash";
-import * as crypto from "crypto";
+import * as _ from 'lodash';
+import * as crypto from 'crypto';
 
 export class Utils {
     static md5(contents: string): string {
-        return crypto.createHash("md5").update(contents).digest("hex");
+        return crypto.createHash('md5').update(contents).digest('hex');
     }
 
     /**
@@ -11,7 +11,7 @@ export class Utils {
      * @param obj
      */
     static snakeCaseKey(obj: { [x: string]: any }): { [x: string]: any } {
-        if (typeof obj != "object") return obj;
+        if (typeof obj != 'object') return obj;
 
         for (const oldName in obj) {
             // Camel to underscore
@@ -27,7 +27,7 @@ export class Utils {
             }
 
             // Recursion
-            if (typeof obj[newName] == "object") {
+            if (typeof obj[newName] == 'object') {
                 obj[newName] = Utils.snakeCaseKey(obj[newName]);
             }
         }
