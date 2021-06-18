@@ -1,6 +1,10 @@
+import { ErrorCodeEnum } from '../enums/error-code.enum';
+
 export interface IApiResponse {
-    data: [] | Record<string, any>;
+    success: boolean;
     message: string;
+    data: [] | Record<string, any>;
+    code?: ErrorCodeEnum;
 }
 
 interface IDataUnprocessable {

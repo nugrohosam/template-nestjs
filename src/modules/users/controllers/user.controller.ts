@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { Response } from 'src/common/utils/response.util';
 import { RegisterRequest } from '../requests/register.request';
 import { RegisterResponse } from '../responses/register.response';
 import { RegisterService } from '../services/register.service';
@@ -12,9 +13,9 @@ export class UserController {
     async register(@Body() request: RegisterRequest): Promise<IApiResponse> {
         const user = await this.registerService.register(request);
 
-        return {
-            message: 'Success create new user',
-            data: RegisterResponse.mapFromUserModel(user),
-        };
+        return Response.success(
+            'Success create new user',
+            RegisterResponse.mapFromUserModel(user),
+        );
     }
 }
