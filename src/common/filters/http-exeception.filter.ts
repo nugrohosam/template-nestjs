@@ -6,6 +6,7 @@ import {
     UnprocessableEntityException,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { Response as ResponseUtility } from '../utils/response.util';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -15,13 +16,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const status = exception.getStatus();
 
         if (exception instanceof UnprocessableEntityException) {
-            response.status(status).json(exception.getResponse());
+            const exceptionResponse = exception.getResponse();
+            const data = exceptionResponse['data'] ?? null;
+
+            response
+                .status(status)
+                .json(
+                    ResponseUtility.error(exceptionResponse['message'], data),
+                );
             return;
         }
-        response.status(status).json({
-            code: status,
-            message: exception.getResponse()['message'],
-            data: exception.getResponse()['error'],
-        });
+
+        response
+            .status(status)
+            .json(
+                ResponseUtility.error(
+                    exception.getResponse()['message'],
+                    exception.getResponse()['error'],
+                ),
+            );
     }
 }

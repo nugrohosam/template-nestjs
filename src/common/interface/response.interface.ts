@@ -1,6 +1,6 @@
 export interface IApiResponse {
-    data: [] | Record<string, any>;
     message: string;
+    data: [] | Record<string, any>;
 }
 
 interface IDataUnprocessable {
