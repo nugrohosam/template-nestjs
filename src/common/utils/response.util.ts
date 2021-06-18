@@ -1,5 +1,4 @@
 import { IApiResponse } from '../interface/response.interface';
-import { ErrorCodeEnum } from '../enums/error-code.enum';
 
 export class Response {
     /**
@@ -10,7 +9,6 @@ export class Response {
         data: [] | Record<string, any>,
     ): IApiResponse {
         return {
-            success: true,
             message,
             data,
         };
@@ -19,13 +17,10 @@ export class Response {
     static error(
         message: string,
         data: [] | Record<string, any>,
-        code?: ErrorCodeEnum,
     ): IApiResponse {
         return {
-            success: false,
             message,
             data,
-            code: code ?? ErrorCodeEnum.Undefined,
         };
     }
 }

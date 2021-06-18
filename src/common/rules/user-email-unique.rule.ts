@@ -6,7 +6,7 @@ import {
     ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { UserModel } from 'src/entities';
+import { UserModel } from 'src/models/user.model';
 
 @ValidatorConstraint({ name: '', async: true })
 @Injectable()

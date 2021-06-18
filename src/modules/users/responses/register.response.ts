@@ -1,4 +1,4 @@
-import { UserModel } from 'src/entities';
+import { UserModel } from 'src/models/user.model';
 
 export class RegisterResponse {
     id: string;

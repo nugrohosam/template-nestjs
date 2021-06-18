@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
-import { UserModel } from 'src/entities';
+import { UserModel } from 'src/models/user.model';
 import { databaseConfig } from './database.config';
 
 class DatabaseProviders {

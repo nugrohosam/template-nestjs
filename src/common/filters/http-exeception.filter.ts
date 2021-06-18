@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { Response as ResponseUtility } from '../utils/response.util';
-import { ErrorCodeEnum } from '../enums/error-code.enum';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -19,18 +18,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         if (exception instanceof UnprocessableEntityException) {
             const exceptionResponse = exception.getResponse();
             const data = exceptionResponse['data'] ?? null;
-            const code = exceptionResponse['data']
-                ? ErrorCodeEnum.RequestValidation
-                : ErrorCodeEnum.BussinessValidation;
 
             response
                 .status(status)
                 .json(
-                    ResponseUtility.error(
-                        exceptionResponse['message'],
-                        data,
-                        code,
-                    ),
+                    ResponseUtility.error(exceptionResponse['message'], data),
                 );
             return;
         }

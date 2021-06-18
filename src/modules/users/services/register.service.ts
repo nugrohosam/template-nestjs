@@ -1,5 +1,5 @@
 import { UnprocessableEntityException } from '@nestjs/common';
-import { UserModel } from 'src/entities';
+import { UserModel } from 'src/models/user.model';
 import { RegisterRequest } from '../requests/register.request';
 
 export class RegisterService {

@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { UserModel } from '../../entities';
 import * as dotenv from 'dotenv';
+import { UserModel } from 'src/models/user.model';
 
 interface IPayload {
     sub?: string;
