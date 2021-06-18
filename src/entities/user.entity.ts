@@ -30,6 +30,7 @@ export class UserModel extends Model<IUser, IUser> implements IUser {
         field: 'id',
         primaryKey: true,
         type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
     })
     id?: string;
 

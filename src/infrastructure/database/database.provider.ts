@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
-import { UserModel } from 'src/entities/dblocaltest';
+import { UserModel } from 'src/entities';
 import { databaseConfig } from './database.config';
 
 class DatabaseProviders {
@@ -7,15 +7,15 @@ class DatabaseProviders {
     // @ts-ignore
     private readonly _primeSequelize = new Sequelize({
         ...databaseConfig,
-        ...{ database: 'db_local_test', logging: false },
+        ...{ logging: false },
     });
     private _databaseProviders = [
         {
-            provide: 'DATABASE_LOCAL',
+            provide: 'DATABASE',
             useFactory: async () => {
                 const config = {
                     ...databaseConfig,
-                    ...{ database: 'db_local_test', logging: false },
+                    ...{ logging: false },
                 };
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
