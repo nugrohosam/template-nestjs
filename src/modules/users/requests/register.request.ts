@@ -1,7 +1,12 @@
+import { Expose } from 'class-transformer';
 import { IsEthereumAddress, IsNotEmpty } from 'class-validator';
 
 export class RegisterRequest {
     @IsNotEmpty()
     @IsEthereumAddress()
-    token_address: string;
+    @Expose({ name: 'token_address' })
+    tokenAddress: string;
+
+    @IsNotEmpty()
+    signature: string;
 }
