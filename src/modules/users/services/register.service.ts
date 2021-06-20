@@ -9,6 +9,7 @@ export class RegisterService {
     ) {}
 
     generateRegisterSignatureMessage(): string {
+        // todo: need to fixed with fe and sc
         return 'register';
     }
 
