@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
+import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { databaseConfig } from './database.config';
 
@@ -22,7 +23,7 @@ class DatabaseProviders {
                 const sequelize = new Sequelize(config);
 
                 // init model to sequelize
-                sequelize.addModels([UserModel]);
+                sequelize.addModels([UserModel, PartyModel]);
 
                 await sequelize.sync();
                 return sequelize;

@@ -5,10 +5,11 @@ import { HttpExceptionFilter } from './common/filters/http-exeception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { ValidationPipe } from './common/pipes/validation.pipe';
 import { DatabaseModule } from './infrastructure/database/database.module';
+import { PartyModule } from './modules/parties/party.module';
 import { UserModule } from './modules/users/user.module';
 
 @Module({
-    imports: [DatabaseModule, RavenModule, UserModule],
+    imports: [DatabaseModule, RavenModule, UserModule, PartyModule],
     providers: [
         {
             // Global Error Handler
