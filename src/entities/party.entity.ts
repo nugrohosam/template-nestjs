@@ -1,4 +1,7 @@
-import { PartyTypeEnum } from 'src/common/enums/party.enum';
+import {
+    DistributionTypeEnum,
+    PartyTypeEnum,
+} from 'src/common/enums/party.enum';
 
 export interface IParty {
     id?: string;
@@ -14,7 +17,7 @@ export interface IParty {
     minDeposit?: number;
     maxDeposit?: number;
     totalMember?: number;
-    distribution: string;
+    distribution: DistributionTypeEnum;
     signature?: string;
     transactionHash?: string;
     createdAt?: Date;

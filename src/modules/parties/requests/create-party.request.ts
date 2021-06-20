@@ -1,8 +1,14 @@
 import { Expose } from 'class-transformer';
 import { IsEnum, IsEthereumAddress, IsNotEmpty } from 'class-validator';
-import { PartyTypeEnum } from 'src/common/enums/party.enum';
+import {
+    DistributionTypeEnum,
+    PartyTypeEnum,
+} from 'src/common/enums/party.enum';
+import { IParty } from 'src/entities/party.entity';
 
-export class CreatePartyRequest {
+export class CreatePartyRequest
+    implements Omit<IParty, 'creatorId' | 'ownerId'>
+{
     @IsNotEmpty()
     name: string;
 
@@ -26,7 +32,8 @@ export class CreatePartyRequest {
     maxDeposit: number;
 
     @IsNotEmpty()
-    distribution: string;
+    @IsEnum(DistributionTypeEnum)
+    distribution: DistributionTypeEnum;
 
     @IsNotEmpty()
     @IsEthereumAddress()

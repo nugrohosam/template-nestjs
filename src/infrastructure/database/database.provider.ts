@@ -25,7 +25,10 @@ class DatabaseProviders {
                 // init model to sequelize
                 sequelize.addModels([UserModel, PartyModel]);
 
-                await sequelize.sync();
+                // init model associations
+                PartyModel.associate();
+
+                await sequelize.sync({ alter: true });
                 return sequelize;
             },
         },

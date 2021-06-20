@@ -8,6 +8,7 @@ import {
     DeletedAt,
 } from 'sequelize-typescript';
 import { IUser } from 'src/entities/user.entity';
+import { PartyModel } from './party.model';
 
 @Table({ tableName: 'users', paranoid: true })
 export class UserModel extends Model<IUser, IUser> implements IUser {
@@ -57,4 +58,20 @@ export class UserModel extends Model<IUser, IUser> implements IUser {
     @Column({ field: 'deleted_at', type: DataType.DATE })
     @DeletedAt
     deletedAt?: Date;
+
+    static associate(): void {
+        UserModel.hasMany(PartyModel, {
+            as: 'ownedParties',
+            foreignKey: 'ownerId',
+            sourceKey: 'id',
+            onDelete: 'set null',
+        });
+
+        UserModel.hasMany(PartyModel, {
+            as: 'createdParties',
+            foreignKey: 'creatorId',
+            sourceKey: 'id',
+            onDelete: 'set null',
+        });
+    }
 }

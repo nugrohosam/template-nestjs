@@ -7,8 +7,12 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
-import { PartyTypeEnum } from 'src/common/enums/party.enum';
+import {
+    DistributionTypeEnum,
+    PartyTypeEnum,
+} from 'src/common/enums/party.enum';
 import { IParty } from 'src/entities/party.entity';
+import { UserModel } from './user.model';
 
 @Table({ tableName: 'parties', paranoid: true })
 export class PartyModel extends Model<IParty, IParty> implements IParty {
@@ -33,7 +37,12 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     name: string;
 
     @Column({
-        type: DataType.ENUM(PartyTypeEnum.MONARCHY),
+        type: DataType.ENUM(
+            PartyTypeEnum.Monarchy,
+            PartyTypeEnum.Republic,
+            PartyTypeEnum.Democracy,
+            PartyTypeEnum.WeightedDemocracy,
+        ),
         allowNull: false,
     })
     type: PartyTypeEnum;
@@ -54,14 +63,14 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @Column({
         field: 'creator_id',
         type: DataType.UUID,
-        allowNull: false,
+        allowNull: true,
     })
     creatorId: string;
 
     @Column({
         field: 'owner_id',
         type: DataType.UUID,
-        allowNull: false,
+        allowNull: true,
     })
     ownerId: string;
 
@@ -105,10 +114,14 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     totalMember?: number;
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.ENUM(
+            DistributionTypeEnum.Daily,
+            DistributionTypeEnum.Monthly,
+            DistributionTypeEnum.Yearly,
+        ),
         allowNull: false,
     })
-    distribution: string;
+    distribution: DistributionTypeEnum;
 
     @Column({
         type: DataType.STRING,
@@ -145,4 +158,20 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     })
     @DeletedAt
     deletedAt?: Date;
+
+    static associate(): void {
+        PartyModel.belongsTo(UserModel, {
+            as: 'owner',
+            foreignKey: 'ownerId',
+            targetKey: 'id',
+            onDelete: 'set null',
+        });
+
+        PartyModel.belongsTo(UserModel, {
+            as: 'creator',
+            foreignKey: 'creatorId',
+            targetKey: 'id',
+            onDelete: 'set null',
+        });
+    }
 }
