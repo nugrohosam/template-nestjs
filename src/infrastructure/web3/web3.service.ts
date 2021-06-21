@@ -17,4 +17,13 @@ export class Web3Service {
     async recover(signature: string, message: string): Promise<string> {
         return this.web3.eth.accounts.recover(message, signature);
     }
+
+    async sign(message: string): Promise<string> {
+        const signature = this.web3.eth.accounts.sign(
+            message,
+            process.env.PLATFORM_PRIVATE_KEY,
+        );
+
+        return signature.signature;
+    }
 }
