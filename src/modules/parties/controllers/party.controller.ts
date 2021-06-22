@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { CreatePartyRequest } from '../requests/create-party.request';
+import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { CreatePartyService } from '../services/create-party.service';
 
@@ -20,6 +21,18 @@ export class PartyController {
                 party,
                 platformSignature,
             ),
+        };
+    }
+
+    @Put('/:partyId/transaction-hash')
+    async updateTransactionHash(
+        @Param('partyId') partyId: string,
+        @Body() request: UpdateTransactionHashRequest,
+    ): Promise<IApiResponse> {
+        // todo: need to be cleared with sc for the contract abi
+        return {
+            message: 'Success update party transaction hash.',
+            data: request,
         };
     }
 }
