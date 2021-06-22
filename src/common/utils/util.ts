@@ -33,4 +33,16 @@ export class Utils {
         }
         return obj;
     }
+
+    /**
+     * make a delay for milisecond before continue to next process
+     * @param milisecond
+     */
+    static takeDelay(milisecond: number): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(true);
+            }, milisecond);
+        });
+    }
 }
