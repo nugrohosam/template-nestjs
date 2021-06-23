@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Web3 from 'web3';
 import dotenv from 'dotenv';
+import { Transaction } from 'web3-core';
 
 dotenv.config();
 
@@ -25,5 +26,9 @@ export class Web3Service {
         );
 
         return signature.signature;
+    }
+
+    async getTransaction(transactionHash: string): Promise<Transaction> {
+        return await this.web3.eth.getTransaction(transactionHash);
     }
 }
