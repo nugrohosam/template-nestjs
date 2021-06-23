@@ -4,7 +4,6 @@ import {
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
-import { Utils } from 'src/common/utils/util';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
 import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
