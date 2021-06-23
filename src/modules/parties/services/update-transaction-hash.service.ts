@@ -39,7 +39,7 @@ export class UpdateTransactionHashService {
         if (!party) throw new NotFoundException('Party not found.');
 
         this.validateSignature(request.memberSignature, party);
-        this.validateTransactionHash(request.transactionHash);
+        await this.validateTransactionHash(request.transactionHash);
         // todo: validate log event check the transactionHash is belongs to party data
 
         party.transactionHash = request.transactionHash;

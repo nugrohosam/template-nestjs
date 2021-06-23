@@ -46,6 +46,7 @@ export class CreatePartyService {
 
         const party = await PartyModel.create({
             ...request,
+            signature: request.memberSignature,
             creatorId: creator.id,
             ownerId: creator.id,
             totalFund: 0,
