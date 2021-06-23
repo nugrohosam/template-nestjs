@@ -1,14 +1,17 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { IParty } from 'src/entities/party.entity';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { CreatePartyService } from '../services/create-party.service';
+import { IndexPartyService } from '../services/index-party.service';
 import { UpdateTransactionHashService } from '../services/update-transaction-hash.service';
 
 @Controller('parties')
 export class PartyController {
     constructor(
+        private readonly indexPartyService: IndexPartyService,
         private readonly createPartyService: CreatePartyService,
         private readonly updateTransactionHashService: UpdateTransactionHashService,
     ) {}
@@ -37,6 +40,14 @@ export class PartyController {
         return {
             message: 'Success update party transaction hash.',
             data: null,
+        };
+    }
+
+    @Get('/')
+    async index(): Promise<IApiResponse> {
+        return {
+            message: 'Success fetching parties data',
+            data: await this.indexPartyService.fetch(),
         };
     }
 }
