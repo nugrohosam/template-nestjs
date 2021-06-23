@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { IParty } from 'src/entities/party.entity';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
