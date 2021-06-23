@@ -9,6 +9,7 @@ import {
 } from 'sequelize-typescript';
 import { IUser } from 'src/entities/user.entity';
 import { PartyModel } from './party.model';
+import { WhitelistedAddressModel } from './whitelisted-address.model';
 
 @Table({ tableName: 'users', paranoid: true })
 export class UserModel extends Model<IUser, IUser> implements IUser {
@@ -72,6 +73,12 @@ export class UserModel extends Model<IUser, IUser> implements IUser {
             foreignKey: 'creatorId',
             sourceKey: 'id',
             onDelete: 'set null',
+        });
+
+        UserModel.hasOne(WhitelistedAddressModel, {
+            as: 'whitelistedAddress',
+            foreignKey: 'user_id',
+            sourceKey: 'id',
         });
     }
 }
