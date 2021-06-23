@@ -20,10 +20,10 @@ export class UpdateTransactionHashService {
     }
 
     async validateTransactionHash(transactionHash: string): Promise<void> {
-        await Utils.takeDelay(1000);
         const transaction = await this.web3Service.getTransaction(
             transactionHash,
         );
+
         if (!transaction)
             throw new UnprocessableEntityException(
                 'Transaction not found in Network.',
