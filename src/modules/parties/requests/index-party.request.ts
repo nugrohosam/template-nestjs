@@ -1,4 +1,11 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Expose } from 'class-transformer';
+import {
+    IsEnum,
+    IsNumber,
+    IsOptional,
+    IsString,
+    IsUUID,
+} from 'class-validator';
 import { OrderDirectionEnum } from 'src/common/enums/index.enum';
 import {
     IPaginateRequest,
@@ -21,4 +28,9 @@ export class IndexPartyRequest implements IPaginateRequest, ISortRequest {
     @IsNumber()
     @IsOptional()
     offset?: number;
+
+    @IsUUID()
+    @IsOptional()
+    @Expose({ name: 'owner_id' })
+    ownerId?: string;
 }

@@ -1,3 +1,5 @@
+import { FindOptions } from 'sequelize';
+import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { IndexPartyRequest } from '../requests/index-party.request';
@@ -10,8 +12,21 @@ export class IndexPartyService {
     private readonly DefaultLimit = 10;
     private readonly DefaultOffset = 0;
 
-    async getTotalParties(): Promise<number> {
+    getFilterOption(query: IndexPartyRequest): FindOptions<IParty> {
+        const options: FindOptions<IParty> = {
+            where: {},
+        };
+
+        if (query.ownerId) {
+            options.where['ownerId'] = query.ownerId;
+        }
+
+        return options;
+    }
+
+    async getTotalParties(query: IndexPartyRequest): Promise<number> {
         const result = await PartyModel.count({
+            where: { ...this.getFilterOption(query).where },
             include: [
                 {
                     model: UserModel,
@@ -26,6 +41,7 @@ export class IndexPartyService {
 
     async getParties(query: IndexPartyRequest): Promise<PartyModel[]> {
         return await PartyModel.findAll({
+            where: { ...this.getFilterOption(query).where },
             include: [
                 {
                     model: UserModel,
@@ -47,7 +63,7 @@ export class IndexPartyService {
 
     async fetch(query: IndexPartyRequest): Promise<PartyPaginationResponse> {
         const parties = await this.getParties(query);
-        const total = await this.getTotalParties();
+        const total = await this.getTotalParties(query);
         const responses = this.mapParties(parties);
 
         return PartyPaginationResponse.mapFromIndexPartyResponse(
