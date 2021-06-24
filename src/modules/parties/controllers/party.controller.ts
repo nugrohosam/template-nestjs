@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { CreatePartyRequest } from '../requests/create-party.request';
+import { IndexPartyRequest } from '../requests/index-party.request';
 import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { CreatePartyService } from '../services/create-party.service';
@@ -43,10 +44,10 @@ export class PartyController {
     }
 
     @Get('/')
-    async index(): Promise<IApiResponse> {
+    async index(@Query() query: IndexPartyRequest): Promise<IApiResponse> {
         return {
             message: 'Success fetching parties data',
-            data: await this.indexPartyService.fetch(),
+            data: await this.indexPartyService.fetch(query),
         };
     }
 }
