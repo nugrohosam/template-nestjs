@@ -7,6 +7,7 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
+import { Association } from 'sequelize/types';
 import {
     DistributionTypeEnum,
     PartyTypeEnum,
@@ -159,6 +160,14 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @DeletedAt
     deletedAt?: Date;
 
+    readonly owner?: UserModel;
+    readonly creator?: UserModel;
+
+    static associations: {
+        owner: Association<PartyModel, UserModel>;
+        creator: Association<PartyModel, UserModel>;
+    };
+
     static associate(): void {
         PartyModel.belongsTo(UserModel, {
             as: 'owner',
@@ -173,5 +182,37 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
             targetKey: 'id',
             onDelete: 'set null',
         });
+    }
+
+    getNextDistributionOn(): Date | null {
+        let date: Date | null = this.createdAt;
+
+        switch (this.distribution) {
+            case DistributionTypeEnum.Daily:
+                date =
+                    date.getHours() > new Date().getHours()
+                        ? new Date(date.setDate(new Date().getDate() + 1))
+                        : new Date(new Date().setTime(date.getTime()));
+                break;
+            case DistributionTypeEnum.Monthly:
+                date =
+                    date.getDate() > new Date().getDate()
+                        ? new Date(date.setMonth(new Date().getMonth() + 1))
+                        : new Date(new Date().setTime(date.getTime()));
+                break;
+            case DistributionTypeEnum.Yearly:
+                date =
+                    date.getDate() > new Date().getDate()
+                        ? new Date(
+                              date.setFullYear(new Date().getFullYear() + 1),
+                          )
+                        : new Date(new Date().setTime(date.getTime()));
+                break;
+            default:
+                date = null;
+                break;
+        }
+
+        return date;
     }
 }
