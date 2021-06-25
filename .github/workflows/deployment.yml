@@ -16,5 +16,5 @@ jobs:
         run: |
           curl --header "Content-Type: application/json" \
             --request POST \
-            --data '{\"name\":\"polpa-backend\", \"token\": \"$TENDANG_TOKEN\"}' \
+            --data '{"name":"polpa-backend", "token": "$TENDANG_TOKEN"}' \
             $TENDANG_URL
