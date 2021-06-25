@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize-typescript';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
+import { WhitelistedAddressModel } from 'src/models/whitelisted-address.model';
 import { databaseConfig } from './database.config';
 
 class DatabaseProviders {
@@ -23,7 +24,11 @@ class DatabaseProviders {
                 const sequelize = new Sequelize(config);
 
                 // init model to sequelize
-                sequelize.addModels([UserModel, PartyModel]);
+                sequelize.addModels([
+                    UserModel,
+                    WhitelistedAddressModel,
+                    PartyModel,
+                ]);
 
                 await sequelize.sync({ alter: true });
                 return sequelize;
