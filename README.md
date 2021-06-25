@@ -22,10 +22,8 @@ npm install
 npx husky install
 ```
 
-- Migrate DB 
-```bash
-npm run database --script="db:migrate"
-```
+- Migrate DB  (sudah auto sync (sequalize sync `alter`) ketika menjalankan app)
+
 
 - Start Command
 ```bash
