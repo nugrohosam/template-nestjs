@@ -1,0 +1,5 @@
+apps:
+- name: 'polpa-backend'
+  interpreter: '/var/www/project/.nvm/versions/node/v14.16.1/bin/node'
+  script: '/var/www/project/.nvm/versions/node/v14.16.1/bin/npm'
+  args: 'start'
