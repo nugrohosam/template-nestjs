@@ -1,8 +1,10 @@
 import {
+    BelongsTo,
     Column,
     CreatedAt,
     DataType,
     DeletedAt,
+    ForeignKey,
     Model,
     Table,
     UpdatedAt,
@@ -66,6 +68,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         type: DataType.UUID,
         allowNull: true,
     })
+    @ForeignKey(() => UserModel)
     creatorId: string;
 
     @Column({
@@ -73,6 +76,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         type: DataType.UUID,
         allowNull: true,
     })
+    @ForeignKey(() => UserModel)
     ownerId: string;
 
     @Column({
@@ -160,31 +164,13 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @DeletedAt
     deletedAt?: Date;
 
+    @BelongsTo(() => UserModel, 'ownerId')
     readonly owner?: UserModel;
+
+    @BelongsTo(() => UserModel, 'creatorId')
     readonly creator?: UserModel;
 
-    static associations: {
-        owner: Association<PartyModel, UserModel>;
-        creator: Association<PartyModel, UserModel>;
-    };
-
-    static associate(): void {
-        PartyModel.belongsTo(UserModel, {
-            as: 'owner',
-            foreignKey: 'ownerId',
-            targetKey: 'id',
-            onDelete: 'set null',
-        });
-
-        PartyModel.belongsTo(UserModel, {
-            as: 'creator',
-            foreignKey: 'creatorId',
-            targetKey: 'id',
-            onDelete: 'set null',
-        });
-    }
-
-    getNextDistributionOn(): Date | null {
+    get nextDistributionOn(): Date | null {
         let date: Date | null = this.createdAt;
 
         switch (this.distribution) {

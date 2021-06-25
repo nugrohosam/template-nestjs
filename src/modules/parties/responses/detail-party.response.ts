@@ -43,7 +43,7 @@ export class DetailPartyResponse
             maxDeposit: party.maxDeposit,
             totalMember: party.totalMember,
             distribution: party.distribution,
-            nextDistributionOn: party.getNextDistributionOn(),
+            nextDistributionOn: party.nextDistributionOn,
             creator: {
                 id: party.creator.id,
                 firstname: party.creator.firstname,
