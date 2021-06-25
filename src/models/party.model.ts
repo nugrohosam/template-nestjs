@@ -1,8 +1,10 @@
 import {
+    BelongsTo,
     Column,
     CreatedAt,
     DataType,
     DeletedAt,
+    ForeignKey,
     Model,
     Table,
     UpdatedAt,
@@ -65,6 +67,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         type: DataType.UUID,
         allowNull: true,
     })
+    @ForeignKey(() => UserModel)
     creatorId: string;
 
     @Column({
@@ -72,6 +75,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         type: DataType.UUID,
         allowNull: true,
     })
+    @ForeignKey(() => UserModel)
     ownerId: string;
 
     @Column({
@@ -159,19 +163,46 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @DeletedAt
     deletedAt?: Date;
 
-    static associate(): void {
-        PartyModel.belongsTo(UserModel, {
-            as: 'owner',
-            foreignKey: 'ownerId',
-            targetKey: 'id',
-            onDelete: 'set null',
-        });
+    @BelongsTo(() => UserModel, 'ownerId')
+    readonly owner?: UserModel;
 
-        PartyModel.belongsTo(UserModel, {
-            as: 'creator',
-            foreignKey: 'creatorId',
-            targetKey: 'id',
-            onDelete: 'set null',
-        });
+    @BelongsTo(() => UserModel, 'creatorId')
+    readonly creator?: UserModel;
+
+    /**
+     * TODO: need to confirm to PO about distribution schedule
+     * get next distribution schedule based on created date
+     * and distribution type
+     */
+    get nextDistributionOn(): Date | null {
+        return this.createdAt;
+
+        // switch (this.distribution) {
+        //     case DistributionTypeEnum.Daily:
+        //         date =
+        //             date.getHours() > new Date().getHours()
+        //                 ? new Date(date.setDate(new Date().getDate() + 1))
+        //                 : new Date(new Date().setTime(date.getTime()));
+        //         break;
+        //     case DistributionTypeEnum.Monthly:
+        //         date =
+        //             date.getDate() > new Date().getDate()
+        //                 ? new Date(date.setMonth(new Date().getMonth() + 1))
+        //                 : new Date(new Date().setTime(date.getTime()));
+        //         break;
+        //     case DistributionTypeEnum.Yearly:
+        //         date =
+        //             date.getDate() > new Date().getDate()
+        //                 ? new Date(
+        //                       date.setFullYear(new Date().getFullYear() + 1),
+        //                   )
+        //                 : new Date(new Date().setTime(date.getTime()));
+        //         break;
+        //     default:
+        //         date = null;
+        //         break;
+        // }
+
+        // return date;
     }
 }

@@ -30,11 +30,6 @@ class DatabaseProviders {
                     PartyModel,
                 ]);
 
-                // init model associations
-                UserModel.associate();
-                WhitelistedAddressModel.associate();
-                PartyModel.associate();
-
                 await sequelize.sync({ alter: true });
                 return sequelize;
             },
