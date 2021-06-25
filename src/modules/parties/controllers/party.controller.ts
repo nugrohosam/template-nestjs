@@ -22,8 +22,12 @@ export class PartyController {
     @Post('/create')
     async store(@Body() request: CreatePartyRequest): Promise<IApiResponse> {
         const party = await this.createPartyService.create(request);
+        const creator = await party.$get('creator');
         const platformSignature =
-            await this.createPartyService.generatePlatformSignature();
+            await this.createPartyService.generatePlatformSignature(
+                party,
+                creator,
+            );
 
         return {
             message: 'Success create party.',

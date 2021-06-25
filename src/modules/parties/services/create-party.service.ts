@@ -3,9 +3,7 @@ import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { CreatePartyRequest } from '../requests/create-party.request';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { config } from 'src/config';
 
 export class CreatePartyService {
     constructor(
@@ -65,7 +63,7 @@ export class CreatePartyService {
         party: PartyModel,
         creator: UserModel,
     ): Promise<string> {
-        const platformAddress = process.env.PLATFORM_ADDRESS;
+        const platformAddress = config.platform.address;
         const message = this.web3Service.hashMessage([
             { t: 'string', v: party.id },
             { t: 'address', v: creator.address },

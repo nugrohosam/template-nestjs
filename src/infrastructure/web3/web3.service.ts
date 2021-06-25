@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { config } from 'src/config';
 import Web3 from 'web3';
-import dotenv from 'dotenv';
 import { Transaction } from 'web3-core';
 import { Mixed } from 'web3-utils';
-
-dotenv.config();
 
 @Injectable()
 export class Web3Service {
@@ -12,7 +10,7 @@ export class Web3Service {
 
     constructor() {
         this.web3 = new Web3(
-            new Web3.providers.HttpProvider(process.env.RPC_SERVER),
+            new Web3.providers.HttpProvider(config.web3.httpProvider),
         );
     }
 
@@ -23,7 +21,7 @@ export class Web3Service {
     async sign(message: string): Promise<string> {
         const signature = this.web3.eth.accounts.sign(
             message,
-            process.env.PLATFORM_PRIVATE_KEY,
+            config.platform.privateKey,
         );
 
         return signature.signature;

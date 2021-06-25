@@ -1,12 +1,10 @@
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { config } from 'src/config';
 
 export const databaseConfig = {
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    host: process.env.DB_HOSTNAME,
-    port: process.env.DB_PORT,
-    dialect: process.env.DB_DIALECT || 'mysql',
+    username: config.database.username,
+    password: config.database.password,
+    database: config.database.database,
+    host: config.database.host,
+    port: config.database.port,
+    dialect: config.database.dialect || 'mysql',
 };
