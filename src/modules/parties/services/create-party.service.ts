@@ -3,21 +3,26 @@ import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { CreatePartyRequest } from '../requests/create-party.request';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export class CreatePartyService {
     constructor(
         @Inject(Web3Service) private readonly web3Service: Web3Service,
     ) {}
 
-    generateCreatePartySignatureMessage(): string {
-        // todo: Need to fixed by FE and SC
-        return 'I would like to create party';
+    generateCreatePartySignatureMessage(request: CreatePartyRequest): string {
+        return this.web3Service.hashMessage([
+            { t: 'string', v: request.memberAddress },
+            { t: 'string', v: request.name },
+        ]);
     }
 
     async validateCreatePartySignature(
         request: CreatePartyRequest,
     ): Promise<string> {
-        const message = this.generateCreatePartySignatureMessage();
+        const message = this.generateCreatePartySignatureMessage(request);
         const signer = await this.web3Service.recover(
             request.memberSignature,
             message,
@@ -56,9 +61,18 @@ export class CreatePartyService {
         return party;
     }
 
-    async generatePlatformSignature(): Promise<string> {
-        // todo: need to fixed by FE and SC
-        const message = 'Create party request is signed';
+    async generatePlatformSignature(
+        party: PartyModel,
+        creator: UserModel,
+    ): Promise<string> {
+        const platformAddress = process.env.PLATFORM_ADDRESS;
+        const message = this.web3Service.hashMessage([
+            { t: 'string', v: party.id },
+            { t: 'address', v: creator.address },
+            { t: 'address', v: platformAddress },
+            { t: 'string', v: creator.id },
+            { t: 'bool', v: party.isPublic ? 1 : 0 },
+        ]);
         return await this.web3Service.sign(message);
     }
 }

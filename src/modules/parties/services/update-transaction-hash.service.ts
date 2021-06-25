@@ -40,7 +40,7 @@ export class UpdateTransactionHashService {
 
         this.validateSignature(request.memberSignature, party);
         await this.validateTransactionHash(request.transactionHash);
-        // todo: validate log event check the transactionHash is belongs to party data
+        // TODO: validate log event check the transactionHash is belongs to party data
 
         party.transactionHash = request.transactionHash;
         return await party.save();
