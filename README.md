@@ -3,25 +3,28 @@
 # Spec Requirement
 ## Requirements :
 - Node LTS 14+
-- NestJS
-- PM2 (production process manager)
-- Sequelize (ORM)
 - MySQL
-
+- PM2 (production process manager)
+- Sentry DSN (`Optional`)
 ## Instalasi Tanpa Docker:
 - Clone repository dari branch develop
 
 - Setup env
 
-- Install framework
+- Install Dependency
 
 ```bash
 npm install
+```
+
+- Setup git hook (lint and format)
+```
 npx husky install
 ```
 
+- Migrate DB 
 ```bash
-npm run dbsakooprem --script="db:migrate"
+npm run database --script="db:migrate"
 ```
 
 - Start Command
@@ -33,7 +36,6 @@ npm run dbsakooprem --script="db:migrate"
 ## Deploy
 - Menggunakan docker
 - Jika aplikasi sudah berjalan di server. Maka akan dijalankan menggunakan bantuan pm2.
-- Api docs `/api-docs` 
 ## Error Monitoring
 
 Setup Sentry config di `.env` (Bisa menghubungi dev lead atau PM utk mendapatkan akses ini)
@@ -54,12 +56,13 @@ SENTRY_DSN=
 ## Build Pipeline Command
 - Development
 ```bash
-npm run dbsakooprem --script="db:migrate"
-npm run build:dev-sandbox
+npm run database --script="db:migrate"
+npm run prebuild
+npm run build
 ```
 - Production
 ```bash
-npm run dbsakooprem --script="db:migrate"
+npm run database --script="db:migrate"
 npm run prebuild
 npm run build
 ```
