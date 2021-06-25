@@ -9,7 +9,6 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
-import { Association } from 'sequelize/types';
 import {
     DistributionTypeEnum,
     PartyTypeEnum,
