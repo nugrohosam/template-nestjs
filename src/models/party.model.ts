@@ -1,5 +1,6 @@
 import {
     BelongsTo,
+    BelongsToMany,
     Column,
     CreatedAt,
     DataType,
@@ -14,6 +15,7 @@ import {
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
 import { IParty } from 'src/entities/party.entity';
+import { PartyMemberModel } from './party-member.model';
 import { UserModel } from './user.model';
 
 @Table({ tableName: 'parties', paranoid: true })
@@ -168,6 +170,14 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
 
     @BelongsTo(() => UserModel, 'creatorId')
     readonly creator?: UserModel;
+
+    @BelongsToMany(
+        () => UserModel,
+        () => PartyMemberModel,
+        'partyId',
+        'memberId',
+    )
+    readonly members?: PartyMemberModel[];
 
     /**
      * TODO: need to confirm to PO about distribution schedule

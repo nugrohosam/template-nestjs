@@ -6,6 +6,9 @@ import {
     IsNumber,
     IsOptional,
 } from 'class-validator';
+import { PartyModel } from 'src/models/party.model';
+import { UserModel } from 'src/models/user.model';
+import { JoinPartyRequest } from 'src/modules/parties/requests/join-party.request';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 
 export class TransferRequest {
@@ -42,4 +45,21 @@ export class TransferRequest {
     @IsNotEmpty()
     @Expose({ name: 'transfer_signature' })
     transferSignature: string;
+
+    static mapFromJoinPartyRequest(
+        party: PartyModel,
+        user: UserModel,
+        request: JoinPartyRequest,
+    ): TransferRequest {
+        return {
+            addressFrom: user.address,
+            addressTo: party.address,
+            amount: request.initialDeposit,
+            type: TransactionTypeEnum.Deposit,
+            description: 'Initial Deposit', // TODO: default description based on type enum
+            currencyId: 0, // TODO: need to confirm about party currency
+            transferSignature: request.joinSignature,
+            transactionHash: request.transactionHash,
+        };
+    }
 }
