@@ -12,7 +12,7 @@ export class CreatePartyService {
 
     generateCreatePartySignatureMessage(request: CreatePartyRequest): string {
         return this.web3Service.hashMessage([
-            { t: 'string', v: request.memberAddress },
+            { t: 'address', v: request.memberAddress },
             { t: 'string', v: request.name },
         ]);
     }
