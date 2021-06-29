@@ -9,12 +9,14 @@ import {
     ForeignKey,
     Model,
     PrimaryKey,
+    Table,
     UpdatedAt,
 } from 'sequelize-typescript';
 import { IPartyMember } from 'src/entities/party-member.entity';
 import { PartyModel } from './party.model';
 import { UserModel } from './user.model';
 
+@Table({ tableName: 'party_members', paranoid: true })
 export class PartyMemberModel
     extends Model<IPartyMember, IPartyMember>
     implements IPartyMember

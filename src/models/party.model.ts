@@ -1,11 +1,11 @@
 import {
     BelongsTo,
+    BelongsToMany,
     Column,
     CreatedAt,
     DataType,
     DeletedAt,
     ForeignKey,
-    HasMany,
     Model,
     Table,
     UpdatedAt,
@@ -171,7 +171,12 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @BelongsTo(() => UserModel, 'creatorId')
     readonly creator?: UserModel;
 
-    @HasMany(() => PartyMemberModel, 'partyId')
+    @BelongsToMany(
+        () => UserModel,
+        () => PartyMemberModel,
+        'partyId',
+        'memberId',
+    )
     readonly members?: PartyMemberModel[];
 
     /**

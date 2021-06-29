@@ -1,4 +1,4 @@
-import { UnprocessableEntityException } from '@nestjs/common';
+import { Inject, UnprocessableEntityException } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
@@ -11,6 +11,7 @@ import { GetPartyService } from './get-party.service';
 
 export class JoinPartyService {
     constructor(
+        @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
         private readonly getUserService: GetUserService,
         private readonly transferService: TransferService,
@@ -19,7 +20,7 @@ export class JoinPartyService {
 
     async validateUser(user: UserModel, party: PartyModel): Promise<void> {
         const member = await party.$get('members', {
-            where: { memberId: user.id },
+            where: { id: user.id },
         })[0];
 
         if (member)

@@ -1,7 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 
+@Injectable()
 export class GetPartyService {
     async getPartyById(partyId: string): Promise<PartyModel> {
         const party = await PartyModel.findOne({
