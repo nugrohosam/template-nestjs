@@ -3,7 +3,7 @@ import { IApiResponse } from 'src/common/interface/response.interface';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { JoinPartyRequest } from '../requests/join-party.request';
-import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
+import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
 import { JoinPartyResponse } from '../responses/join-party.response';
@@ -45,7 +45,7 @@ export class PartyController {
     @Put('/:partyId/transaction-hash')
     async updateTransactionHash(
         @Param('partyId') partyId: string,
-        @Body() request: UpdateTransactionHashRequest,
+        @Body() request: UpdateDeployedPartyDataRequest,
     ): Promise<IApiResponse> {
         await this.updateTransactionHashService.updateParty(partyId, request);
         return {
