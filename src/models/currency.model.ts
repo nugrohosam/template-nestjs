@@ -4,9 +4,11 @@ import {
     Column,
     CreatedAt,
     DataType,
+    DeletedAt,
     Model,
     PrimaryKey,
     Table,
+    UpdatedAt,
 } from 'sequelize-typescript';
 import { ICurrency } from 'src/entities/currency.entity';
 
@@ -36,11 +38,11 @@ export class CurrencyModel
     @Column({ type: DataType.DATE, field: 'created_at' })
     createdAt?: Date | null;
 
-    @CreatedAt
+    @UpdatedAt
     @Column({ type: DataType.DATE, field: 'updated_at' })
     updatedAt?: Date | null;
 
-    @CreatedAt
+    @DeletedAt
     @Column({ type: DataType.DATE, field: 'deleted_at' })
     deletedAt?: Date | null;
 }

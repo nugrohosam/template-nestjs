@@ -12,12 +12,12 @@ export class TransferRequest {
     @IsEthereumAddress()
     @IsNotEmpty()
     @Expose({ name: 'from_address' })
-    fromAddress: string;
+    addressFrom: string;
 
     @IsEthereumAddress()
     @IsNotEmpty()
     @Expose({ name: 'to_address' })
-    toAddress: string;
+    addressTo: string;
 
     @IsNumber()
     @IsNotEmpty()
