@@ -18,6 +18,14 @@ export class JoinPartyService {
         private readonly web3Service: Web3Service,
     ) {}
 
+    generateJoinSignature(user: UserModel, party: PartyModel): string {
+        return this.web3Service.hashMessage([
+            { t: 'address', v: user.address },
+            { t: 'string', v: user.id },
+            { t: 'address', v: party.address },
+        ]);
+    }
+
     async validateUser(user: UserModel, party: PartyModel): Promise<void> {
         const member = await party.$get('members', {
             where: { id: user.id },
@@ -27,6 +35,18 @@ export class JoinPartyService {
             throw new UnprocessableEntityException(
                 'User already a member in that party.',
             );
+    }
+
+    async validateJoinSignature(
+        user: UserModel,
+        party: PartyModel,
+        signature: string,
+    ): Promise<void> {
+        const message = this.generateJoinSignature(user, party);
+        const signer = await this.web3Service.recover(signature, message);
+
+        if (signer !== user.address)
+            throw new UnprocessableEntityException('Signature not valid.');
     }
 
     async storePartyMember(
@@ -54,7 +74,7 @@ export class JoinPartyService {
         );
 
         await this.validateUser(user, party);
-        // TODO: validate join signature with user address
+        await this.validateJoinSignature(user, party, request.joinSignature);
         // TODO: validate transaction hash
 
         const partyMember = await this.storePartyMember(party, user, request);
