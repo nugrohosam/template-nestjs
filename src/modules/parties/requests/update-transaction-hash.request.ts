@@ -1,7 +1,12 @@
 import { Expose } from 'class-transformer';
-import { IsNotEmpty } from 'class-validator';
+import { IsEthereumAddress, IsNotEmpty } from 'class-validator';
 
-export class UpdateTransactionHashRequest {
+export class UpdateDeployedPartyDataRequest {
+    @IsNotEmpty()
+    @IsEthereumAddress()
+    @Expose({ name: 'party_address' })
+    partyAddress: string;
+
     @IsNotEmpty()
     @Expose({ name: 'transaction_hash' })
     transactionHash: string;

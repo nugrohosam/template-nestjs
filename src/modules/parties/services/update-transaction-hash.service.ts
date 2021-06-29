@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
-import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
+import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 
 export class UpdateTransactionHashService {
     constructor(
@@ -31,7 +31,7 @@ export class UpdateTransactionHashService {
 
     async updateParty(
         partyId: string,
-        request: UpdateTransactionHashRequest,
+        request: UpdateDeployedPartyDataRequest,
     ): Promise<PartyModel> {
         const party = await PartyModel.findOne({
             where: { id: partyId },
@@ -42,6 +42,7 @@ export class UpdateTransactionHashService {
         await this.validateTransactionHash(request.transactionHash);
         // TODO: validate log event check the transactionHash is belongs to party data
 
+        party.address = request.partyAddress;
         party.transactionHash = request.transactionHash;
         return await party.save();
     }
