@@ -2,12 +2,14 @@ import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
+import { JoinPartyRequest } from '../requests/join-party.request';
 import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
 import { CreatePartyService } from '../services/create-party.service';
 import { GetPartyService } from '../services/get-party.service';
 import { IndexPartyService } from '../services/index-party.service';
+import { JoinPartyService } from '../services/join-party.service';
 import { UpdateTransactionHashService } from '../services/update-transaction-hash.service';
 
 @Controller('parties')
@@ -17,6 +19,7 @@ export class PartyController {
         private readonly getPartyService: GetPartyService,
         private readonly createPartyService: CreatePartyService,
         private readonly updateTransactionHashService: UpdateTransactionHashService,
+        private readonly joinPartyService: JoinPartyService,
     ) {}
 
     @Post('/create')
@@ -64,6 +67,20 @@ export class PartyController {
         return {
             message: 'Success get party',
             data: DetailPartyResponse.mapFromPartyModel(party),
+        };
+    }
+
+    @Post('/:partyId/join')
+    async join(
+        @Param('partyId') partyId: string,
+        @Body() request: JoinPartyRequest,
+    ): Promise<IApiResponse> {
+        await this.joinPartyService.join(partyId, request);
+        // TODO: generate platform join party signature
+
+        return {
+            message: 'Success add user to party',
+            data: request,
         };
     }
 }

@@ -6,7 +6,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { ValidationPipe } from './common/pipes/validation.pipe';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { PartyModule } from './modules/parties/party.module';
-import { TrasnactionModule } from './modules/transactions/transaction.module';
+import { TransactionModule } from './modules/transactions/transaction.module';
 import { UserModule } from './modules/users/user.module';
 
 @Module({
@@ -15,7 +15,7 @@ import { UserModule } from './modules/users/user.module';
         RavenModule,
         UserModule,
         PartyModule,
-        TrasnactionModule,
+        TransactionModule,
     ],
     providers: [
         {
