@@ -6,6 +6,7 @@ import { JoinPartyRequest } from '../requests/join-party.request';
 import { UpdateTransactionHashRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
+import { JoinPartyResponse } from '../responses/join-party.response';
 import { CreatePartyService } from '../services/create-party.service';
 import { GetPartyService } from '../services/get-party.service';
 import { IndexPartyService } from '../services/index-party.service';
@@ -75,12 +76,16 @@ export class PartyController {
         @Param('partyId') partyId: string,
         @Body() request: JoinPartyRequest,
     ): Promise<IApiResponse> {
-        await this.joinPartyService.join(partyId, request);
-        // TODO: generate platform join party signature
+        const partyMember = await this.joinPartyService.join(partyId, request);
+        const platformSignature =
+            await this.joinPartyService.generatePlatformSignature(partyMember);
 
         return {
             message: 'Success add user to party',
-            data: request,
+            data: JoinPartyResponse.mapFromPartyMemberModel(
+                partyMember,
+                platformSignature,
+            ),
         };
     }
 }

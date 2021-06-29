@@ -6,6 +6,7 @@ import {
     CreatedAt,
     UpdatedAt,
     DeletedAt,
+    HasMany,
 } from 'sequelize-typescript';
 import { IUser } from 'src/entities/user.entity';
 import { PartyModel } from './party.model';
@@ -59,6 +60,9 @@ export class UserModel extends Model<IUser, IUser> implements IUser {
     @Column({ field: 'deleted_at', type: DataType.DATE })
     @DeletedAt
     deletedAt?: Date;
+
+    @HasMany(() => PartyModel, 'creatorId')
+    ownedParties?: PartyModel[];
 
     static associate(): void {
         UserModel.hasMany(PartyModel, {

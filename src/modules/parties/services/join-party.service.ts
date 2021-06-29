@@ -1,3 +1,5 @@
+import { UnprocessableEntityException } from '@nestjs/common';
+import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -12,7 +14,19 @@ export class JoinPartyService {
         private readonly getPartyService: GetPartyService,
         private readonly getUserService: GetUserService,
         private readonly transferService: TransferService,
+        private readonly web3Service: Web3Service,
     ) {}
+
+    async validateUser(user: UserModel, party: PartyModel): Promise<void> {
+        const member = await party.$get('members', {
+            where: { memberId: user.id },
+        })[0];
+
+        if (member)
+            throw new UnprocessableEntityException(
+                'User already a member in that party.',
+            );
+    }
 
     async storePartyMember(
         party: PartyModel,
@@ -38,12 +52,27 @@ export class JoinPartyService {
             request.userAddress,
         );
 
+        await this.validateUser(user, party);
         // TODO: validate join signature with user address
         // TODO: validate transaction hash
+
+        const partyMember = await this.storePartyMember(party, user, request);
 
         await this.transferService.storeTransaction(
             TransferRequest.mapFromJoinPartyRequest(party, user, request),
         );
-        return await this.storePartyMember(party, user, request);
+
+        return partyMember;
+    }
+
+    async generatePlatformSignature(
+        partyMember: PartyMemberModel,
+    ): Promise<string> {
+        const message = this.web3Service.hashMessage([
+            { t: 'address', v: partyMember.party.address },
+            { t: 'address', v: partyMember.member.address },
+            { t: 'string', v: partyMember.id },
+        ]);
+        return await this.web3Service.sign(message);
     }
 }

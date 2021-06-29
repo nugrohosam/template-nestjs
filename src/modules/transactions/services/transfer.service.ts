@@ -14,6 +14,7 @@ export class TransferService {
             description: request.description,
         });
     }
+
     async transfer(request: TransferRequest): Promise<TransactionModel> {
         // TODO: validate signature
         // TODO: validate transaction hash
