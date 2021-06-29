@@ -6,8 +6,8 @@ export class TransferService {
         request: TransferRequest,
     ): Promise<TransactionModel> {
         return await TransactionModel.create({
-            addressFrom: request.fromAddress,
-            addressTo: request.toAddress,
+            addressFrom: request.addressFrom,
+            addressTo: request.addressTo,
             amount: request.amount,
             currencyId: request.currencyId,
             type: request.type,

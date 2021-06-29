@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import {
+    IsEnum,
     IsEthereumAddress,
     IsNotEmpty,
     IsNumber,
@@ -8,17 +9,18 @@ import {
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { JoinPartyRequest } from 'src/modules/parties/requests/join-party.request';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 
 export class TransferRequest {
     @IsEthereumAddress()
     @IsNotEmpty()
     @Expose({ name: 'from_address' })
-    fromAddress: string;
+    addressFrom: string;
 
     @IsEthereumAddress()
     @IsNotEmpty()
     @Expose({ name: 'to_address' })
-    toAddress: string;
+    addressTo: string;
 
     @IsNumber()
     @IsNotEmpty()
@@ -30,7 +32,8 @@ export class TransferRequest {
     currencyId: number;
 
     @IsNotEmpty()
-    type: string; // TODO: use enum instead
+    @IsEnum(TransactionTypeEnum)
+    type: TransactionTypeEnum;
 
     @IsOptional()
     description: string;
@@ -49,10 +52,10 @@ export class TransferRequest {
         request: JoinPartyRequest,
     ): TransferRequest {
         return {
-            fromAddress: user.address,
-            toAddress: party.address,
+            addressFrom: user.address,
+            addressTo: party.address,
             amount: request.initialDeposit,
-            type: 'deposit', // TODO: use enum instead
+            type: TransactionTypeEnum.Deposit,
             description: 'Initial Deposit', // TODO: default description based on type enum
             currencyId: 0, // TODO: need to confirm about party currency
             transferSignature: request.joinSignature,
