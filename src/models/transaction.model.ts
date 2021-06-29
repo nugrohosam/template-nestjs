@@ -10,6 +10,7 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { ITransaction } from 'src/entities/transaction.entity';
 
 @Table({ tableName: 'transactions', paranoid: true })
@@ -40,8 +41,13 @@ export class TransactionModel
     currencyId: number;
 
     @AllowNull(false)
-    @Column(DataType.STRING)
-    type: string;
+    @Column(
+        DataType.ENUM(
+            TransactionTypeEnum.Deposit,
+            TransactionTypeEnum.Withdraw,
+        ),
+    )
+    type: TransactionTypeEnum;
 
     @Column(DataType.TEXT)
     description: string | null;

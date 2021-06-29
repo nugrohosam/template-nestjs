@@ -1,10 +1,12 @@
 import { Expose } from 'class-transformer';
 import {
+    IsEnum,
     IsEthereumAddress,
     IsNotEmpty,
     IsNumber,
     IsOptional,
 } from 'class-validator';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 
 export class TransferRequest {
     @IsEthereumAddress()
@@ -27,7 +29,8 @@ export class TransferRequest {
     currencyId: number;
 
     @IsNotEmpty()
-    type: string;
+    @IsEnum(TransactionTypeEnum)
+    type: TransactionTypeEnum;
 
     @IsOptional()
     description: string;
