@@ -56,9 +56,11 @@ export class PartyController {
 
     @Get('/')
     async index(@Query() query: IndexPartyRequest): Promise<IApiResponse> {
+        const { data, meta } = await this.indexPartyService.fetch(query);
         return {
             message: 'Success fetching parties data',
-            data: await this.indexPartyService.fetch(query),
+            meta,
+            data,
         };
     }
 

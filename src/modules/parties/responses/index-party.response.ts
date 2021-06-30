@@ -42,7 +42,6 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
 }
 
 export class PartyPaginationResponse implements IPaginateResponse {
-    message: string;
     meta: IPaginationMeta;
     data: Array<IndexPartyResponse>;
 
@@ -53,7 +52,6 @@ export class PartyPaginationResponse implements IPaginateResponse {
         indexPartyResponses: IndexPartyResponse[],
     ): PartyPaginationResponse {
         return {
-            message: 'Success fetching data',
             meta: {
                 limit,
                 offset,

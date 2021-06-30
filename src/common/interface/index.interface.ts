@@ -21,7 +21,6 @@ export interface IPaginationMeta {
 }
 
 export interface IPaginateResponse {
-    message: string;
     meta: IPaginationMeta;
     data: [] | Record<string, any>;
 }
