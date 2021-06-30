@@ -20,7 +20,7 @@ export interface IPaginationMeta {
     total: number;
 }
 
-export interface IPaginateResponse {
+export interface IPaginateResponse<T> {
     meta: IPaginationMeta;
-    data: [] | Record<string, any>;
+    data: Array<T>;
 }

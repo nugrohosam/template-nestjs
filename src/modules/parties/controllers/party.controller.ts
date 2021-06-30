@@ -6,6 +6,7 @@ import { JoinPartyRequest } from '../requests/join-party.request';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
+import { IndexPartyResponse } from '../responses/index-party.response';
 import { JoinPartyResponse } from '../responses/join-party.response';
 import { CreatePartyService } from '../services/create-party.service';
 import { GetPartyService } from '../services/get-party.service';
@@ -24,7 +25,9 @@ export class PartyController {
     ) {}
 
     @Post('/create')
-    async store(@Body() request: CreatePartyRequest): Promise<IApiResponse> {
+    async store(
+        @Body() request: CreatePartyRequest,
+    ): Promise<IApiResponse<CreatePartyResponse>> {
         const party = await this.createPartyService.create(request);
         const creator = await party.$get('creator');
         const platformSignature =
@@ -46,7 +49,7 @@ export class PartyController {
     async updateTransactionHash(
         @Param('partyId') partyId: string,
         @Body() request: UpdateDeployedPartyDataRequest,
-    ): Promise<IApiResponse> {
+    ): Promise<IApiResponse<null>> {
         await this.updateTransactionHashService.updateParty(partyId, request);
         return {
             message: 'Success update party transaction hash.',
@@ -55,7 +58,9 @@ export class PartyController {
     }
 
     @Get('/')
-    async index(@Query() query: IndexPartyRequest): Promise<IApiResponse> {
+    async index(
+        @Query() query: IndexPartyRequest,
+    ): Promise<IApiResponse<IndexPartyResponse[]>> {
         const { data, meta } = await this.indexPartyService.fetch(query);
         return {
             message: 'Success fetching parties data',
@@ -65,7 +70,9 @@ export class PartyController {
     }
 
     @Get('/:partyId')
-    async show(@Param('partyId') partyId: string): Promise<IApiResponse> {
+    async show(
+        @Param('partyId') partyId: string,
+    ): Promise<IApiResponse<DetailPartyResponse>> {
         const party = await this.getPartyService.getPartyById(partyId);
         return {
             message: 'Success get party',
@@ -77,7 +84,7 @@ export class PartyController {
     async join(
         @Param('partyId') partyId: string,
         @Body() request: JoinPartyRequest,
-    ): Promise<IApiResponse> {
+    ): Promise<IApiResponse<JoinPartyResponse>> {
         const partyMember = await this.joinPartyService.join(partyId, request);
         const platformSignature =
             await this.joinPartyService.generatePlatformSignature(partyMember);
