@@ -14,9 +14,14 @@ export interface IPaginateRequest {
 
 // Index Response
 
-export interface IPaginateResponse {
+export interface IPaginationMeta {
     limit: number;
     offset: number;
     total: number;
-    items: [] | Record<string, any>;
+}
+
+export interface IPaginateResponse {
+    message: string;
+    meta: IPaginationMeta;
+    data: [] | Record<string, any>;
 }

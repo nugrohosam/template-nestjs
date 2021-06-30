@@ -2,7 +2,10 @@ import {
     PartyTypeEnum,
     DistributionTypeEnum,
 } from 'src/common/enums/party.enum';
-import { IPaginateResponse } from 'src/common/interface/index.interface';
+import {
+    IPaginateResponse,
+    IPaginationMeta,
+} from 'src/common/interface/index.interface';
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 
@@ -39,10 +42,9 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
 }
 
 export class PartyPaginationResponse implements IPaginateResponse {
-    limit: number;
-    offset: number;
-    total: number;
-    items: Array<IndexPartyResponse>;
+    message: string;
+    meta: IPaginationMeta;
+    data: Array<IndexPartyResponse>;
 
     static mapFromIndexPartyResponse(
         limit: number,
@@ -51,10 +53,13 @@ export class PartyPaginationResponse implements IPaginateResponse {
         indexPartyResponses: IndexPartyResponse[],
     ): PartyPaginationResponse {
         return {
-            limit,
-            offset,
-            total,
-            items: indexPartyResponses,
+            message: 'Success fetching data',
+            meta: {
+                limit,
+                offset,
+                total,
+            },
+            data: indexPartyResponses,
         };
     }
 }
