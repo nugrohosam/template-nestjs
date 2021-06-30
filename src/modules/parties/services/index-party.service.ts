@@ -1,14 +1,13 @@
 import { FindOptions } from 'sequelize';
+import { IPaginateResponse } from 'src/common/interface/index.interface';
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { IndexPartyRequest } from '../requests/index-party.request';
-import {
-    IndexPartyResponse,
-    PartyPaginationResponse,
-} from '../responses/index-party.response';
+import { IndexPartyResponse } from '../responses/index-party.response';
 
 export class IndexPartyService {
+    // TODO: need to init this globaly
     private readonly DefaultLimit = 10;
     private readonly DefaultOffset = 0;
 
@@ -61,16 +60,20 @@ export class IndexPartyService {
         });
     }
 
-    async fetch(query: IndexPartyRequest): Promise<PartyPaginationResponse> {
+    async fetch(
+        query: IndexPartyRequest,
+    ): Promise<IPaginateResponse<IndexPartyResponse>> {
         const parties = await this.getParties(query);
         const total = await this.getTotalParties(query);
         const responses = this.mapParties(parties);
 
-        return PartyPaginationResponse.mapFromIndexPartyResponse(
-            query.limit ?? this.DefaultLimit,
-            query.offset ?? this.DefaultOffset,
-            total,
-            responses,
-        );
+        return {
+            data: responses,
+            meta: {
+                limit: query.limit ?? this.DefaultLimit,
+                offset: query.offset ?? this.DefaultOffset,
+                total: total,
+            },
+        };
     }
 }
