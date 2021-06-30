@@ -11,7 +11,7 @@ export class CreatePartyService {
     ) {}
 
     generateCreatePartySignatureMessage(request: CreatePartyRequest): string {
-        return this.web3Service.hashMessage([
+        return this.web3Service.soliditySha3([
             { t: 'address', v: request.memberAddress },
             { t: 'string', v: request.name },
         ]);
@@ -64,7 +64,7 @@ export class CreatePartyService {
         creator: UserModel,
     ): Promise<string> {
         const platformAddress = config.platform.address;
-        const message = this.web3Service.hashMessage([
+        const message = this.web3Service.soliditySha3([
             { t: 'string', v: party.id },
             { t: 'address', v: creator.address },
             { t: 'address', v: platformAddress },
