@@ -18,9 +18,14 @@ export class JoinPartyService {
         private readonly web3Service: Web3Service,
     ) {}
 
-    generateJoinSignature(user: UserModel, party: PartyModel): string {
+    generateJoinSignature(
+        user: UserModel,
+        party: PartyModel,
+        deposit: bigint,
+    ): string {
         return this.web3Service.hashMessage([
             { t: 'address', v: user.address },
+            { t: 'uint', v: deposit.toString() }, // need to persist the digits
             { t: 'string', v: user.id },
             { t: 'address', v: party.address },
         ]);
@@ -40,10 +45,17 @@ export class JoinPartyService {
     async validateJoinSignature(
         user: UserModel,
         party: PartyModel,
-        signature: string,
+        request: JoinPartyRequest,
     ): Promise<void> {
-        const message = this.generateJoinSignature(user, party);
-        const signer = await this.web3Service.recover(signature, message);
+        const message = this.generateJoinSignature(
+            user,
+            party,
+            request.initialDeposit,
+        );
+        const signer = await this.web3Service.recover(
+            request.joinSignature,
+            message,
+        );
 
         if (signer !== user.address)
             throw new UnprocessableEntityException('Signature not valid.');
