@@ -23,7 +23,7 @@ export class JoinPartyService {
         party: PartyModel,
         deposit: bigint,
     ): string {
-        return this.web3Service.hashMessage([
+        return this.web3Service.soliditySha3([
             { t: 'address', v: user.address },
             { t: 'uint', v: deposit.toString() }, // need to persist the digits
             { t: 'string', v: user.id },
@@ -101,7 +101,7 @@ export class JoinPartyService {
     async generatePlatformSignature(
         partyMember: PartyMemberModel,
     ): Promise<string> {
-        const message = this.web3Service.hashMessage([
+        const message = this.web3Service.soliditySha3([
             { t: 'address', v: partyMember.party.address },
             { t: 'address', v: partyMember.member.address },
             { t: 'string', v: partyMember.id },

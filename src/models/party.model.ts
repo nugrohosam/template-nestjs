@@ -6,6 +6,7 @@ import {
     DataType,
     DeletedAt,
     ForeignKey,
+    HasMany,
     Model,
     Table,
     UpdatedAt,
@@ -15,6 +16,7 @@ import {
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
 import { IParty } from 'src/entities/party.entity';
+import { PartyInvitationModel } from './party-invitation.model';
 import { PartyMemberModel } from './party-member.model';
 import { UserModel } from './user.model';
 
@@ -178,6 +180,9 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         'memberId',
     )
     readonly members?: PartyMemberModel[];
+
+    @HasMany(() => PartyInvitationModel)
+    readonly invitations?: PartyInvitationModel[];
 
     /**
      * TODO: need to confirm to PO about distribution schedule
