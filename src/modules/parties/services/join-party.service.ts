@@ -86,7 +86,7 @@ export class JoinPartyService {
         );
 
         await this.validateUser(user, party);
-        await this.validateJoinSignature(user, party, request.joinSignature);
+        await this.validateJoinSignature(user, party, request);
         // TODO: validate transaction hash
 
         const partyMember = await this.storePartyMember(party, user, request);
