@@ -1,11 +1,17 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { IndexPartyInvitationRequest } from '../requests/index-party-invitation.request';
 import { InviteUserRequest } from '../requests/invite-user.request';
+import { IndexPartyInvitationResponse } from '../responses/index-party-invitation.response';
+import { IndexPartyInvitationService } from '../services/index-party-invitation.service';
 import { InvitePartyService } from '../services/invite-party.service';
 
 @Controller('parties/:partyId/invitations')
 export class PartyInvitationController {
-    constructor(private readonly invitePartyService: InvitePartyService) {}
+    constructor(
+        private readonly invitePartyService: InvitePartyService,
+        private readonly indexPartyInvitationService: IndexPartyInvitationService,
+    ) {}
 
     @Post()
     async invite(
@@ -21,6 +27,21 @@ export class PartyInvitationController {
             data: {
                 invitationId: invitation.id,
             },
+        };
+    }
+
+    @Get()
+    async index(
+        @Param('partyId') partyId: string,
+        @Query() query: IndexPartyInvitationRequest,
+    ): Promise<IApiResponse<IndexPartyInvitationResponse[]>> {
+        const result = await this.indexPartyInvitationService.fetch(
+            partyId,
+            query,
+        );
+        return {
+            message: 'Success fetch party invitations',
+            ...result,
         };
     }
 }
