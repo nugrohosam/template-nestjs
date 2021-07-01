@@ -9,9 +9,6 @@ export class ProfileResponse implements Omit<IUser, 'address'> {
     imageUrl: string;
     about: string;
     website: string;
-    createdAt: Date | null;
-    updatedAt: Date | null;
-    deletedAt: Date | null;
 
     static mapFromUserModel(user: UserModel): ProfileResponse {
         return {
@@ -22,9 +19,6 @@ export class ProfileResponse implements Omit<IUser, 'address'> {
             imageUrl: user.imageUrl,
             about: user.about,
             website: user.website,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
-            deletedAt: user.deletedAt,
         };
     }
 }
