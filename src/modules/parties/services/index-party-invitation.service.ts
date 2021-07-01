@@ -36,6 +36,15 @@ export class IndexPartyInvitationService {
         });
     }
 
+    async getTotalInvitations(
+        partyId: string,
+        query: IndexPartyInvitationRequest,
+    ): Promise<number> {
+        return await PartyInvitationModel.count({
+            where: { partyId, ...this.prepareFilterOptions(query) },
+        });
+    }
+
     mapInvitationModel(
         invitations: Array<PartyInvitationModel>,
     ): Array<IndexPartyInvitationResponse> {
@@ -54,7 +63,7 @@ export class IndexPartyInvitationService {
         query.offset = query.offset ?? this.DefaultOffset;
 
         const invitations = await this.getInvitations(partyId, query);
-        const total = invitations.length;
+        const total = await this.getTotalInvitations(partyId, query);
         const response = this.mapInvitationModel(invitations);
 
         return {
