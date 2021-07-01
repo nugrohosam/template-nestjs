@@ -62,6 +62,8 @@ export class IndexPartyInvitationService {
         query.limit = query.limit ?? this.DefaultLimit;
         query.offset = query.offset ?? this.DefaultOffset;
 
+        // TODO: Buat library khusus handle pagination
+        // reference: https://github.com/nestjsx/nestjs-typeorm-paginate
         const invitations = await this.getInvitations(partyId, query);
         const total = await this.getTotalInvitations(partyId, query);
         const response = this.mapInvitationModel(invitations);
