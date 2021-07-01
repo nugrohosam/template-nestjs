@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, NotFoundException } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
@@ -12,9 +12,11 @@ export class AcceptInvitationService {
     async getPartyInvitation(
         invitationId: string,
     ): Promise<PartyInvitationModel> {
-        return await PartyInvitationModel.findOne({
+        const invitation = await PartyInvitationModel.findOne({
             where: { id: invitationId },
         });
+        if (!invitation) throw new NotFoundException('Invitation not found');
+        return invitation;
     }
 
     generateAcceptSignature(invitation: PartyInvitationModel): string {
