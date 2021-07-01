@@ -1,4 +1,10 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+    IsBoolean,
+    IsEnum,
+    IsNumber,
+    IsOptional,
+    IsString,
+} from 'class-validator';
 import { OrderDirectionEnum } from 'src/common/enums/index.enum';
 import {
     IPaginateRequest,
@@ -23,4 +29,8 @@ export class IndexPartyInvitationRequest
     @IsNumber()
     @IsOptional()
     offset?: number;
+
+    @IsBoolean()
+    @IsOptional()
+    accepted?: boolean;
 }
