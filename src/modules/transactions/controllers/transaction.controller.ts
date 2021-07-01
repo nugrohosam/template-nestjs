@@ -8,8 +8,12 @@ export class TransactionController {
     constructor(private readonly transferService: TransferService) {}
 
     @Post('transfer')
-    async transfer(@Body() request: TransferRequest): Promise<IApiResponse> {
+    async transfer(
+        @Body() request: TransferRequest,
+    ): Promise<IApiResponse<{ id: string }>> {
         const transaction = await this.transferService.transfer(request);
+
+        // TODO: need to specify the transfer response
         return {
             message: 'Transfer success.',
             data: {

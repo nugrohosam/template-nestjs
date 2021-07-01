@@ -18,9 +18,14 @@ export class JoinPartyService {
         private readonly web3Service: Web3Service,
     ) {}
 
-    generateJoinSignature(user: UserModel, party: PartyModel): string {
-        return this.web3Service.hashMessage([
+    generateJoinSignature(
+        user: UserModel,
+        party: PartyModel,
+        deposit: bigint,
+    ): string {
+        return this.web3Service.soliditySha3([
             { t: 'address', v: user.address },
+            { t: 'uint', v: deposit.toString() }, // need to persist the digits
             { t: 'string', v: user.id },
             { t: 'address', v: party.address },
         ]);
@@ -40,10 +45,17 @@ export class JoinPartyService {
     async validateJoinSignature(
         user: UserModel,
         party: PartyModel,
-        signature: string,
+        request: JoinPartyRequest,
     ): Promise<void> {
-        const message = this.generateJoinSignature(user, party);
-        const signer = await this.web3Service.recover(signature, message);
+        const message = this.generateJoinSignature(
+            user,
+            party,
+            request.initialDeposit,
+        );
+        const signer = await this.web3Service.recover(
+            request.joinSignature,
+            message,
+        );
 
         if (signer !== user.address)
             throw new UnprocessableEntityException('Signature not valid.');
@@ -74,7 +86,7 @@ export class JoinPartyService {
         );
 
         await this.validateUser(user, party);
-        await this.validateJoinSignature(user, party, request.joinSignature);
+        await this.validateJoinSignature(user, party, request);
         // TODO: validate transaction hash
 
         const partyMember = await this.storePartyMember(party, user, request);
@@ -89,7 +101,7 @@ export class JoinPartyService {
     async generatePlatformSignature(
         partyMember: PartyMemberModel,
     ): Promise<string> {
-        const message = this.web3Service.hashMessage([
+        const message = this.web3Service.soliditySha3([
             { t: 'address', v: partyMember.party.address },
             { t: 'address', v: partyMember.member.address },
             { t: 'string', v: partyMember.id },

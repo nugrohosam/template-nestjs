@@ -30,4 +30,7 @@ export const config = {
     sentry: {
         dsn: process.env.SENTRY_DSN,
     },
+
+    disableSignatureValidation:
+        process.env.DISABLE_SIGNATURE_VALIDATION === 'true',
 };

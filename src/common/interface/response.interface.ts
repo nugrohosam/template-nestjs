@@ -1,6 +1,9 @@
-export interface IApiResponse {
+import { IPaginationMeta } from './index.interface';
+
+export interface IApiResponse<T> {
     message: string;
-    data: [] | Record<string, any>;
+    meta?: IPaginationMeta;
+    data: T;
 }
 
 interface IDataUnprocessable {
