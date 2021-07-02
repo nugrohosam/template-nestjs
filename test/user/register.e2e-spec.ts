@@ -34,7 +34,10 @@ describe('Register Test (POST)', () => {
             .send(bodyRequest)
             .expect(201)
             .then((response) => {
-                const validateResult = validateJsonSchema.validate(response.body, schemaSuccess);
+                const validateResult = validateJsonSchema.validate(
+                    response.body,
+                    schemaSuccess,
+                );
                 expect(validateResult.valid).toBe(true);
                 done();
             });
@@ -47,7 +50,10 @@ describe('Register Test (POST)', () => {
             .send(bodyRequest)
             .expect(422)
             .then((response) => {
-                const validateResult = validateJsonSchema.validate(response.body, schemaFailed);
+                const validateResult = validateJsonSchema.validate(
+                    response.body,
+                    schemaFailed,
+                );
                 expect(validateResult.valid).toBe(true);
                 done();
             });

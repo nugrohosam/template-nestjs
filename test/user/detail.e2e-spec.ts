@@ -23,7 +23,10 @@ describe('Detail User Test (GET)', () => {
             .get('/profile/0xF8ed25616EC89B78fe281EB3C2075B14295C70b8')
             .expect(200)
             .then((response) => {
-                const validateResult = validateJsonSchema.validate(response.body, schema);
+                const validateResult = validateJsonSchema.validate(
+                    response.body,
+                    schema,
+                );
                 expect(validateResult.valid).toBe(true);
                 done();
             });

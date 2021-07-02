@@ -37,7 +37,10 @@ describe('Party Test (POST)', () => {
             })
             .expect(201)
             .then((response) => {
-                const validateResult = validateJsonSchema.validate(response.body, schema);
+                const validateResult = validateJsonSchema.validate(
+                    response.body,
+                    schema,
+                );
                 expect(validateResult.valid).toBe(true);
                 done();
             });
