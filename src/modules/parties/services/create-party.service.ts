@@ -56,7 +56,7 @@ export class CreatePartyService {
             signature: request.memberSignature,
             creatorId: creator.id,
             ownerId: creator.id,
-            totalFund: 0,
+            totalFund: BigInt(0),
             totalMember: 0,
         });
 

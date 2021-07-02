@@ -13,9 +13,9 @@ export interface IParty {
     creatorId: string;
     ownerId: string;
     isPublic: boolean;
-    totalFund?: number;
-    minDeposit?: number;
-    maxDeposit?: number;
+    totalFund?: bigint;
+    minDeposit?: bigint;
+    maxDeposit?: bigint;
     totalMember?: number;
     distribution: DistributionTypeEnum;
     signature?: string;

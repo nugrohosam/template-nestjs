@@ -13,7 +13,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     purpose: string;
     isPublic: boolean;
     totalMember: number;
-    totalFund: number;
+    totalFund: bigint;
     distribution: DistributionTypeEnum;
     ownerId: string;
     createdAt: Date;
