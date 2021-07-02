@@ -34,10 +34,14 @@ export class AcceptInvitationService {
     async accept(invitationId: string, signature: string): Promise<void> {
         const invitation = await this.getPartyInvitation(invitationId);
         await this.validateUserAddress(invitation.userAddress);
+
+        const message = this.generateAcceptSignature(invitation);
+        // TODO: need to removed after testing
+        console.log('message[accept-party-invitation]: ' + message);
         await this.web3Service.validateSignature(
             signature,
             invitation.userAddress,
-            this.generateAcceptSignature(invitation),
+            message,
         );
 
         invitation.acceptedAt = new Date();

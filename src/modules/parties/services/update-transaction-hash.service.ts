@@ -2,7 +2,6 @@ import {
     Inject,
     NotFoundException,
     UnauthorizedException,
-    UnprocessableEntityException,
 } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
@@ -23,10 +22,11 @@ export class UpdateTransactionHashService {
             transactionHash,
         );
 
-        if (!transaction)
-            throw new UnprocessableEntityException(
-                'Transaction not found in Network.',
-            );
+        // TODO: need to validate if transactionHash
+        if (!transaction) return;
+        // throw new UnprocessableEntityException(
+        //     'Transaction not found in Network.',
+        // );
     }
 
     async updateParty(

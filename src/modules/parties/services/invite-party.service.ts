@@ -55,10 +55,18 @@ export class InvitePartyService {
         request: InviteUserRequest,
     ): Promise<PartyInvitationModel> {
         const party = await this.getPartyService.getPartyById(partyId);
+        const message = this.generateInvitePartyMessage(
+            request.userAddress,
+            party,
+        );
+
+        // TODO: need to removed after testing
+        console.log('message[invite-party]: ' + message);
+
         await this.web3Service.validateSignature(
             request.inviteSignature,
-            request.userAddress,
-            this.generateInvitePartyMessage(request.userAddress, party),
+            party.owner.address,
+            message,
         );
         await this.validateUserAddress(request.userAddress, party);
         return await this.storeInvitation(party, request);

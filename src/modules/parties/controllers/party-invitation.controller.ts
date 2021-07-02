@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { AcceptInvitationRequest } from '../requests/accept-invitation.request';
 import { IndexPartyInvitationRequest } from '../requests/index-party-invitation.request';
 import { InviteUserRequest } from '../requests/invite-user.request';
 import { IndexPartyInvitationResponse } from '../responses/index-party-invitation.response';
@@ -50,9 +51,12 @@ export class PartyInvitationController {
     @Put(':invitationId')
     async accept(
         @Param('invitationId') invitationId: string,
-        @Body('signature') signature: string,
+        @Body() request: AcceptInvitationRequest,
     ): Promise<IApiResponse<null>> {
-        await this.acceptInvitationService.accept(invitationId, signature);
+        await this.acceptInvitationService.accept(
+            invitationId,
+            request.signature,
+        );
         return {
             message: 'Success accept invitation',
             data: null,
