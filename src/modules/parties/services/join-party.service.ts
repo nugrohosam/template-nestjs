@@ -1,5 +1,6 @@
 import { Inject, UnprocessableEntityException } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
+import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -31,6 +32,26 @@ export class JoinPartyService {
         ]);
     }
 
+    async checkUserAcceptInvitation(
+        user: UserModel,
+        party: PartyModel,
+    ): Promise<void> {
+        const invitation = await PartyInvitationModel.findOne({
+            where: {
+                userAddress: user.address,
+                partyId: party.id,
+            },
+        });
+
+        if (!invitation)
+            throw new UnprocessableEntityException('Invitation not found.');
+
+        if (invitation.acceptedAt === null)
+            throw new UnprocessableEntityException(
+                'Invitation not accepted yet.',
+            );
+    }
+
     async validateUser(user: UserModel, party: PartyModel): Promise<void> {
         const member = await party.$get('members', {
             where: { id: user.id },
@@ -40,6 +61,10 @@ export class JoinPartyService {
             throw new UnprocessableEntityException(
                 'User already a member in that party.',
             );
+
+        if (!party.isPublic) {
+            await this.checkUserAcceptInvitation(user, party);
+        }
     }
 
     async validateJoinSignature(
