@@ -173,13 +173,16 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @BelongsTo(() => UserModel, 'creatorId')
     readonly creator?: UserModel;
 
+    @HasMany(() => PartyMemberModel, 'partyId')
+    readonly partyMembers?: PartyMemberModel[];
+
     @BelongsToMany(
         () => UserModel,
         () => PartyMemberModel,
         'partyId',
         'memberId',
     )
-    readonly members?: PartyMemberModel[];
+    readonly members?: UserModel[];
 
     @HasMany(() => PartyInvitationModel)
     readonly invitations?: PartyInvitationModel[];

@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { ProfileResponse } from 'src/modules/users/responses/profile.response';
 import { CreatePartyRequest } from '../requests/create-party.request';
+import { IndexPartyMemberRequest } from '../requests/index-party-member.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { JoinPartyRequest } from '../requests/join-party.request';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
@@ -10,6 +12,7 @@ import { IndexPartyResponse } from '../responses/index-party.response';
 import { JoinPartyResponse } from '../responses/join-party.response';
 import { CreatePartyService } from '../services/create-party.service';
 import { GetPartyService } from '../services/get-party.service';
+import { IndexPartyMemberService } from '../services/index-party-meber.service';
 import { IndexPartyService } from '../services/index-party.service';
 import { JoinPartyService } from '../services/join-party.service';
 import { UpdateTransactionHashService } from '../services/update-transaction-hash.service';
@@ -22,6 +25,7 @@ export class PartyController {
         private readonly createPartyService: CreatePartyService,
         private readonly updateTransactionHashService: UpdateTransactionHashService,
         private readonly joinPartyService: JoinPartyService,
+        private readonly indexPartyMemberService: IndexPartyMemberService,
     ) {}
 
     @Post('/create')
@@ -94,6 +98,19 @@ export class PartyController {
                 partyMember,
                 platformSignature,
             ),
+        };
+    }
+
+    @Get('/:partyId/members')
+    async members(
+        @Param('partyId') partyId: string,
+        @Query() query: IndexPartyMemberRequest,
+    ): Promise<IApiResponse<ProfileResponse[]>> {
+        const result = await this.indexPartyMemberService.fetch(partyId, query);
+
+        return {
+            message: 'Success get user members',
+            ...result,
         };
     }
 }
