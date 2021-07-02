@@ -21,6 +21,10 @@ export class CreatePartyService {
         request: CreatePartyRequest,
     ): Promise<string> {
         const message = this.generateCreatePartySignatureMessage(request);
+
+        // TODO: need to removed after testing
+        console.log('message[create-party]: ' + message);
+
         const signer = await this.web3Service.recover(
             request.memberSignature,
             message,
@@ -71,6 +75,8 @@ export class CreatePartyService {
             { t: 'string', v: creator.id },
             { t: 'bool', v: party.isPublic ? 1 : 0 },
         ]);
+        // TODO: need to removed after testing
+        console.log('message[platform-create-party]: ' + message);
         return await this.web3Service.sign(message);
     }
 }

@@ -1,5 +1,6 @@
 import { Inject, UnprocessableEntityException } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
+import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -31,15 +32,42 @@ export class JoinPartyService {
         ]);
     }
 
+    async checkUserAcceptInvitation(
+        user: UserModel,
+        party: PartyModel,
+    ): Promise<void> {
+        const invitation = await PartyInvitationModel.findOne({
+            where: {
+                userAddress: user.address,
+                partyId: party.id,
+            },
+        });
+
+        if (!invitation)
+            throw new UnprocessableEntityException('User not invited.');
+
+        if (invitation.acceptedAt === null)
+            throw new UnprocessableEntityException(
+                'Invitation not accepted yet.',
+            );
+    }
+
     async validateUser(user: UserModel, party: PartyModel): Promise<void> {
-        const member = await party.$get('members', {
-            where: { id: user.id },
-        })[0];
+        const member = await PartyMemberModel.findOne({
+            where: {
+                partyId: party.id,
+                memberId: user.id,
+            },
+        });
 
         if (member)
             throw new UnprocessableEntityException(
                 'User already a member in that party.',
             );
+
+        if (!party.isPublic) {
+            await this.checkUserAcceptInvitation(user, party);
+        }
     }
 
     async validateJoinSignature(
@@ -52,6 +80,10 @@ export class JoinPartyService {
             party,
             request.initialDeposit,
         );
+
+        // TODO: need to removed after testing
+        console.log('message[join-party]: ' + message);
+
         const signer = await this.web3Service.recover(
             request.joinSignature,
             message,
@@ -59,6 +91,14 @@ export class JoinPartyService {
 
         if (signer !== user.address)
             throw new UnprocessableEntityException('Signature not valid.');
+    }
+
+    validateUserInitialDeposit(party: PartyModel, deposit: bigint): void {
+        if (deposit < party.minDeposit || deposit > party.maxDeposit) {
+            throw new UnprocessableEntityException(
+                `Deposit must be between ${party.minDeposit} and ${party.maxDeposit}`,
+            );
+        }
     }
 
     async storePartyMember(
@@ -87,6 +127,7 @@ export class JoinPartyService {
 
         await this.validateUser(user, party);
         await this.validateJoinSignature(user, party, request);
+        this.validateUserInitialDeposit(party, request.initialDeposit);
         // TODO: validate transaction hash
 
         const partyMember = await this.storePartyMember(party, user, request);
@@ -101,11 +142,16 @@ export class JoinPartyService {
     async generatePlatformSignature(
         partyMember: PartyMemberModel,
     ): Promise<string> {
+        const party = await partyMember.$get('party');
+        const member = await partyMember.$get('member');
+
         const message = this.web3Service.soliditySha3([
-            { t: 'address', v: partyMember.party.address },
-            { t: 'address', v: partyMember.member.address },
+            { t: 'address', v: party.address },
+            { t: 'address', v: member.address },
             { t: 'string', v: partyMember.id },
         ]);
+        // TODO: need to removed after testing
+        console.log('message[platform-join-party]: ' + message);
         return await this.web3Service.sign(message);
     }
 }
