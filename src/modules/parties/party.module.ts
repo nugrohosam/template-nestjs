@@ -4,6 +4,7 @@ import { TransactionModule } from '../transactions/transaction.module';
 import { UserModule } from '../users/user.module';
 import { PartyInvitationController } from './controllers/party-invitation.controller';
 import { PartyController } from './controllers/party.controller';
+import { AcceptInvitationService } from './services/accept-invitation.service';
 import { CreatePartyService } from './services/create-party.service';
 import { GetPartyService } from './services/get-party.service';
 import { IndexPartyInvitationService } from './services/index-party-invitation.service';
@@ -23,6 +24,7 @@ import { UpdateTransactionHashService } from './services/update-transaction-hash
         JoinPartyService,
         InvitePartyService,
         IndexPartyInvitationService,
+        AcceptInvitationService,
     ],
 })
 export class PartyModule {}
