@@ -12,7 +12,7 @@ import { IndexPartyResponse } from '../responses/index-party.response';
 import { JoinPartyResponse } from '../responses/join-party.response';
 import { CreatePartyService } from '../services/create-party.service';
 import { GetPartyService } from '../services/get-party.service';
-import { IndexPartyMemberService } from '../services/index-party-meber.service';
+import { IndexPartyMemberService } from '../services/index-party-member.service';
 import { IndexPartyService } from '../services/index-party.service';
 import { JoinPartyService } from '../services/join-party.service';
 import { UpdateTransactionHashService } from '../services/update-transaction-hash.service';

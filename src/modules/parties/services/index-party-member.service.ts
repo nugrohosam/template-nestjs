@@ -1,11 +1,16 @@
 import { Inject } from '@nestjs/common';
-import { IPaginateResponse } from 'src/common/interface/index.interface';
+import { FindOptions } from 'sequelize';
+import { IPartyMember } from 'src/entities/party-member.entity';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { ProfileResponse } from 'src/modules/users/responses/profile.response';
 import { IndexPartyMemberRequest } from '../requests/index-party-member.request';
 import { GetPartyService } from './get-party.service';
+import {
+    PaginationResponse,
+    SequelizePaginator,
+} from 'sequelize-typescript-paginator';
 
 export class IndexPartyMemberService {
     readonly DefaultLimit = 10;
@@ -16,24 +21,19 @@ export class IndexPartyMemberService {
         private readonly getPartyService: GetPartyService,
     ) {}
 
-    async getPartyMembers(
+    getFindOptions(
         party: PartyModel,
         query: IndexPartyMemberRequest,
-    ): Promise<PartyMemberModel[]> {
-        return await party.$get('partyMembers', {
+    ): FindOptions<IPartyMember> {
+        return {
+            where: { partyId: party.id },
             include: {
                 model: UserModel,
                 as: 'member',
                 required: true,
             },
             order: [[query.order ?? 'created_at', query.sort ?? 'desc']],
-            limit: query.limit ?? this.DefaultLimit,
-            offset: query.offset ?? this.DefaultOffset,
-        });
-    }
-
-    async getTotalPartyMembers(party: PartyModel): Promise<number> {
-        return await party.$count('partyMembers');
+        };
     }
 
     mapPartyMembers(partyMembers: PartyMemberModel[]): ProfileResponse[] {
@@ -45,18 +45,20 @@ export class IndexPartyMemberService {
     async fetch(
         partyId: string,
         query: IndexPartyMemberRequest,
-    ): Promise<IPaginateResponse<ProfileResponse>> {
+    ): Promise<PaginationResponse<ProfileResponse>> {
         const party = await this.getPartyService.getPartyById(partyId);
-        const partyMembers = await this.getPartyMembers(party, query);
-        const totalPartyMembers = await this.getTotalPartyMembers(party);
-        const response = this.mapPartyMembers(partyMembers);
+        const { data, meta } = await SequelizePaginator.paginate(
+            PartyMemberModel,
+            {
+                perPage: 10,
+                page: 1,
+            },
+            this.getFindOptions(party, query),
+        );
+        const response = this.mapPartyMembers(data);
 
         return {
-            meta: {
-                limit: query.limit ?? this.DefaultLimit,
-                offset: query.offset ?? this.DefaultOffset,
-                total: totalPartyMembers,
-            },
+            meta,
             data: response,
         };
     }

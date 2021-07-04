@@ -1,31 +1,24 @@
-import { FindOptions } from 'sequelize';
-import { IPaginateResponse } from 'src/common/interface/index.interface';
+import { FindOptions, WhereOptions } from 'sequelize';
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { IndexPartyResponse } from '../responses/index-party.response';
+import {
+    PaginationResponse,
+    SequelizePaginator,
+} from 'sequelize-typescript-paginator';
 
 export class IndexPartyService {
-    // TODO: need to init this globaly
-    private readonly DefaultLimit = 10;
-    private readonly DefaultOffset = 0;
-
-    getFilterOption(query: IndexPartyRequest): FindOptions<IParty> {
-        const options: FindOptions<IParty> = {
-            where: {},
-        };
+    getFindOptions(query: IndexPartyRequest): FindOptions<IParty> {
+        const where: WhereOptions<IParty> = {};
 
         if (query.ownerId) {
-            options.where['ownerId'] = query.ownerId;
+            where['ownerId'] = query.ownerId;
         }
 
-        return options;
-    }
-
-    async getTotalParties(query: IndexPartyRequest): Promise<number> {
-        const result = await PartyModel.count({
-            where: { ...this.getFilterOption(query).where },
+        return {
+            where,
             include: [
                 {
                     model: UserModel,
@@ -33,25 +26,7 @@ export class IndexPartyService {
                     required: true,
                 },
             ],
-        });
-
-        return result;
-    }
-
-    async getParties(query: IndexPartyRequest): Promise<PartyModel[]> {
-        return await PartyModel.findAll({
-            where: { ...this.getFilterOption(query).where },
-            include: [
-                {
-                    model: UserModel,
-                    as: 'owner',
-                    required: true,
-                },
-            ],
-            order: [[query.sort ?? 'created_at', query.order ?? 'desc']],
-            limit: query.limit ?? this.DefaultLimit,
-            offset: query.offset ?? this.DefaultOffset,
-        });
+        };
     }
 
     mapParties(parties: PartyModel[]): Array<IndexPartyResponse> {
@@ -62,18 +37,20 @@ export class IndexPartyService {
 
     async fetch(
         query: IndexPartyRequest,
-    ): Promise<IPaginateResponse<IndexPartyResponse>> {
-        const parties = await this.getParties(query);
-        const total = await this.getTotalParties(query);
-        const responses = this.mapParties(parties);
+    ): Promise<PaginationResponse<IndexPartyResponse>> {
+        const { data, meta } = await SequelizePaginator.paginate(
+            PartyModel,
+            {
+                perPage: 10,
+                page: 1,
+            },
+            this.getFindOptions(query),
+        );
+        const response = this.mapParties(data);
 
         return {
-            data: responses,
-            meta: {
-                limit: query.limit ?? this.DefaultLimit,
-                offset: query.offset ?? this.DefaultOffset,
-                total: total,
-            },
+            data: response,
+            meta,
         };
     }
 }

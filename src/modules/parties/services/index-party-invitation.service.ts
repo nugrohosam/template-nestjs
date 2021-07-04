@@ -1,48 +1,35 @@
+import { FindOptions } from 'sequelize';
 import { Op } from 'sequelize';
 import { WhereOptions } from 'sequelize/types';
-import { IPaginateResponse } from 'src/common/interface/index.interface';
 import { IPartyInvitation } from 'src/entities/parti-invitation.entity';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { IndexPartyInvitationRequest } from '../requests/index-party-invitation.request';
 import { IndexPartyInvitationResponse } from '../responses/index-party-invitation.response';
+import {
+    PaginationResponse,
+    SequelizePaginator,
+} from 'sequelize-typescript-paginator';
 
 export class IndexPartyInvitationService {
     readonly DefaultLimit = 10;
     readonly DefaultOffset = 0;
 
-    prepareFilterOptions(
+    getFindOptions(
+        partyId: string,
         query: IndexPartyInvitationRequest,
-    ): WhereOptions<IPartyInvitation> {
-        const whereOptions: WhereOptions<IPartyInvitation> = {};
+    ): FindOptions<IPartyInvitation> {
+        const where: WhereOptions<IPartyInvitation> = {};
 
         if (query.accepted) {
-            whereOptions.acceptedAt = {
+            where.acceptedAt = {
                 [Op.ne]: null,
             };
         }
 
-        return whereOptions;
-    }
-
-    async getInvitations(
-        partyId: string,
-        query: IndexPartyInvitationRequest,
-    ): Promise<Array<PartyInvitationModel>> {
-        return await PartyInvitationModel.findAll({
-            where: { partyId, ...this.prepareFilterOptions(query) },
+        return {
+            where: { partyId, ...where },
             order: [[query.sort ?? 'created_at', query.order || 'desc']],
-            limit: query.limit,
-            offset: query.offset,
-        });
-    }
-
-    async getTotalInvitations(
-        partyId: string,
-        query: IndexPartyInvitationRequest,
-    ): Promise<number> {
-        return await PartyInvitationModel.count({
-            where: { partyId, ...this.prepareFilterOptions(query) },
-        });
+        };
     }
 
     mapInvitationModel(
@@ -58,22 +45,19 @@ export class IndexPartyInvitationService {
     async fetch(
         partyId: string,
         query: IndexPartyInvitationRequest,
-    ): Promise<IPaginateResponse<IndexPartyInvitationResponse>> {
-        query.limit = query.limit ?? this.DefaultLimit;
-        query.offset = query.offset ?? this.DefaultOffset;
-
-        // TODO: Buat library khusus handle pagination
-        // reference: https://github.com/nestjsx/nestjs-typeorm-paginate
-        const invitations = await this.getInvitations(partyId, query);
-        const total = await this.getTotalInvitations(partyId, query);
-        const response = this.mapInvitationModel(invitations);
+    ): Promise<PaginationResponse<IndexPartyInvitationResponse>> {
+        const { data, meta } = await SequelizePaginator.paginate(
+            PartyInvitationModel,
+            {
+                perPage: 10,
+                page: 1,
+            },
+            this.getFindOptions(partyId, query),
+        );
+        const response = this.mapInvitationModel(data);
 
         return {
-            meta: {
-                limit: query.limit,
-                offset: query.offset,
-                total: total,
-            },
+            meta,
             data: response,
         };
     }

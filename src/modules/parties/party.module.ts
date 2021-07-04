@@ -8,7 +8,7 @@ import { AcceptInvitationService } from './services/accept-invitation.service';
 import { CreatePartyService } from './services/create-party.service';
 import { GetPartyService } from './services/get-party.service';
 import { IndexPartyInvitationService } from './services/index-party-invitation.service';
-import { IndexPartyMemberService } from './services/index-party-meber.service';
+import { IndexPartyMemberService } from './services/index-party-member.service';
 import { IndexPartyService } from './services/index-party.service';
 import { InvitePartyService } from './services/invite-party.service';
 import { JoinPartyService } from './services/join-party.service';
