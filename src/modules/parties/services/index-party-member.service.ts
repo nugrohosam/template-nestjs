@@ -18,7 +18,7 @@ export class IndexPartyMemberService {
         private readonly getPartyService: GetPartyService,
     ) {}
 
-    getFindOptions(
+    private getFindOptions(
         party: PartyModel,
         query: IndexPartyMemberRequest,
     ): FindOptions<IPartyMember> {
@@ -33,7 +33,9 @@ export class IndexPartyMemberService {
         };
     }
 
-    mapPartyMembers(partyMembers: PartyMemberModel[]): ProfileResponse[] {
+    private mapPartyMembers(
+        partyMembers: PartyMemberModel[],
+    ): ProfileResponse[] {
         return partyMembers.map((partyMember) =>
             ProfileResponse.mapFromUserModel(partyMember.member),
         );

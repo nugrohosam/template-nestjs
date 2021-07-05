@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript-paginator';
 
 export class IndexPartyService {
-    getFindOptions(query: IndexPartyRequest): FindOptions<IParty> {
+    private getFindOptions(query: IndexPartyRequest): FindOptions<IParty> {
         const where: WhereOptions<IParty> = {};
 
         if (query.ownerId) {
@@ -29,7 +29,7 @@ export class IndexPartyService {
         };
     }
 
-    mapParties(parties: PartyModel[]): Array<IndexPartyResponse> {
+    private mapParties(parties: PartyModel[]): Array<IndexPartyResponse> {
         return parties.map((party) => {
             return IndexPartyResponse.mapFromPartyModel(party);
         });

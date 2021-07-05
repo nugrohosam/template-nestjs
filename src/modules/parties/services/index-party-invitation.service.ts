@@ -11,7 +11,7 @@ import {
 } from 'sequelize-typescript-paginator';
 
 export class IndexPartyInvitationService {
-    getFindOptions(
+    private getFindOptions(
         partyId: string,
         query: IndexPartyInvitationRequest,
     ): FindOptions<IPartyInvitation> {
@@ -29,7 +29,7 @@ export class IndexPartyInvitationService {
         };
     }
 
-    mapInvitationModel(
+    private mapInvitationModel(
         invitations: Array<PartyInvitationModel>,
     ): Array<IndexPartyInvitationResponse> {
         return invitations.map((invitation) =>
