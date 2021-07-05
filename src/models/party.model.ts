@@ -95,7 +95,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    totalFund?: number;
+    totalFund?: bigint;
 
     @Column({
         field: 'min_deposit',
@@ -103,7 +103,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    minDeposit?: number;
+    minDeposit?: bigint;
 
     @Column({
         field: 'max_deposit',
@@ -111,7 +111,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    maxDeposit?: number;
+    maxDeposit?: bigint;
 
     @Column({
         field: 'total_member',
@@ -173,13 +173,16 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @BelongsTo(() => UserModel, 'creatorId')
     readonly creator?: UserModel;
 
+    @HasMany(() => PartyMemberModel, 'partyId')
+    readonly partyMembers?: PartyMemberModel[];
+
     @BelongsToMany(
         () => UserModel,
         () => PartyMemberModel,
         'partyId',
         'memberId',
     )
-    readonly members?: PartyMemberModel[];
+    readonly members?: UserModel[];
 
     @HasMany(() => PartyInvitationModel)
     readonly invitations?: PartyInvitationModel[];

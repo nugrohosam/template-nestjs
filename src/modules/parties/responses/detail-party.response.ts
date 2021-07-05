@@ -16,9 +16,9 @@ export class DetailPartyResponse
     purpose: string;
     imageUrl: string;
     isPublic: boolean;
-    totalFund: number;
-    minDeposit: number;
-    maxDeposit: number;
+    totalFund: bigint;
+    minDeposit: bigint;
+    maxDeposit: bigint;
     totalMember: number;
     distribution: DistributionTypeEnum;
     nextDistributionOn: Date;

@@ -25,11 +25,11 @@ export class CreatePartyRequest
 
     @IsNotEmpty()
     @Expose({ name: 'min_deposit' })
-    minDeposit: number;
+    minDeposit: bigint;
 
     @IsNotEmpty()
     @Expose({ name: 'max_deposit' })
-    maxDeposit: number;
+    maxDeposit: bigint;
 
     @IsNotEmpty()
     @IsEnum(DistributionTypeEnum)

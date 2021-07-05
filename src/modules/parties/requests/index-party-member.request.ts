@@ -1,16 +1,10 @@
-import { Expose } from 'class-transformer';
-import {
-    IsEnum,
-    IsNumber,
-    IsOptional,
-    IsString,
-    IsUUID,
-} from 'class-validator';
 import { OrderDirectionEnum } from 'src/common/enums/index.enum';
 import { ISortRequest } from 'src/common/interface/index.interface';
 import { PaginationMeta } from 'sequelize-typescript-paginator';
+import { Expose } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class IndexPartyRequest
+export class IndexPartyMemberRequest
     implements Partial<PaginationMeta>, ISortRequest
 {
     @IsString()
@@ -29,9 +23,4 @@ export class IndexPartyRequest
     @IsNumber()
     @IsOptional()
     page?: number;
-
-    @IsUUID()
-    @IsOptional()
-    @Expose({ name: 'owner_id' })
-    ownerId?: string;
 }
