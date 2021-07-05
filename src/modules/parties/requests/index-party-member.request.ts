@@ -1,12 +1,26 @@
 import { OrderDirectionEnum } from 'src/common/enums/index.enum';
-import {
-    IPaginateRequest,
-    ISortRequest,
-} from 'src/common/interface/index.interface';
+import { ISortRequest } from 'src/common/interface/index.interface';
+import { PaginationMeta } from 'sequelize-typescript-paginator';
+import { Expose } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class IndexPartyMemberRequest implements IPaginateRequest, ISortRequest {
+export class IndexPartyMemberRequest
+    implements Partial<PaginationMeta>, ISortRequest
+{
+    @IsString()
+    @IsOptional()
     sort?: string;
+
+    @IsEnum(OrderDirectionEnum)
+    @IsOptional()
     order?: OrderDirectionEnum;
-    limit?: number;
-    offset?: number;
+
+    @IsNumber()
+    @IsOptional()
+    @Expose({ name: 'per_page' })
+    perPage?: number;
+
+    @IsNumber()
+    @IsOptional()
+    page?: number;
 }

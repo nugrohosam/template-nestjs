@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import {
     IsBoolean,
     IsEnum,
@@ -6,13 +7,11 @@ import {
     IsString,
 } from 'class-validator';
 import { OrderDirectionEnum } from 'src/common/enums/index.enum';
-import {
-    IPaginateRequest,
-    ISortRequest,
-} from 'src/common/interface/index.interface';
+import { ISortRequest } from 'src/common/interface/index.interface';
+import { PaginationMeta } from 'sequelize-typescript-paginator';
 
 export class IndexPartyInvitationRequest
-    implements ISortRequest, IPaginateRequest
+    implements ISortRequest, Partial<PaginationMeta>
 {
     @IsString()
     @IsOptional()
@@ -24,11 +23,12 @@ export class IndexPartyInvitationRequest
 
     @IsNumber()
     @IsOptional()
-    limit?: number;
+    @Expose({ name: 'per_page' })
+    perPage?: number;
 
     @IsNumber()
     @IsOptional()
-    offset?: number;
+    page?: number;
 
     @IsBoolean()
     @IsOptional()

@@ -13,9 +13,6 @@ import {
 } from 'sequelize-typescript-paginator';
 
 export class IndexPartyMemberService {
-    readonly DefaultLimit = 10;
-    readonly DefaultOffset = 0;
-
     constructor(
         @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
@@ -50,10 +47,10 @@ export class IndexPartyMemberService {
         const { data, meta } = await SequelizePaginator.paginate(
             PartyMemberModel,
             {
-                perPage: 10,
-                page: 1,
+                perPage: query.perPage ?? 10,
+                page: query.page ?? 1,
+                options: this.getFindOptions(party, query),
             },
-            this.getFindOptions(party, query),
         );
         const response = this.mapPartyMembers(data);
 

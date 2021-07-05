@@ -38,14 +38,11 @@ export class IndexPartyService {
     async fetch(
         query: IndexPartyRequest,
     ): Promise<PaginationResponse<IndexPartyResponse>> {
-        const { data, meta } = await SequelizePaginator.paginate(
-            PartyModel,
-            {
-                perPage: 10,
-                page: 1,
-            },
-            this.getFindOptions(query),
-        );
+        const { data, meta } = await SequelizePaginator.paginate(PartyModel, {
+            perPage: query.perPage ?? 10,
+            page: query.page ?? 1,
+            options: this.getFindOptions(query),
+        });
         const response = this.mapParties(data);
 
         return {

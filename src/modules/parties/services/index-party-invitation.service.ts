@@ -11,9 +11,6 @@ import {
 } from 'sequelize-typescript-paginator';
 
 export class IndexPartyInvitationService {
-    readonly DefaultLimit = 10;
-    readonly DefaultOffset = 0;
-
     getFindOptions(
         partyId: string,
         query: IndexPartyInvitationRequest,
@@ -49,10 +46,10 @@ export class IndexPartyInvitationService {
         const { data, meta } = await SequelizePaginator.paginate(
             PartyInvitationModel,
             {
-                perPage: 10,
-                page: 1,
+                perPage: query.perPage ?? 10,
+                page: query.page ?? 1,
+                options: this.getFindOptions(partyId, query),
             },
-            this.getFindOptions(partyId, query),
         );
         const response = this.mapInvitationModel(data);
 
