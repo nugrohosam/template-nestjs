@@ -18,7 +18,7 @@ import { config } from 'src/config';
 export class UploadController {
     @Post('upload')
     @UseInterceptors(
-        // need to separate this to reusable file
+        // TODO: need to separate this to reusable file
         FileInterceptor('file', {
             storage: diskStorage({
                 destination: config.storage.path,
