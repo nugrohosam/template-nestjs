@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Post,
+    Put,
+    Query,
+} from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { ProfileResponse } from 'src/modules/users/responses/profile.response';
 import { CreatePartyRequest } from '../requests/create-party.request';
@@ -11,6 +20,7 @@ import { DetailPartyResponse } from '../responses/detail-party.response';
 import { IndexPartyResponse } from '../responses/index-party.response';
 import { JoinPartyResponse } from '../responses/join-party.response';
 import { CreatePartyService } from '../services/create-party.service';
+import { DeletePartyService } from '../services/delete-party.service';
 import { GetPartyService } from '../services/get-party.service';
 import { IndexPartyMemberService } from '../services/index-party-member.service';
 import { IndexPartyService } from '../services/index-party.service';
@@ -24,6 +34,7 @@ export class PartyController {
         private readonly getPartyService: GetPartyService,
         private readonly createPartyService: CreatePartyService,
         private readonly updateTransactionHashService: UpdateTransactionHashService,
+        private readonly deletePartyService: DeletePartyService,
         private readonly joinPartyService: JoinPartyService,
         private readonly indexPartyMemberService: IndexPartyMemberService,
     ) {}
@@ -57,6 +68,17 @@ export class PartyController {
         await this.updateTransactionHashService.updateParty(partyId, request);
         return {
             message: 'Success update party transaction hash.',
+            data: null,
+        };
+    }
+
+    @Delete('/:partyId')
+    async delete(
+        @Param('partyId') partyId: string,
+    ): Promise<IApiResponse<null>> {
+        await this.deletePartyService.delete(partyId);
+        return {
+            message: 'Success delete party',
             data: null,
         };
     }
