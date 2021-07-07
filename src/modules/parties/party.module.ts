@@ -6,6 +6,7 @@ import { PartyInvitationController } from './controllers/party-invitation.contro
 import { PartyController } from './controllers/party.controller';
 import { AcceptInvitationService } from './services/accept-invitation.service';
 import { CreatePartyService } from './services/create-party.service';
+import { DeletePartyService } from './services/delete-party.service';
 import { GetPartyService } from './services/get-party.service';
 import { IndexPartyInvitationService } from './services/index-party-invitation.service';
 import { IndexPartyMemberService } from './services/index-party-member.service';
@@ -27,6 +28,7 @@ import { UpdateTransactionHashService } from './services/update-transaction-hash
         IndexPartyInvitationService,
         AcceptInvitationService,
         IndexPartyMemberService,
+        DeletePartyService,
     ],
 })
 export class PartyModule {}
