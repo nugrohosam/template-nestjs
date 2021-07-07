@@ -1,4 +1,10 @@
-import { Inject, UnprocessableEntityException } from '@nestjs/common';
+import {
+    Inject,
+    UnauthorizedException,
+    UnprocessableEntityException,
+} from '@nestjs/common';
+import { PartyModel } from 'src/models/party.model';
+import { DeletePartyRequest } from '../requests/delete-party.request';
 import { GetPartyService } from './get-party.service';
 
 export class DeletePartyService {
@@ -7,8 +13,15 @@ export class DeletePartyService {
         private readonly getPartyService: GetPartyService,
     ) {}
 
-    async delete(partyId: string): Promise<void> {
+    validateSignature(signature: string, party: PartyModel): void {
+        if (signature !== party.signature)
+            throw new UnauthorizedException('Signature not valid.');
+    }
+
+    async delete(partyId: string, request: DeletePartyRequest): Promise<void> {
         const party = await this.getPartyService.getPartyById(partyId);
+
+        this.validateSignature(request.memberSignature, party);
 
         if (party.transactionHash && party.address)
             throw new UnprocessableEntityException('Party active.');

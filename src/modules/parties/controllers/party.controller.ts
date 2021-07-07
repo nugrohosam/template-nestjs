@@ -11,6 +11,7 @@ import {
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { ProfileResponse } from 'src/modules/users/responses/profile.response';
 import { CreatePartyRequest } from '../requests/create-party.request';
+import { DeletePartyRequest } from '../requests/delete-party.request';
 import { IndexPartyMemberRequest } from '../requests/index-party-member.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { JoinPartyRequest } from '../requests/join-party.request';
@@ -75,8 +76,9 @@ export class PartyController {
     @Delete('/:partyId')
     async delete(
         @Param('partyId') partyId: string,
+        @Body() request: DeletePartyRequest,
     ): Promise<IApiResponse<null>> {
-        await this.deletePartyService.delete(partyId);
+        await this.deletePartyService.delete(partyId, request);
         return {
             message: 'Success delete party',
             data: null,
