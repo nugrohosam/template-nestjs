@@ -12,6 +12,8 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     imageUrl: string | null;
     purpose: string;
     isPublic: boolean;
+    minDeposit: bigint;
+    maxDeposit: bigint;
     totalMember: number;
     totalFund: bigint;
     distribution: DistributionTypeEnum;
@@ -27,6 +29,8 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             imageUrl: party.imageUrl,
             purpose: party.purpose,
             isPublic: party.isPublic,
+            minDeposit: party.minDeposit,
+            maxDeposit: party.maxDeposit,
             totalMember: party.totalMember,
             totalFund: party.totalFund,
             distribution: party.distribution,
