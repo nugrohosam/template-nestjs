@@ -28,7 +28,7 @@ describe('Register Test (POST)', () => {
     });
 
     it('success register', (done) => {
-        return supertest(app.getHttpServer())
+        return supertest("localhost:3000")
             .post('/register')
             .set('Content-Type', 'application/json')
             .send(bodyRequest)
@@ -44,7 +44,7 @@ describe('Register Test (POST)', () => {
     });
 
     it('failed register', (done) => {
-        return supertest(app.getHttpServer())
+        return supertest("localhost:3000")
             .post('/register')
             .set('Content-Type', 'application/json')
             .send(bodyRequest)
