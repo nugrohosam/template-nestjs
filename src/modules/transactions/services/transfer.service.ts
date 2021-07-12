@@ -12,6 +12,7 @@ export class TransferService {
             currencyId: request.currencyId,
             type: request.type,
             description: request.description,
+            transactionHash: request.transactionHash,
         });
     }
 

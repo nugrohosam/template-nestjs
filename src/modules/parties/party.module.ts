@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { Web3Module } from 'src/infrastructure/web3/web3.module';
 import { TransactionModule } from '../transactions/transaction.module';
 import { UserModule } from '../users/user.module';
+import { JoinPartyController } from './controllers/join-party.controller';
 import { PartyInvitationController } from './controllers/party-invitation.controller';
 import { PartyController } from './controllers/party.controller';
 import { AcceptInvitationService } from './services/accept-invitation.service';
@@ -17,7 +18,11 @@ import { UpdateTransactionHashService } from './services/update-transaction-hash
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule],
-    controllers: [PartyController, PartyInvitationController],
+    controllers: [
+        PartyController,
+        PartyInvitationController,
+        JoinPartyController,
+    ],
     providers: [
         IndexPartyService,
         GetPartyService,

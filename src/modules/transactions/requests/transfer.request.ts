@@ -36,11 +36,12 @@ export class TransferRequest {
     type: TransactionTypeEnum;
 
     @IsOptional()
-    description: string;
+    description?: string;
 
+    @IsOptional()
     @IsNotEmpty()
     @Expose({ name: 'transaction_hash' })
-    transactionHash: string;
+    transactionHash?: string;
 
     @IsNotEmpty()
     @Expose({ name: 'transfer_signature' })
@@ -59,7 +60,6 @@ export class TransferRequest {
             description: 'Initial Deposit', // TODO: default description based on type enum
             currencyId: 0, // TODO: need to confirm about party currency
             transferSignature: request.joinSignature,
-            transactionHash: request.transactionHash,
         };
     }
 }

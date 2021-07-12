@@ -50,17 +50,20 @@ export class TransactionModel
     type: TransactionTypeEnum;
 
     @Column(DataType.TEXT)
-    description: string | null;
+    description?: string;
+
+    @Column({ type: DataType.STRING, field: 'transaction_hash' })
+    transactionHash?: string;
 
     @CreatedAt
     @Column({ type: DataType.DATE, field: 'created_at' })
-    createdAt?: Date | null;
+    createdAt?: Date;
 
     @UpdatedAt
     @Column({ type: DataType.DATE, field: 'updated_at' })
-    updatedAt?: Date | null;
+    updatedAt?: Date;
 
     @DeletedAt
     @Column({ type: DataType.DATE, field: 'deleted_at' })
-    deletedAt?: Date | null;
+    deletedAt?: Date;
 }

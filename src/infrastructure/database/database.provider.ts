@@ -10,7 +10,7 @@ import { databaseConfig } from './database.config';
 class DatabaseProviders {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    private readonly _primeSequelize = new Sequelize({
+    private readonly _localSequelize = new Sequelize({
         ...databaseConfig,
         ...{ logging: false },
     });
@@ -47,10 +47,10 @@ class DatabaseProviders {
         return this._databaseProviders;
     }
 
-    getPrimeSequelize() {
-        return this._primeSequelize;
+    getLocalSequelize() {
+        return this._localSequelize;
     }
 }
 
 export const databaseProviders = new DatabaseProviders().getDatabaseProviders();
-export const localDatabase = new DatabaseProviders().getPrimeSequelize();
+export const localDatabase = new DatabaseProviders().getLocalSequelize();
