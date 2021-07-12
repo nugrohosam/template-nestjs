@@ -9,7 +9,6 @@ const validateJsonSchema = new Validator();
 
 describe('Party List Test (GET)', () => {
     let app: INestApplication;
-    let bodyRequest;
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -18,18 +17,13 @@ describe('Party List Test (GET)', () => {
 
         app = moduleFixture.createNestApplication();
         await app.init();
-        bodyRequest = {
-            per_page: 10,
-            page: 1,
-            owner_id:'1a160d9c-eba6-440e-803a-d9cee909ad50',
-        };
     });
 
     it('success list party', (done) => {
         return supertest("localhost:3000")
             .get('/parties')
             .set('Content-Type', 'application/json')
-            .send(bodyRequest)
+            .query({per_page:10,page:1,owner_id:'1a160d9c-eba6-440e-803a-d9cee909ad50'})
             .expect(200)
             .then((response) => {
                 const validateResult = validateJsonSchema.validate(
