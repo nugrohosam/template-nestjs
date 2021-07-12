@@ -168,8 +168,8 @@ export class JoinPartyService {
         const member = await partyMember.$get('member');
 
         const message = this.web3Service.soliditySha3([
-            { t: 'address', v: party.address },
             { t: 'address', v: member.address },
+            { t: 'address', v: party.address },
             { t: 'string', v: partyMember.id },
         ]);
         // TODO: need to removed after testing
