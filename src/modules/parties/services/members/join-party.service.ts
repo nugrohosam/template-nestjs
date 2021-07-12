@@ -12,7 +12,7 @@ import { UserModel } from 'src/models/user.model';
 import { TransferRequest } from 'src/modules/transactions/requests/transfer.request';
 import { TransferService } from 'src/modules/transactions/services/transfer.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
-import { JoinPartyRequest } from '../../requests/join-party.request';
+import { JoinPartyRequest } from '../../requests/member/join-party.request';
 import { GetPartyService } from '../get-party.service';
 
 export class JoinPartyService {

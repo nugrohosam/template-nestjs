@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
-import { JoinPartyRequest } from 'src/modules/parties/requests/join-party.request';
+import { JoinPartyRequest } from 'src/modules/parties/requests/member/join-party.request';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 
 export class TransferRequest {

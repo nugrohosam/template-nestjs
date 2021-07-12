@@ -2,8 +2,8 @@ import { Inject, UnprocessableEntityException } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyModel } from 'src/models/party.model';
-import { InviteUserRequest } from '../requests/invite-user.request';
-import { GetPartyService } from './get-party.service';
+import { InviteUserRequest } from '../../requests/invitation/invite-user.request';
+import { GetPartyService } from '../get-party.service';
 
 export class InvitePartyService {
     constructor(

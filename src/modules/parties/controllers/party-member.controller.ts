@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { ProfileResponse } from 'src/modules/users/responses/profile.response';
-import { IndexPartyMemberRequest } from '../requests/index-party-member.request';
-import { JoinPartyRequest } from '../requests/join-party.request';
+import { IndexPartyMemberRequest } from '../requests/member/index-party-member.request';
+import { JoinPartyRequest } from '../requests/member/join-party.request';
 import { UpdatePartyMemberRequest } from '../requests/member/update-party-member.request';
-import { JoinPartyResponse } from '../responses/join-party.response';
+import { JoinPartyResponse } from '../responses/member/join-party.response';
 import { IndexPartyMemberService } from '../services/members/index-party-member.service';
 import { JoinPartyService } from '../services/members/join-party.service';
 import { UpdatePartyMemberService } from '../services/members/update-party-member.service';

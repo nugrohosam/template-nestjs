@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { AcceptInvitationRequest } from '../requests/accept-invitation.request';
-import { IndexPartyInvitationRequest } from '../requests/index-party-invitation.request';
-import { InviteUserRequest } from '../requests/invite-user.request';
-import { IndexPartyInvitationResponse } from '../responses/index-party-invitation.response';
-import { AcceptInvitationService } from '../services/accept-invitation.service';
-import { IndexPartyInvitationService } from '../services/index-party-invitation.service';
-import { InvitePartyService } from '../services/invite-party.service';
+import { AcceptInvitationRequest } from '../requests/invitation/accept-invitation.request';
+import { IndexPartyInvitationRequest } from '../requests/invitation/index-party-invitation.request';
+import { InviteUserRequest } from '../requests/invitation/invite-user.request';
+import { IndexPartyInvitationResponse } from '../responses/invitation/index-party-invitation.response';
+import { AcceptInvitationService } from '../services/invitation/accept-invitation.service';
+import { IndexPartyInvitationService } from '../services/invitation/index-party-invitation.service';
+import { InvitePartyService } from '../services/invitation/invite-party.service';
 
 @Controller('parties/:partyId/invitations')
 export class PartyInvitationController {
