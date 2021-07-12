@@ -3,8 +3,8 @@ import { Op } from 'sequelize';
 import { WhereOptions } from 'sequelize/types';
 import { IPartyInvitation } from 'src/entities/parti-invitation.entity';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
-import { IndexPartyInvitationRequest } from '../requests/index-party-invitation.request';
-import { IndexPartyInvitationResponse } from '../responses/index-party-invitation.response';
+import { IndexPartyInvitationRequest } from '../../requests/invitation/index-party-invitation.request';
+import { IndexPartyInvitationResponse } from '../../responses/invitation/index-party-invitation.response';
 import {
     PaginationResponse,
     SequelizePaginator,

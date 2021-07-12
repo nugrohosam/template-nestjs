@@ -14,8 +14,4 @@ export class JoinPartyRequest {
     @IsNotEmpty()
     @Expose({ name: 'join_signature' })
     joinSignature: string;
-
-    @IsNotEmpty()
-    @Expose({ name: 'transaction_hash' })
-    transactionHash: string;
 }

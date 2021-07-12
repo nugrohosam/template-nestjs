@@ -1,4 +1,9 @@
-import { Inject, UnprocessableEntityException } from '@nestjs/common';
+import {
+    Inject,
+    InternalServerErrorException,
+    UnprocessableEntityException,
+} from '@nestjs/common';
+import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -7,8 +12,8 @@ import { UserModel } from 'src/models/user.model';
 import { TransferRequest } from 'src/modules/transactions/requests/transfer.request';
 import { TransferService } from 'src/modules/transactions/services/transfer.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
-import { JoinPartyRequest } from '../requests/join-party.request';
-import { GetPartyService } from './get-party.service';
+import { JoinPartyRequest } from '../../requests/member/join-party.request';
+import { GetPartyService } from '../get-party.service';
 
 export class JoinPartyService {
     constructor(
@@ -112,7 +117,7 @@ export class JoinPartyService {
             initialFund: request.initialDeposit,
             totalFund: request.initialDeposit,
             status: 'active', // TODO: need based on member status enum
-            transactionHash: request.transactionHash,
+            signature: request.joinSignature,
         });
     }
 
@@ -130,11 +135,28 @@ export class JoinPartyService {
         this.validateUserInitialDeposit(party, request.initialDeposit);
         // TODO: validate transaction hash
 
-        const partyMember = await this.storePartyMember(party, user, request);
+        let partyMember: PartyMemberModel;
+        const transaction = await localDatabase.transaction();
+        try {
+            partyMember = await this.storePartyMember(party, user, request);
 
-        await this.transferService.storeTransaction(
-            TransferRequest.mapFromJoinPartyRequest(party, user, request),
-        );
+            const depositTransaction =
+                await this.transferService.storeTransaction(
+                    TransferRequest.mapFromJoinPartyRequest(
+                        party,
+                        user,
+                        request,
+                    ),
+                );
+
+            partyMember.depositTransactionId = depositTransaction.id;
+            await partyMember.save();
+
+            await transaction.commit();
+        } catch (err: any) {
+            await transaction.rollback();
+            throw new InternalServerErrorException(err);
+        }
 
         return partyMember;
     }

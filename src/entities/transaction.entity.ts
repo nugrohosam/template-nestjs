@@ -7,8 +7,9 @@ export interface ITransaction {
     amount: bigint;
     currencyId: number;
     type: TransactionTypeEnum;
-    description: string | null;
-    createdAt?: Date | null;
-    updatedAt?: Date | null;
-    deletedAt?: Date | null;
+    description?: string;
+    transactionHash?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
 }

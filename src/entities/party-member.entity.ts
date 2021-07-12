@@ -5,8 +5,10 @@ export interface IPartyMember {
     initialFund: bigint;
     totalFund: bigint;
     status: string;
-    transactionHash: string;
-    createdAt?: Date | null;
-    updatedAt?: Date | null;
-    deletedAt?: Date | null;
+    signature: string;
+    transactionHash?: string;
+    depositTransactionId?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
 }

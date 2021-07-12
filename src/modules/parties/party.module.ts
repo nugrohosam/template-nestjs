@@ -2,33 +2,45 @@ import { Module } from '@nestjs/common';
 import { Web3Module } from 'src/infrastructure/web3/web3.module';
 import { TransactionModule } from '../transactions/transaction.module';
 import { UserModule } from '../users/user.module';
+import { PartyMemberController } from './controllers/party-member.controller';
 import { PartyInvitationController } from './controllers/party-invitation.controller';
 import { PartyController } from './controllers/party.controller';
-import { AcceptInvitationService } from './services/accept-invitation.service';
+import { AcceptInvitationService } from './services/invitation/accept-invitation.service';
 import { CreatePartyService } from './services/create-party.service';
 import { DeletePartyService } from './services/delete-party.service';
 import { GetPartyService } from './services/get-party.service';
-import { IndexPartyInvitationService } from './services/index-party-invitation.service';
-import { IndexPartyMemberService } from './services/index-party-member.service';
+import { IndexPartyInvitationService } from './services/invitation/index-party-invitation.service';
+import { IndexPartyMemberService } from './services/members/index-party-member.service';
 import { IndexPartyService } from './services/index-party.service';
-import { InvitePartyService } from './services/invite-party.service';
-import { JoinPartyService } from './services/join-party.service';
+import { JoinPartyService } from './services/members/join-party.service';
 import { UpdateTransactionHashService } from './services/update-transaction-hash.service';
+import { UpdatePartyMemberService } from './services/members/update-party-member.service';
+import { GetPartyMemberService } from './services/members/get-party-member.service';
+import { InvitePartyService } from './services/invitation/invite-party.service';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule],
-    controllers: [PartyController, PartyInvitationController],
+    controllers: [
+        PartyController,
+        PartyInvitationController,
+        PartyMemberController,
+    ],
     providers: [
+        // Party Porviders
         IndexPartyService,
         GetPartyService,
         CreatePartyService,
         UpdateTransactionHashService,
-        JoinPartyService,
+        DeletePartyService,
+        // Party Invitation Providers
         InvitePartyService,
         IndexPartyInvitationService,
         AcceptInvitationService,
+        // Party Member / Join Party Providers
+        JoinPartyService,
+        UpdatePartyMemberService,
+        GetPartyMemberService,
         IndexPartyMemberService,
-        DeletePartyService,
     ],
 })
 export class PartyModule {}
