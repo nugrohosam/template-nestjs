@@ -12,8 +12,8 @@ import { UserModel } from 'src/models/user.model';
 import { TransferRequest } from 'src/modules/transactions/requests/transfer.request';
 import { TransferService } from 'src/modules/transactions/services/transfer.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
-import { JoinPartyRequest } from '../requests/join-party.request';
-import { GetPartyService } from './get-party.service';
+import { JoinPartyRequest } from '../../requests/join-party.request';
+import { GetPartyService } from '../get-party.service';
 
 export class JoinPartyService {
     constructor(
@@ -117,6 +117,7 @@ export class JoinPartyService {
             initialFund: request.initialDeposit,
             totalFund: request.initialDeposit,
             status: 'active', // TODO: need based on member status enum
+            signature: request.joinSignature,
         });
     }
 

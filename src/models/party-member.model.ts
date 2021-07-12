@@ -50,6 +50,10 @@ export class PartyMemberModel
     @Column(DataType.STRING)
     status: string; // TODO: use party member status enum instead
 
+    @AllowNull(false)
+    @Column(DataType.STRING)
+    signature: string;
+
     @Column({ type: DataType.STRING, field: 'transaction_hash' })
     transactionHash?: string;
 

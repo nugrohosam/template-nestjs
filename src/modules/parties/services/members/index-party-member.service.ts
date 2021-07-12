@@ -5,8 +5,8 @@ import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { ProfileResponse } from 'src/modules/users/responses/profile.response';
-import { IndexPartyMemberRequest } from '../requests/index-party-member.request';
-import { GetPartyService } from './get-party.service';
+import { IndexPartyMemberRequest } from '../../requests/index-party-member.request';
+import { GetPartyService } from '../get-party.service';
 import {
     PaginationResponse,
     SequelizePaginator,

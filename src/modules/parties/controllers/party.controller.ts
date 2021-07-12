@@ -9,10 +9,8 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { ProfileResponse } from 'src/modules/users/responses/profile.response';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { DeletePartyRequest } from '../requests/delete-party.request';
-import { IndexPartyMemberRequest } from '../requests/index-party-member.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
@@ -21,9 +19,9 @@ import { IndexPartyResponse } from '../responses/index-party.response';
 import { CreatePartyService } from '../services/create-party.service';
 import { DeletePartyService } from '../services/delete-party.service';
 import { GetPartyService } from '../services/get-party.service';
-import { IndexPartyMemberService } from '../services/index-party-member.service';
+import { IndexPartyMemberService } from '../services/members/index-party-member.service';
 import { IndexPartyService } from '../services/index-party.service';
-import { JoinPartyService } from '../services/join-party.service';
+import { JoinPartyService } from '../services/members/join-party.service';
 import { UpdateTransactionHashService } from '../services/update-transaction-hash.service';
 
 @Controller('parties')
@@ -102,19 +100,6 @@ export class PartyController {
         return {
             message: 'Success get party',
             data: DetailPartyResponse.mapFromPartyModel(party),
-        };
-    }
-
-    @Get('/:partyId/members')
-    async members(
-        @Param('partyId') partyId: string,
-        @Query() query: IndexPartyMemberRequest,
-    ): Promise<IApiResponse<ProfileResponse[]>> {
-        const result = await this.indexPartyMemberService.fetch(partyId, query);
-
-        return {
-            message: 'Success get user members',
-            ...result,
         };
     }
 }
