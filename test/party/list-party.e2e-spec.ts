@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import supertest from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { Validator } from 'jsonschema';
-import schema from './resources/list-success.json';
+import schemaSuccess from './resources/list-success.json';
 
 const validateJsonSchema = new Validator();
 
@@ -28,7 +28,7 @@ describe('Party List Test (GET)', () => {
             .then((response) => {
                 const validateResult = validateJsonSchema.validate(
                     response.body,
-                    schema,
+                    schemaSuccess,
                 );
                 expect(validateResult.valid).toBe(true);
                 done();
