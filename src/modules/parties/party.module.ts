@@ -19,6 +19,7 @@ import { GetPartyMemberService } from './services/members/get-party-member.servi
 import { InvitePartyService } from './services/invitation/invite-party.service';
 import { JoinRequestController } from './controllers/join-request.controller';
 import { RequestJoinService } from './services/join-request/request-join.service';
+import { IndexJoinRequest } from './services/join-request/index-join-request.service';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule],
@@ -37,6 +38,7 @@ import { RequestJoinService } from './services/join-request/request-join.service
         DeletePartyService,
         // Join Request Providers
         RequestJoinService,
+        IndexJoinRequest,
         // Party Invitation Providers
         InvitePartyService,
         IndexPartyInvitationService,

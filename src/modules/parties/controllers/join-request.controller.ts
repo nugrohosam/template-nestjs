@@ -1,12 +1,17 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { IndexRequest } from 'src/common/request/index.request';
 import { JoinRequestRequest } from '../requests/join-request/join-request.request';
 import { JoinRequestResponse } from '../responses/join-request/join-request.response';
+import { IndexJoinRequest } from '../services/join-request/index-join-request.service';
 import { RequestJoinService } from '../services/join-request/request-join.service';
 
 @Controller('parties/:partyId/join-requests')
 export class JoinRequestController {
-    constructor(private readonly requestJoinService: RequestJoinService) {}
+    constructor(
+        private readonly requestJoinService: RequestJoinService,
+        private readonly indexJoinRequest: IndexJoinRequest,
+    ) {}
 
     @Post()
     async request(
@@ -21,6 +26,23 @@ export class JoinRequestController {
         return {
             message: 'Success request join a party.',
             data: JoinRequestResponse.mapFromJoinRequestModel(joinRequest),
+        };
+    }
+
+    @Get()
+    async index(
+        @Param('partyId') partyId: string,
+        @Query() query: IndexRequest,
+    ): Promise<IApiResponse<JoinRequestResponse[]>> {
+        const { data, meta } = await this.indexJoinRequest.fetchByPartyId(
+            partyId,
+            query,
+        );
+
+        return {
+            message: "Success get party's join requests",
+            meta,
+            data,
         };
     }
 }
