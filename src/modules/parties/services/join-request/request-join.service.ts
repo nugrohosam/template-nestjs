@@ -10,6 +10,7 @@ import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { JoinRequestRequest } from '../../requests/join-request/join-request.request';
 import { GetPartyService } from '../get-party.service';
+import { GetJoinRequestService } from './get-join-request.service';
 
 @Injectable()
 export class RequestJoinService {
@@ -18,6 +19,8 @@ export class RequestJoinService {
         private readonly getPartyService: GetPartyService,
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
+        @Inject(GetJoinRequestService)
+        private readonly getJoinRequestService: GetJoinRequestService,
     ) {}
 
     private generateSignatureMessage(
@@ -86,6 +89,7 @@ export class RequestJoinService {
             message,
         );
 
-        return await this.storeJoinRequest(request, party);
+        const { id } = await this.storeJoinRequest(request, party);
+        return await this.getJoinRequestService.getById(id);
     }
 }
