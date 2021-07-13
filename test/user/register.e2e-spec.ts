@@ -3,8 +3,8 @@ import { INestApplication } from '@nestjs/common';
 import supertest from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { Validator } from 'jsonschema';
-import schemaSuccess from './resources/register-success.json';
-import schemaFailed from './resources/register-failed.json';
+import schemaSuccess from './resources/register-user/register-success.json';
+import schemaFailed from './resources/register-user/register-failed.json';
 
 const validateJsonSchema = new Validator();
 

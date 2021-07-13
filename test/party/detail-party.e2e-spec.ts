@@ -3,9 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import supertest from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { Validator } from 'jsonschema';
-import schemaSuccess from './resources/details-success.json';
-import schemaFailed from './resources/details-failed.json';
-import schemaPrivate from './resources/details-private.json';
+import schemaSuccess from './resources/detail-party/details-success.json';
+import schemaFailed from './resources/detail-party/details-failed.json';
+import schemaPrivate from './resources/detail-party/details-private.json';
 
 const validateJsonSchema = new Validator();
 

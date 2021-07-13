@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import supertest from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { Validator } from 'jsonschema';
-import schema from './resources/create-success.json';
+import schema from './resources/create-party/create-success.json';
 
 const validateJsonSchema = new Validator();
 
