@@ -5,6 +5,7 @@ import {
 } from 'sequelize-typescript-paginator';
 import { IndexRequest } from 'src/common/request/index.request';
 import { JoinRequestModel } from 'src/models/join-request.model';
+import { PartyModel } from 'src/models/party.model';
 import { JoinRequestResponse } from '../../responses/join-request/join-request.response';
 
 @Injectable()
@@ -22,6 +23,12 @@ export class IndexJoinRequest {
                     where: { partyId },
                     order: [
                         [query.sort ?? 'created_at', query.order ?? 'desc'],
+                    ],
+                    include: [
+                        {
+                            model: PartyModel,
+                            required: true,
+                        },
                     ],
                 },
             },

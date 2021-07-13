@@ -1,5 +1,6 @@
 import {
     AllowNull,
+    BelongsTo,
     Column,
     CreatedAt,
     DataType,
@@ -32,7 +33,7 @@ export class JoinRequestModel
 
     @ForeignKey(() => PartyModel)
     @AllowNull(false)
-    @Column({ type: DataType.STRING, field: 'prarty_id' })
+    @Column({ type: DataType.UUID, field: 'party_id' })
     partyId: string;
 
     @Column({ type: DataType.DATE, field: 'accepted_at' })
@@ -63,4 +64,7 @@ export class JoinRequestModel
             return JoinRequestStatusEnum.Pending;
         }
     }
+
+    @BelongsTo(() => PartyModel, 'partyId')
+    readonly party?: PartyModel;
 }

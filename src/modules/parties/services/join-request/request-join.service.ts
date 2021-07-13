@@ -42,7 +42,7 @@ export class RequestJoinService {
         const message = this.generateSignatureMessage(request, party);
 
         // TODO: need to removed after testing
-        console.log('message[platform-create-party]: ' + message);
+        console.log('message[request-join]: ' + message);
         await this.web3Service.validateSignature(
             request.signature,
             request.userAddress,

@@ -20,6 +20,8 @@ import { InvitePartyService } from './services/invitation/invite-party.service';
 import { JoinRequestController } from './controllers/join-request.controller';
 import { RequestJoinService } from './services/join-request/request-join.service';
 import { IndexJoinRequest } from './services/join-request/index-join-request.service';
+import { UpdateStatusJoinRequestService } from './services/join-request/update-status-join-request.service';
+import { GetJoinRequestService } from './services/join-request/get-join-request.service';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule],
@@ -39,6 +41,8 @@ import { IndexJoinRequest } from './services/join-request/index-join-request.ser
         // Join Request Providers
         RequestJoinService,
         IndexJoinRequest,
+        GetJoinRequestService,
+        UpdateStatusJoinRequestService,
         // Party Invitation Providers
         InvitePartyService,
         IndexPartyInvitationService,
