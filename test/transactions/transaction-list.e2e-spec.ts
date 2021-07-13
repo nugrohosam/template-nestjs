@@ -22,7 +22,7 @@ describe('Transaction List Test (GET)', () => {
 
     it('success list transaction', (done) => {
         return supertest("localhost:3000")
-            .get('/transactions/by-user-id/2f52a365-9573-44b8-856e-a1332a62806c')
+            .get('/transactions/by-user-id/' + process.env.USER_ID)
             .expect(200)
             .then((response) => {
                 const validateResult = validateJsonSchema.validate(
