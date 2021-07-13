@@ -54,7 +54,7 @@ export class InvitePartyService {
         partyId: string,
         request: InviteUserRequest,
     ): Promise<PartyInvitationModel> {
-        const party = await this.getPartyService.getPartyById(partyId);
+        const party = await this.getPartyService.getById(partyId);
         const message = this.generateInvitePartyMessage(
             request.userAddress,
             party,

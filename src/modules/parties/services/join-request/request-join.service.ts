@@ -38,7 +38,7 @@ export class RequestJoinService {
         partyId: string,
         request: JoinRequestRequest,
     ): Promise<JoinRequestModel> {
-        const party = await this.getPartyService.getPartyById(partyId);
+        const party = await this.getPartyService.getById(partyId);
         const message = this.generateSignatureMessage(request, party);
 
         // TODO: need to removed after testing
