@@ -125,7 +125,7 @@ export class JoinPartyService {
         partyId: string,
         request: JoinPartyRequest,
     ): Promise<PartyMemberModel> {
-        const party = await this.getPartyService.getPartyById(partyId);
+        const party = await this.getPartyService.getById(partyId);
         const user = await this.getUserService.getUserByAddress(
             request.userAddress,
         );

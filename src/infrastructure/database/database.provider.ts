@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
+import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
@@ -32,6 +33,7 @@ class DatabaseProviders {
                     WhitelistedAddressModel,
                     PartyModel,
                     PartyMemberModel,
+                    JoinRequestModel,
                     PartyInvitationModel,
                     TransactionModel,
                 ]);

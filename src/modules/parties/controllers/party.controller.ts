@@ -96,7 +96,7 @@ export class PartyController {
     async show(
         @Param('partyId') partyId: string,
     ): Promise<IApiResponse<DetailPartyResponse>> {
-        const party = await this.getPartyService.getPartyById(partyId);
+        const party = await this.getPartyService.getById(partyId);
         return {
             message: 'Success get party',
             data: DetailPartyResponse.mapFromPartyModel(party),

@@ -4,7 +4,7 @@ import { UserModel } from 'src/models/user.model';
 
 @Injectable()
 export class GetPartyService {
-    async getPartyById(partyId: string): Promise<PartyModel> {
+    async getById(partyId: string): Promise<PartyModel> {
         const party = await PartyModel.findOne({
             include: [
                 {

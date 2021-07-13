@@ -45,7 +45,7 @@ export class IndexPartyMemberService {
         partyId: string,
         query: IndexPartyMemberRequest,
     ): Promise<PaginationResponse<ProfileResponse>> {
-        const party = await this.getPartyService.getPartyById(partyId);
+        const party = await this.getPartyService.getById(partyId);
         const { data, meta } = await SequelizePaginator.paginate(
             PartyMemberModel,
             {

@@ -19,7 +19,7 @@ export class DeletePartyService {
     }
 
     async delete(partyId: string, request: DeletePartyRequest): Promise<void> {
-        const party = await this.getPartyService.getPartyById(partyId);
+        const party = await this.getPartyService.getById(partyId);
 
         this.validateSignature(request.memberSignature, party);
 

@@ -17,11 +17,17 @@ import { UpdateTransactionHashService } from './services/update-transaction-hash
 import { UpdatePartyMemberService } from './services/members/update-party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
 import { InvitePartyService } from './services/invitation/invite-party.service';
+import { JoinRequestController } from './controllers/join-request.controller';
+import { RequestJoinService } from './services/join-request/request-join.service';
+import { IndexJoinRequest } from './services/join-request/index-join-request.service';
+import { UpdateStatusJoinRequestService } from './services/join-request/update-status-join-request.service';
+import { GetJoinRequestService } from './services/join-request/get-join-request.service';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule],
     controllers: [
         PartyController,
+        JoinRequestController,
         PartyInvitationController,
         PartyMemberController,
     ],
@@ -32,6 +38,11 @@ import { InvitePartyService } from './services/invitation/invite-party.service';
         CreatePartyService,
         UpdateTransactionHashService,
         DeletePartyService,
+        // Join Request Providers
+        RequestJoinService,
+        IndexJoinRequest,
+        GetJoinRequestService,
+        UpdateStatusJoinRequestService,
         // Party Invitation Providers
         InvitePartyService,
         IndexPartyInvitationService,
