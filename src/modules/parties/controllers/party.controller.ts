@@ -99,7 +99,7 @@ export class PartyController {
         const party = await this.getPartyService.getById(partyId);
         return {
             message: 'Success get party',
-            data: DetailPartyResponse.mapFromPartyModel(party),
+            data: await DetailPartyResponse.mapFromPartyModel(party),
         };
     }
 }

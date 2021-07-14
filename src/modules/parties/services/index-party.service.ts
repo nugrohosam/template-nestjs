@@ -8,13 +8,22 @@ import {
     PaginationResponse,
     SequelizePaginator,
 } from 'sequelize-typescript-paginator';
+import { Op } from 'sequelize';
 
 export class IndexPartyService {
     private getFindOptions(query: IndexPartyRequest): FindOptions<IParty> {
-        const where: WhereOptions<IParty> = {};
+        const where: WhereOptions<IParty> = {
+            isPublic: true,
+            transactionHash: {
+                [Op.ne]: null,
+            },
+            address: {
+                [Op.ne]: null,
+            },
+        };
 
         if (query.ownerId) {
-            where['ownerId'] = query.ownerId;
+            where.ownerId = query.ownerId;
         }
 
         return {
