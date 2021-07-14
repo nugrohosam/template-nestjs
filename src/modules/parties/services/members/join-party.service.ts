@@ -110,29 +110,6 @@ export class JoinPartyService {
         }
     }
 
-    async validateJoinSignature(
-        user: UserModel,
-        party: PartyModel,
-        request: JoinPartyRequest,
-    ): Promise<void> {
-        const message = this.generateJoinSignature(
-            user,
-            party,
-            request.initialDeposit,
-        );
-
-        // TODO: need to removed after testing
-        console.log('message[join-party]: ' + message);
-
-        const signer = await this.web3Service.recover(
-            request.joinSignature,
-            message,
-        );
-
-        if (signer !== user.address)
-            throw new UnprocessableEntityException('Signature not valid.');
-    }
-
     private validateUserInitialDeposit(
         party: PartyModel,
         deposit: bigint,
@@ -169,8 +146,21 @@ export class JoinPartyService {
         );
 
         await this.validateUser(user, party);
-        await this.validateJoinSignature(user, party, request);
         this.validateUserInitialDeposit(party, request.initialDeposit);
+
+        const message = this.generateJoinSignature(
+            user,
+            party,
+            request.initialDeposit,
+        );
+        // TODO: need to removed after testing
+        console.log('message[request-join]: ' + message);
+        await this.web3Service.validateSignature(
+            request.joinSignature,
+            user.address,
+            message,
+        );
+
         // TODO: validate transaction hash
 
         let partyMember: PartyMemberModel;
