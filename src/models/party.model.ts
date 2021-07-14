@@ -198,4 +198,12 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
 
         return true;
     }
+
+    async isMember(user: UserModel): Promise<boolean> {
+        const partyMembers = await PartyMemberModel.findOne({
+            where: { memberId: user.id, partyId: this.id },
+        });
+
+        return partyMembers !== null;
+    }
 }

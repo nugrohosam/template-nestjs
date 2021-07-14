@@ -22,9 +22,10 @@ import { RequestJoinService } from './services/join-request/request-join.service
 import { IndexJoinRequest } from './services/join-request/index-join-request.service';
 import { UpdateStatusJoinRequestService } from './services/join-request/update-status-join-request.service';
 import { GetJoinRequestService } from './services/join-request/get-join-request.service';
+import { CommonModule } from '../commons/common.module';
 
 @Module({
-    imports: [Web3Module, UserModule, TransactionModule],
+    imports: [Web3Module, UserModule, TransactionModule, CommonModule],
     controllers: [
         PartyController,
         JoinRequestController,
