@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
-import { PartyInvitationModel } from 'src/models/party-invitation.model';
+import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -37,27 +37,26 @@ export class JoinPartyService {
         ]);
     }
 
-    async checkUserAcceptInvitation(
-        user: UserModel,
-        party: PartyModel,
-    ): Promise<void> {
-        const invitation = await PartyInvitationModel.findOne({
-            where: {
-                userAddress: user.address,
-                partyId: party.id,
-            },
+    private async checkOwnerHasJoin(party: PartyModel): Promise<void> {
+        const member = await PartyMemberModel.findOne({
+            where: { partyId: party.id, memberId: party.ownerId },
         });
 
-        if (!invitation)
-            throw new UnprocessableEntityException('User not invited.');
-
-        if (invitation.acceptedAt === null)
+        if (!member)
             throw new UnprocessableEntityException(
-                'Invitation not accepted yet.',
+                'Party owner not joined yet.',
+            );
+
+        if (!member.depositTransactionId)
+            throw new UnprocessableEntityException(
+                'Party owner not init deposit yet.',
             );
     }
 
-    async validateUser(user: UserModel, party: PartyModel): Promise<void> {
+    private async checkUserIsNotMember(
+        user: UserModel,
+        party: PartyModel,
+    ): Promise<void> {
         const member = await PartyMemberModel.findOne({
             where: {
                 partyId: party.id,
@@ -69,9 +68,45 @@ export class JoinPartyService {
             throw new UnprocessableEntityException(
                 'User already a member in that party.',
             );
+    }
+
+    private async checkUserRequestAccepted(
+        user: UserModel,
+        party: PartyModel,
+    ): Promise<void> {
+        if (user.id === party.ownerId) return;
+
+        const joinRequest = await JoinRequestModel.findOne({
+            where: {
+                userAddress: user.address,
+                partyId: party.id,
+            },
+        });
+
+        if (!joinRequest)
+            throw new UnprocessableEntityException(
+                'User must request to join first.',
+            );
+
+        if (joinRequest.rejectedAt)
+            throw new UnprocessableEntityException('Join request rejected.');
+
+        if (!joinRequest.acceptedAt) {
+            throw new UnprocessableEntityException(
+                'Join request has not accepted yet.',
+            );
+        }
+    }
+
+    async validateUser(user: UserModel, party: PartyModel): Promise<void> {
+        if (party.ownerId !== user.id) {
+            await this.checkOwnerHasJoin(party);
+        }
+
+        await this.checkUserIsNotMember(user, party);
 
         if (!party.isPublic) {
-            await this.checkUserAcceptInvitation(user, party);
+            await this.checkUserRequestAccepted(user, party);
         }
     }
 
@@ -98,7 +133,10 @@ export class JoinPartyService {
             throw new UnprocessableEntityException('Signature not valid.');
     }
 
-    validateUserInitialDeposit(party: PartyModel, deposit: bigint): void {
+    private validateUserInitialDeposit(
+        party: PartyModel,
+        deposit: bigint,
+    ): void {
         if (deposit < party.minDeposit || deposit > party.maxDeposit) {
             throw new UnprocessableEntityException(
                 `Deposit must be between ${party.minDeposit} and ${party.maxDeposit}`,
