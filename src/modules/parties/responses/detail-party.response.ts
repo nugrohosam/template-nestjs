@@ -11,6 +11,7 @@ export class DetailPartyResponse
 {
     id: string;
     isActive: boolean;
+    isMember: boolean;
     address: string;
     name: string;
     type: PartyTypeEnum;
@@ -31,10 +32,12 @@ export class DetailPartyResponse
 
     static async mapFromPartyModel(
         party: PartyModel,
+        user?: UserModel,
     ): Promise<DetailPartyResponse> {
         return {
             id: party.id,
             isActive: await party.isActive(),
+            isMember: user ? await party.isMember(user) : false,
             address: party.address,
             name: party.name,
             type: party.type,
