@@ -187,40 +187,15 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @HasMany(() => PartyInvitationModel)
     readonly invitations?: PartyInvitationModel[];
 
-    /**
-     * TODO: need to confirm to PO about distribution schedule
-     * get next distribution schedule based on created date
-     * and distribution type
-     */
-    get nextDistributionOn(): Date | null {
-        return this.createdAt;
+    async isActive(): Promise<boolean> {
+        if (!this.address || !this.transactionHash) return false;
 
-        // switch (this.distribution) {
-        //     case DistributionTypeEnum.Daily:
-        //         date =
-        //             date.getHours() > new Date().getHours()
-        //                 ? new Date(date.setDate(new Date().getDate() + 1))
-        //                 : new Date(new Date().setTime(date.getTime()));
-        //         break;
-        //     case DistributionTypeEnum.Monthly:
-        //         date =
-        //             date.getDate() > new Date().getDate()
-        //                 ? new Date(date.setMonth(new Date().getMonth() + 1))
-        //                 : new Date(new Date().setTime(date.getTime()));
-        //         break;
-        //     case DistributionTypeEnum.Yearly:
-        //         date =
-        //             date.getDate() > new Date().getDate()
-        //                 ? new Date(
-        //                       date.setFullYear(new Date().getFullYear() + 1),
-        //                   )
-        //                 : new Date(new Date().setTime(date.getTime()));
-        //         break;
-        //     default:
-        //         date = null;
-        //         break;
-        // }
+        const partyMembers = await PartyMemberModel.findOne({
+            where: { memberId: this.ownerId, partyId: this.id },
+        });
+        if (!partyMembers) return false;
+        if (!partyMembers.depositTransactionId) return false;
 
-        // return date;
+        return true;
     }
 }
