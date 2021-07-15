@@ -7,6 +7,7 @@ import {
     UpdatedAt,
     DeletedAt,
     HasMany,
+    Index,
 } from 'sequelize-typescript';
 import { IUser } from 'src/entities/user.entity';
 import { PartyModel } from './party.model';
@@ -22,6 +23,7 @@ export class UserModel extends Model<IUser, IUser> implements IUser {
     })
     id?: string;
 
+    @Index
     @Column({ field: 'address', type: DataType.STRING, allowNull: false })
     address: string;
 

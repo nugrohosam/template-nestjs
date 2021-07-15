@@ -8,6 +8,7 @@ import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { JoinRequestRequest } from '../../requests/join-request/join-request.request';
 import { GetPartyService } from '../get-party.service';
 import { GetJoinRequestService } from './get-join-request.service';
@@ -21,18 +22,15 @@ export class RequestJoinService {
         private readonly web3Service: Web3Service,
         @Inject(GetJoinRequestService)
         private readonly getJoinRequestService: GetJoinRequestService,
+        @Inject(GetUserService)
+        private readonly getUserService: GetUserService,
     ) {}
 
-    private generateSignatureMessage(
-        request: JoinRequestRequest,
-        party: PartyModel,
-    ): string {
-        return this.web3Service.soliditySha3([
-            { t: 'address', v: request.userAddress },
-            { t: 'string', v: party.id },
-        ]);
-    }
-
+    /**
+     * validateUserAddress.
+     * user must not registered as party member,
+     * user can only make one join request
+     */
     private async validateUserAddress(
         userAddress: string,
         partyId: string,
@@ -63,11 +61,11 @@ export class RequestJoinService {
     }
 
     async storeJoinRequest(
-        request: JoinRequestRequest,
+        user: UserModel,
         party: PartyModel,
     ): Promise<JoinRequestModel> {
         return await JoinRequestModel.create({
-            userAddress: request.userAddress,
+            userAddress: user.address,
             partyId: party.id,
         });
     }
@@ -76,20 +74,24 @@ export class RequestJoinService {
         partyId: string,
         request: JoinRequestRequest,
     ): Promise<JoinRequestModel> {
+        const user = await this.getUserService.getUserByAddress(
+            request.userAddress,
+        );
         const party = await this.getPartyService.getById(partyId);
-        const message = this.generateSignatureMessage(request, party);
 
-        await this.validateUserAddress(request.userAddress, partyId);
+        await this.validateUserAddress(user.address, party.id);
 
+        const message = `I would like to make join request to this Party.${user.address} ${partyId}`;
         // TODO: need to removed after testing
         console.log('message[request-join]: ' + message);
+
         await this.web3Service.validateSignature(
             request.signature,
-            request.userAddress,
+            user.address,
             message,
         );
 
-        const { id } = await this.storeJoinRequest(request, party);
+        const { id } = await this.storeJoinRequest(user, party);
         return await this.getJoinRequestService.getById(id);
     }
 }

@@ -29,10 +29,9 @@ export class UpdateStatusJoinRequestService {
         const joinRequest = await this.getJoinRequestService.getById(
             joinRequestId,
         );
-        const message = this.generateSignatureMessage(
-            joinRequest,
-            request.accept,
-        );
+        const message = request.accept
+            ? `I'm accepting join request ${joinRequestId}`
+            : `I'm rejecting join request ${joinRequestId}`;
 
         // TODO: need to removed after testing
         console.log('message[update-status-join-request]: ' + message);
@@ -47,6 +46,7 @@ export class UpdateStatusJoinRequestService {
         } else {
             joinRequest.rejectedAt = new Date();
         }
+        joinRequest.processedBy = joinRequest.party.owner.address;
 
         return await joinRequest.save();
     }
