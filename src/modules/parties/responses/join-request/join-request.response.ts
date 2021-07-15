@@ -12,7 +12,7 @@ export class JoinRequestResponse
         >
 {
     id?: string;
-    member: MemberResponse;
+    user: MemberResponse;
     party?: IndexPartyResponse;
     status: JoinRequestStatusEnum;
     acceptedAt?: Date;
@@ -23,7 +23,7 @@ export class JoinRequestResponse
     ): JoinRequestResponse {
         return {
             id: model.id,
-            member: {
+            user: {
                 id: model.user.id,
                 address: model.user.address,
                 username: model.user.username,
