@@ -15,6 +15,7 @@ import {
 import { JoinRequestStatusEnum } from 'src/common/enums/party.enum';
 import { IJoinRequest } from 'src/entities/join-request.entity';
 import { PartyModel } from './party.model';
+import { UserModel } from './user.model';
 
 @Table({ tableName: 'join_requests', paranoid: true })
 export class JoinRequestModel
@@ -27,9 +28,9 @@ export class JoinRequestModel
     @Column(DataType.UUID)
     id?: string;
 
-    @AllowNull(false)
-    @Column({ type: DataType.STRING, field: 'user_address' })
-    userAddress: string;
+    @ForeignKey(() => UserModel)
+    @Column({ type: DataType.UUID, field: 'user_id' })
+    userId: string;
 
     @ForeignKey(() => PartyModel)
     @AllowNull(false)
@@ -71,4 +72,7 @@ export class JoinRequestModel
 
     @BelongsTo(() => PartyModel, 'partyId')
     readonly party?: PartyModel;
+
+    @BelongsTo(() => UserModel, 'userId')
+    readonly user?: UserModel;
 }

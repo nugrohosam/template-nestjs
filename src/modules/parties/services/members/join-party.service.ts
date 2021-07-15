@@ -78,7 +78,7 @@ export class JoinPartyService {
 
         const joinRequest = await JoinRequestModel.findOne({
             where: {
-                userAddress: user.address,
+                userId: user.id,
                 partyId: party.id,
             },
         });
