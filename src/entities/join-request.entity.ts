@@ -1,6 +1,6 @@
 export interface IJoinRequest {
     id?: string;
-    userAddress: string;
+    userId: string;
     partyId: string;
     acceptedAt?: Date;
     rejectedAt?: Date;

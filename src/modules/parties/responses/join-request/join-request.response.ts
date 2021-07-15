@@ -1,14 +1,18 @@
 import { JoinRequestStatusEnum } from 'src/common/enums/party.enum';
 import { IJoinRequest } from 'src/entities/join-request.entity';
 import { JoinRequestModel } from 'src/models/join-request.model';
+import { MemberResponse } from 'src/modules/users/responses/member.response';
 import { IndexPartyResponse } from '../index-party.response';
 
 export class JoinRequestResponse
     implements
-        Omit<IJoinRequest, 'partyId' | 'createdAt' | 'updatedAt' | 'deletedAt'>
+        Omit<
+            IJoinRequest,
+            'userId' | 'partyId' | 'createdAt' | 'updatedAt' | 'deletedAt'
+        >
 {
     id?: string;
-    userAddress: string;
+    member: MemberResponse;
     party?: IndexPartyResponse;
     status: JoinRequestStatusEnum;
     acceptedAt?: Date;
@@ -19,8 +23,12 @@ export class JoinRequestResponse
     ): JoinRequestResponse {
         return {
             id: model.id,
-            userAddress: model.userAddress,
-            party: !model.party
+            member: {
+                id: model.user.id,
+                address: model.user.address,
+                username: model.user.username,
+            },
+            party: !model
                 ? undefined
                 : IndexPartyResponse.mapFromPartyModel(model.party),
             acceptedAt: model.acceptedAt,

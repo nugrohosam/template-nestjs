@@ -27,21 +27,21 @@ export class RequestJoinService {
     ) {}
 
     /**
-     * validateUserAddress.
+     * validateUser.
      * user must not registered as party member,
      * user can only make one join request
      */
-    private async validateUserAddress(
-        userAddress: string,
-        partyId: string,
+    private async canUserRequestJoinParty(
+        user: UserModel,
+        party: PartyModel,
     ): Promise<void> {
         const memberCount = await PartyMemberModel.count({
-            where: { partyId },
+            where: { partyId: party.id },
             include: [
                 {
                     model: UserModel,
                     as: 'member',
-                    where: { address: userAddress },
+                    where: { id: user.id },
                     required: true,
                 },
             ],
@@ -52,7 +52,7 @@ export class RequestJoinService {
             );
 
         const joinRequestCount = await JoinRequestModel.count({
-            where: { userAddress, partyId },
+            where: { id: user.id, partyId: party.id },
         });
         if (joinRequestCount > 0)
             throw new UnprocessableEntityException(
@@ -65,7 +65,7 @@ export class RequestJoinService {
         party: PartyModel,
     ): Promise<JoinRequestModel> {
         return await JoinRequestModel.create({
-            userAddress: user.address,
+            userId: user.id,
             partyId: party.id,
         });
     }
@@ -79,7 +79,7 @@ export class RequestJoinService {
         );
         const party = await this.getPartyService.getById(partyId);
 
-        await this.validateUserAddress(user.address, party.id);
+        await this.canUserRequestJoinParty(user, party);
 
         const message = `I would like to make join request to this Party.${user.address} ${partyId}`;
         // TODO: need to removed after testing
