@@ -42,6 +42,7 @@ export class RegisterService {
 
         const user = new UserModel();
         user.address = request.tokenAddress;
+        user.username = request.tokenAddress;
         await user.save();
 
         return user;
