@@ -36,6 +36,10 @@ export class JoinRequestModel
     @Column({ type: DataType.UUID, field: 'party_id' })
     partyId: string;
 
+    @AllowNull(false)
+    @Column({ type: DataType.STRING, field: 'processed_by' })
+    processedBy: string;
+
     @Column({ type: DataType.DATE, field: 'accepted_at' })
     acceptedAt?: Date;
 
