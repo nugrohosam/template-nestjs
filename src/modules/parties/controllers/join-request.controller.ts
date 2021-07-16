@@ -1,66 +1,31 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
-import { JoinRequestRequest } from '../requests/join-request/join-request.request';
-import { UpdateStatusJoinRequestRequest } from '../requests/join-request/update-status-join-request.request';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { JoinRequestResponse } from '../responses/join-request/join-request.response';
-import { IndexJoinRequest } from '../services/join-request/index-join-request.service';
-import { RequestJoinService } from '../services/join-request/request-join.service';
-import { UpdateStatusJoinRequestService } from '../services/join-request/update-status-join-request.service';
+import { IndexJoinRequestService } from '../services/join-request/index-join-request.service';
 
-@Controller('parties/:partyId/join-requests')
+@Controller('join-requests')
 export class JoinRequestController {
     constructor(
-        private readonly requestJoinService: RequestJoinService,
-        private readonly indexJoinRequest: IndexJoinRequest,
-        private readonly updateStatusJoinRequestService: UpdateStatusJoinRequestService,
+        private readonly indexJoinRequestService: IndexJoinRequestService,
+        @Inject(GetUserService) private readonly getUserService: GetUserService,
     ) {}
 
-    @Post()
-    async request(
-        @Param('partyId') partyId: string,
-        @Body() request: JoinRequestRequest,
-    ): Promise<IApiResponse<JoinRequestResponse>> {
-        const joinRequest = await this.requestJoinService.call(
-            partyId,
-            request,
-        );
-
-        return {
-            message: 'Success request join a party.',
-            data: JoinRequestResponse.mapFromJoinRequestModel(joinRequest),
-        };
-    }
-
-    @Get()
-    async index(
-        @Param('partyId') partyId: string,
+    @Get(':userAddress')
+    async indexByUser(
+        @Param('userAddress') userAddress: string,
         @Query() query: IndexRequest,
     ): Promise<IApiResponse<JoinRequestResponse[]>> {
-        const { data, meta } = await this.indexJoinRequest.fetchByPartyId(
-            partyId,
+        const user = await this.getUserService.getUserByAddress(userAddress);
+        const { data, meta } = await this.indexJoinRequestService.fetchByUserId(
+            user.id,
             query,
         );
-
         return {
-            message: "Success get party's join requests",
+            message: 'Success fetch join requests.',
             meta,
             data,
-        };
-    }
-
-    @Put(':joinRequestId')
-    async updateStatus(
-        @Param('joinRequestId') joinRequestId: string,
-        @Body() request: UpdateStatusJoinRequestRequest,
-    ): Promise<IApiResponse<JoinRequestResponse>> {
-        const joinRequest = await this.updateStatusJoinRequestService.call(
-            joinRequestId,
-            request,
-        );
-        return {
-            message: 'Success update join party request status',
-            data: JoinRequestResponse.mapFromJoinRequestModel(joinRequest),
         };
     }
 }

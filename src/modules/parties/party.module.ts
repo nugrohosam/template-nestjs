@@ -17,20 +17,22 @@ import { UpdateTransactionHashService } from './services/update-transaction-hash
 import { UpdatePartyMemberService } from './services/members/update-party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
 import { InvitePartyService } from './services/invitation/invite-party.service';
-import { JoinRequestController } from './controllers/join-request.controller';
+import { PartyJoinRequestController } from './controllers/party-join-request.controller';
 import { RequestJoinService } from './services/join-request/request-join.service';
-import { IndexJoinRequest } from './services/join-request/index-join-request.service';
+import { IndexJoinRequestService } from './services/join-request/index-join-request.service';
 import { UpdateStatusJoinRequestService } from './services/join-request/update-status-join-request.service';
 import { GetJoinRequestService } from './services/join-request/get-join-request.service';
 import { CommonModule } from '../commons/common.module';
+import { JoinRequestController } from './controllers/join-request.controller';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
     controllers: [
         PartyController,
-        JoinRequestController,
+        PartyJoinRequestController,
         PartyInvitationController,
         PartyMemberController,
+        JoinRequestController,
     ],
     providers: [
         // Party Porviders
@@ -41,7 +43,7 @@ import { CommonModule } from '../commons/common.module';
         DeletePartyService,
         // Join Request Providers
         RequestJoinService,
-        IndexJoinRequest,
+        IndexJoinRequestService,
         GetJoinRequestService,
         UpdateStatusJoinRequestService,
         // Party Invitation Providers
