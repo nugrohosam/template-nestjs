@@ -4,7 +4,7 @@ import { IndexRequest } from 'src/common/request/index.request';
 import { JoinRequestRequest } from '../requests/join-request/join-request.request';
 import { UpdateStatusJoinRequestRequest } from '../requests/join-request/update-status-join-request.request';
 import { JoinRequestResponse } from '../responses/join-request/join-request.response';
-import { IndexJoinRequest } from '../services/join-request/index-join-request.service';
+import { IndexJoinRequestService } from '../services/join-request/index-join-request.service';
 import { RequestJoinService } from '../services/join-request/request-join.service';
 import { UpdateStatusJoinRequestService } from '../services/join-request/update-status-join-request.service';
 
@@ -12,7 +12,7 @@ import { UpdateStatusJoinRequestService } from '../services/join-request/update-
 export class PartyJoinRequestController {
     constructor(
         private readonly requestJoinService: RequestJoinService,
-        private readonly indexJoinRequest: IndexJoinRequest,
+        private readonly indexJoinRequest: IndexJoinRequestService,
         private readonly updateStatusJoinRequestService: UpdateStatusJoinRequestService,
     ) {}
 
