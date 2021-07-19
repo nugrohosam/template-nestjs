@@ -1,7 +1,35 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { TransactionModel } from 'src/models/transaction.model';
+import { GetPartyService } from 'src/modules/parties/services/get-party.service';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { TransferRequest } from '../requests/transfer.request';
 
+@Injectable()
 export class TransferService {
+    constructor(
+        @Inject(Web3Service) private readonly web3Service: Web3Service,
+        @Inject(GetUserService) private readonly getUserService: GetUserService,
+        @Inject(GetPartyService)
+        private readonly getPartyService: GetPartyService,
+    ) {}
+
+    async generateSignatureMessage(request: TransferRequest): Promise<string> {
+        const fromUser = await this.getUserService.getUserByAddress(
+            request.addressFrom,
+        );
+        const party = await this.getPartyService.getByAddress(
+            request.addressTo,
+        );
+        return this.web3Service.soliditySha3([
+            { t: 'address', v: request.addressFrom },
+            { t: 'string', v: fromUser.id },
+            { t: 'address', v: request.addressTo },
+            { t: 'string', v: party.id },
+            { t: 'uint256', v: request.amount.toString() },
+        ]);
+    }
+
     async storeTransaction(
         request: TransferRequest,
     ): Promise<TransactionModel> {
@@ -12,13 +40,20 @@ export class TransferService {
             currencyId: request.currencyId,
             type: request.type,
             description: request.description,
-            transactionHash: request.transactionHash,
+            signature: request.transferSignature,
         });
     }
 
     async transfer(request: TransferRequest): Promise<TransactionModel> {
-        // TODO: validate signature
-        // TODO: validate transaction hash
+        const message = await this.generateSignatureMessage(request);
+        // TODO: need to removed after testing
+        console.log('message[platform-create-party]: ' + message);
+
+        await this.web3Service.validateSignature(
+            request.transferSignature,
+            request.addressFrom,
+            message,
+        );
 
         return await this.storeTransaction(request);
     }

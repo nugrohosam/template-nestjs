@@ -38,11 +38,6 @@ export class TransferRequest {
     @IsOptional()
     description?: string;
 
-    @IsOptional()
-    @IsNotEmpty()
-    @Expose({ name: 'transaction_hash' })
-    transactionHash?: string;
-
     @IsNotEmpty()
     @Expose({ name: 'transfer_signature' })
     transferSignature: string;

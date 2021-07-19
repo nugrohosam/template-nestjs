@@ -8,6 +8,7 @@ export interface ITransaction {
     currencyId: number;
     type: TransactionTypeEnum;
     description?: string;
+    signature: string;
     transactionHash?: string;
     createdAt?: Date;
     updatedAt?: Date;
