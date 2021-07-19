@@ -20,7 +20,7 @@ describe('Project List Test (GET)', () => {
         await app.init();
 
         bodyRequest = {
-            partyId: '2324b2bd-ac55-4d01-92cb-3ca0c8a27e21',
+            partyId: '2324b2bd-ac55-4d01-92cb-3ca0c8a27e21', // todo: id bikin dinamis
         };
     });
 

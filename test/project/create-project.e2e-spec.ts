@@ -29,17 +29,17 @@ describe('Create Project Test (POST)', () => {
                 'On top of rewards earned from providing liquidity to the Defi project’s pools, MAKI tokens allow holders to earn additional income as a portion of the protocol’s fee. This additional income will be accumulated proportionally based on the amount of tokens that each user has staked against the total amount of LP tokens.\n',
             contract_address: '0x5FaD6fBBA4BbA686bA9B8052Cf0bd51699f38B93',
             attachment_url: 'https://drive.google.com/file/d/11YIetPS0fLXvtNjVMVNZ6MAWk7ZsaAS/view',
-            vote_start: '2021-06-01 00:00:00',
-            vote_end: '2021-07-31 23:59:59',
-            project_start: '2021-08-01 23:00:00',
-            project_end: '2021-08-31 23:00:00',
+            vote_start: '2021-06-01 00:00:00', // todo: pakai date time today + 1 atau + 7
+            vote_end: '2021-07-31 23:59:59', // todo: pakai date time today + 1 atau + 7
+            project_start: '2021-08-01 23:00:00', // todo: pakai date time today + 1 atau + 7
+            project_end: '2021-08-31 23:00:00', // todo: pakai date time today + 1 atau + 7
             amount: 50000000000000,
-            currency_id: 1,
+            currency_id: 1, // todo: currency ID dari API
         };
     });
 
     it('success create project', (done) => {
-        return supertest("localhost:3000")
+        return supertest("localhost:3000") // todo: pakai .env
             .post('/projects/create')
             .set('Content-Type', 'application/json')
             .send(bodyRequest)

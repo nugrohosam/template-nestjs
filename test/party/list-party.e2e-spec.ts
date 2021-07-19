@@ -20,10 +20,11 @@ describe('Party List Test (GET)', () => {
     });
 
     it('success list party', (done) => {
+        //todo: pakai .env
         return supertest("localhost:3000")
             .get('/parties')
             .set('Content-Type', 'application/json')
-            .query({per_page:10,page:1,owner_id:'1a160d9c-eba6-440e-803a-d9cee909ad50'})
+            .query({per_page:10,page:1,owner_id:'1a160d9c-eba6-440e-803a-d9cee909ad50'}) // todo: owner id buat dinamis, ambil detail user
             .expect(200)
             .then((response) => {
                 const validateResult = validateJsonSchema.validate(

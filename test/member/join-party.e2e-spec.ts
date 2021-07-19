@@ -20,6 +20,7 @@ describe('Join Party Test (POST)', () => {
         app = moduleFixture.createNestApplication();
         await app.init();
 
+        // todo: user_address pindahkan ke .env
         bodyRequest = {
             initial_deposit: 2,
             user_address: '0xf6d03bFCcC910B0575757aF934FC27e68e42ef4E',
@@ -30,6 +31,7 @@ describe('Join Party Test (POST)', () => {
     });
 
     it('success join public party', (done) => {
+        // todo: localhost:3000 pindahkan ke .env
         return supertest('localhost:3000')
             .post('/parties/' + process.env.PARTY_ID + '/join')
             .set('Content-Type', 'application/json')
