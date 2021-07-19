@@ -18,6 +18,7 @@ export class UpdateTransferService {
         if (request.transferSignature !== transaction.signature)
             throw new UnauthorizedException('Signature not valid');
 
+        // TODO: need to discuss with sc about which input index used to be indetifier
         await this.web3Service.validateTransaction(
             request.transactionHash,
             transaction.addressFrom,
