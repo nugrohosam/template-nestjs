@@ -22,4 +22,12 @@ export class GetPartyService {
         if (!party) throw new NotFoundException('Party not found.');
         return party;
     }
+
+    async getByAddress(address: string): Promise<PartyModel> {
+        const party = await PartyModel.findOne({
+            where: { address },
+        });
+        if (!party) throw new NotFoundException('Party not found');
+        return party;
+    }
 }

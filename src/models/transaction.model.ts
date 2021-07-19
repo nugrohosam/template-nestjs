@@ -52,6 +52,9 @@ export class TransactionModel
     @Column(DataType.TEXT)
     description?: string;
 
+    @Column(DataType.STRING)
+    signature: string;
+
     @Column({ type: DataType.STRING, field: 'transaction_hash' })
     transactionHash?: string;
 

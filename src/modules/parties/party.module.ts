@@ -56,5 +56,6 @@ import { JoinRequestController } from './controllers/join-request.controller';
         GetPartyMemberService,
         IndexPartyMemberService,
     ],
+    exports: [GetPartyService],
 })
 export class PartyModule {}
