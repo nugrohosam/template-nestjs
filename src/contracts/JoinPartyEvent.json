@@ -1,5 +1,5 @@
 {
-    "createPartyEvent": {
+    "joinPartyEvent": {
         "anonymous": false,
         "inputs": [
             {
@@ -10,20 +10,20 @@
             },
             {
                 "indexed": false,
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
                 "internalType": "string",
-                "name": "partyName",
+                "name": "joinPartyId",
                 "type": "string"
             },
             {
                 "indexed": false,
                 "internalType": "string",
-                "name": "partyId",
-                "type": "string"
-            },
-            {
-                "indexed": false,
-                "internalType": "string",
-                "name": "ownerId",
+                "name": "userId",
                 "type": "string"
             },
             {
@@ -31,9 +31,15 @@
                 "internalType": "uint256",
                 "name": "timestamp",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "tokenTransferStatus",
+                "type": "bool"
             }
         ],
-        "name": "create_event",
+        "name": "join_event",
         "type": "event"
     }
 }

@@ -1,5 +1,5 @@
 {
-    "createPartyEvent": {
+    "depositEvent": {
         "anonymous": false,
         "inputs": [
             {
@@ -10,8 +10,14 @@
             },
             {
                 "indexed": false,
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
                 "internalType": "string",
-                "name": "partyName",
+                "name": "userId",
                 "type": "string"
             },
             {
@@ -22,18 +28,24 @@
             },
             {
                 "indexed": false,
-                "internalType": "string",
-                "name": "ownerId",
-                "type": "string"
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
             },
             {
                 "indexed": false,
                 "internalType": "uint256",
                 "name": "timestamp",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "tokenTransferStatus",
+                "type": "bool"
             }
         ],
-        "name": "create_event",
+        "name": "deposit_event",
         "type": "event"
     }
 }
