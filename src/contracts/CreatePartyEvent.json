@@ -1,0 +1,37 @@
+{
+    "anonymous": false,
+    "inputs": [
+        {
+            "indexed": false,
+            "internalType": "address",
+            "name": "caller",
+            "type": "address"
+        },
+        {
+            "indexed": false,
+            "internalType": "string",
+            "name": "partyName",
+            "type": "string"
+        },
+        {
+            "indexed": false,
+            "internalType": "string",
+            "name": "partyId",
+            "type": "string"
+        },
+        {
+            "indexed": false,
+            "internalType": "string",
+            "name": "ownerId",
+            "type": "string"
+        },
+        {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+        }
+    ],
+    "name": "create_event",
+    "type": "event"
+}
