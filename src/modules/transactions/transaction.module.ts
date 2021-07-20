@@ -17,6 +17,6 @@ import { UpdateTransferService } from './services/update-transfer.service';
         UpdateTransferService,
         IndexTransactionService,
     ],
-    exports: [TransferService],
+    exports: [TransferService, IndexTransactionService],
 })
 export class TransactionModule {}

@@ -11,7 +11,10 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { IndexRequest } from 'src/common/request/index.request';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
+import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
+import { IndexTransactionService } from 'src/modules/transactions/services/index-transaction.service';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { DeletePartyRequest } from '../requests/delete-party.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
@@ -35,6 +38,8 @@ export class PartyController {
         private readonly deletePartyService: DeletePartyService,
         @Inject(GetSignerService)
         private readonly getSignerService: GetSignerService,
+        @Inject(IndexTransactionService)
+        private readonly indexTransactionService: IndexTransactionService,
     ) {}
 
     @Post('/create')
@@ -105,6 +110,23 @@ export class PartyController {
         return {
             message: 'Success get party',
             data: await DetailPartyResponse.mapFromPartyModel(party, signer),
+        };
+    }
+
+    @Get('/:partyId/transactions')
+    async transactions(
+        @Param('partyId') partyId: string,
+        @Query() query: IndexRequest,
+    ): Promise<IApiResponse<TransactionResponse[]>> {
+        const party = await this.getPartyService.getById(partyId);
+        const { data, meta } = await this.indexTransactionService.fetchByParty(
+            party,
+            query,
+        );
+        return {
+            message: "Success fetch party's transactions",
+            meta,
+            data,
         };
     }
 }

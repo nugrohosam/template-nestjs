@@ -1,12 +1,17 @@
+import { Injectable } from '@nestjs/common';
+import { Op } from 'sequelize';
 import { FindOptions, WhereOptions } from 'sequelize';
 import {
     PaginationResponse,
     SequelizePaginator,
 } from 'sequelize-typescript-paginator';
+import { IndexRequest } from 'src/common/request/index.request';
+import { PartyModel } from 'src/models/party.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { IndexTransactionRequest } from '../requests/index-transaction.request';
 import { TransactionResponse } from '../responses/transaction.response';
 
+@Injectable()
 export class IndexTransactionService {
     private getFindOptions(
         query: IndexTransactionRequest,
@@ -40,9 +45,27 @@ export class IndexTransactionService {
         );
 
         const response = this.mapTransactionResponse(data);
-        return {
-            data: response,
-            meta,
+        return { data: response, meta };
+    }
+
+    async fetchByParty(
+        party: PartyModel,
+        query: IndexRequest,
+    ): Promise<PaginationResponse<TransactionResponse>> {
+        const options: FindOptions<TransactionModel> = {
+            where: {
+                [Op.or]: {
+                    addressFrom: party.address,
+                    addressTo: party.address,
+                },
+            },
+            order: [['created_at', 'desc']],
         };
+        const { data, meta } = await SequelizePaginator.paginate(
+            TransactionModel,
+            { perPage: query.perPage ?? 10, page: query.page ?? 1, options },
+        );
+        const response = this.mapTransactionResponse(data);
+        return { data: response, meta };
     }
 }
