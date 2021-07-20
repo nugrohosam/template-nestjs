@@ -4,13 +4,19 @@ import { PartyModule } from '../parties/party.module';
 import { UserModule } from '../users/user.module';
 import { TransactionController } from './controllers/transaction.controller';
 import { GetTransactionService } from './services/get-transaction.service';
+import { IndexTransactionService } from './services/index-transaction.service';
 import { TransferService } from './services/transfer.service';
 import { UpdateTransferService } from './services/update-transfer.service';
 
 @Module({
     imports: [Web3Module, UserModule, forwardRef(() => PartyModule)],
     controllers: [TransactionController],
-    providers: [TransferService, GetTransactionService, UpdateTransferService],
+    providers: [
+        TransferService,
+        GetTransactionService,
+        UpdateTransferService,
+        IndexTransactionService,
+    ],
     exports: [TransferService],
 })
 export class TransactionModule {}

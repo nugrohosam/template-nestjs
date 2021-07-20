@@ -29,7 +29,7 @@ export class IndexPartyMemberService {
                 as: 'member',
                 required: true,
             },
-            order: [[query.order ?? 'created_at', query.sort ?? 'desc']],
+            order: [[query.sort ?? 'created_at', query.order ?? 'desc']],
         };
     }
 
