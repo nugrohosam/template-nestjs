@@ -24,6 +24,7 @@ import { UpdateStatusJoinRequestService } from './services/join-request/update-s
 import { GetJoinRequestService } from './services/join-request/get-join-request.service';
 import { CommonModule } from '../commons/common.module';
 import { JoinRequestController } from './controllers/join-request.controller';
+import { PartyCalculationService } from './services/party-calculation.service';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
@@ -41,6 +42,7 @@ import { JoinRequestController } from './controllers/join-request.controller';
         CreatePartyService,
         UpdateTransactionHashService,
         DeletePartyService,
+        PartyCalculationService,
         // Join Request Providers
         RequestJoinService,
         IndexJoinRequestService,
@@ -56,6 +58,6 @@ import { JoinRequestController } from './controllers/join-request.controller';
         GetPartyMemberService,
         IndexPartyMemberService,
     ],
-    exports: [GetPartyService],
+    exports: [GetPartyService, PartyCalculationService],
 })
 export class PartyModule {}

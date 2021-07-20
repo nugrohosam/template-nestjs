@@ -1,7 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+} from '@nestjs/common';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { TransactionModel } from 'src/models/transaction.model';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
+import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { TransferRequest } from '../requests/transfer.request';
 
@@ -12,6 +19,8 @@ export class TransferService {
         @Inject(GetUserService) private readonly getUserService: GetUserService,
         @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
+        @Inject(PartyCalculationService)
+        private readonly partyCalculationService: PartyCalculationService,
     ) {}
 
     async generateSignatureMessage(request: TransferRequest): Promise<string> {
@@ -55,6 +64,22 @@ export class TransferService {
             message,
         );
 
-        return await this.storeTransaction(request);
+        const dbTransaction = await localDatabase.transaction();
+        try {
+            const transaction = await this.storeTransaction(request);
+            if (transaction.type === TransactionTypeEnum.Deposit) {
+                await this.partyCalculationService.deposit(
+                    transaction.addressTo,
+                    transaction.addressFrom,
+                    transaction.amount,
+                );
+            }
+
+            await dbTransaction.commit();
+            return transaction;
+        } catch (err) {
+            await dbTransaction.rollback();
+            throw new InternalServerErrorException(err);
+        }
     }
 }

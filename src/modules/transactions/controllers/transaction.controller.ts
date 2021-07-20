@@ -21,15 +21,12 @@ export class TransactionController {
     @Post('transfer')
     async transfer(
         @Body() request: TransferRequest,
-    ): Promise<IApiResponse<{ id: string }>> {
+    ): Promise<IApiResponse<TransactionResponse>> {
         const transaction = await this.transferService.transfer(request);
 
-        // TODO: need to specify the transfer response
         return {
             message: 'Transfer success.',
-            data: {
-                id: transaction.id,
-            },
+            data: TransactionResponse.mapFromTransactionModel(transaction),
         };
     }
 
