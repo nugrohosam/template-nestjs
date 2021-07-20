@@ -9,11 +9,11 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { ProfileResponse } from 'src/modules/users/responses/profile.response';
 import { IndexPartyMemberRequest } from '../requests/member/index-party-member.request';
 import { JoinPartyRequest } from '../requests/member/join-party.request';
 import { UpdatePartyMemberRequest } from '../requests/member/update-party-member.request';
 import { JoinPartyResponse } from '../responses/member/join-party.response';
+import { MemberDetailRespose } from '../responses/member/member-detail.response';
 import { IndexPartyMemberService } from '../services/members/index-party-member.service';
 import { JoinPartyService } from '../services/members/join-party.service';
 import { UpdatePartyMemberService } from '../services/members/update-party-member.service';
@@ -63,7 +63,7 @@ export class PartyMemberController {
     async members(
         @Param('partyId') partyId: string,
         @Query() query: IndexPartyMemberRequest,
-    ): Promise<IApiResponse<ProfileResponse[]>> {
+    ): Promise<IApiResponse<MemberDetailRespose[]>> {
         const result = await this.indexPartyMemberService.fetch(partyId, query);
 
         return {

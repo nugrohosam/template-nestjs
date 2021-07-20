@@ -19,7 +19,13 @@ export class Web3Service {
     }
 
     async recover(signature: string, message: string): Promise<string> {
-        return this.web3.eth.accounts.recover(message, signature);
+        try {
+            return this.web3.eth.accounts.recover(message, signature);
+        } catch (err) {
+            throw new UnprocessableEntityException(
+                'Signature not a valid signature string',
+            );
+        }
     }
 
     /**
