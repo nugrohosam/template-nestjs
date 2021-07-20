@@ -1,10 +1,5 @@
-import {
-    Inject,
-    Injectable,
-    InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
-import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { TransactionModel } from 'src/models/transaction.model';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
@@ -64,22 +59,15 @@ export class TransferService {
             message,
         );
 
-        const dbTransaction = await localDatabase.transaction();
-        try {
-            const transaction = await this.storeTransaction(request);
-            if (transaction.type === TransactionTypeEnum.Deposit) {
-                await this.partyCalculationService.deposit(
-                    transaction.addressTo,
-                    transaction.addressFrom,
-                    transaction.amount,
-                );
-            }
-
-            await dbTransaction.commit();
-            return transaction;
-        } catch (err) {
-            await dbTransaction.rollback();
-            throw new InternalServerErrorException(err);
+        const transaction = await this.storeTransaction(request);
+        if (transaction.type === TransactionTypeEnum.Deposit) {
+            await this.partyCalculationService.deposit(
+                transaction.addressTo,
+                transaction.addressFrom,
+                transaction.amount,
+            );
         }
+
+        return transaction;
     }
 }
