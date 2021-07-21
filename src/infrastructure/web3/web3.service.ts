@@ -101,7 +101,7 @@ export class Web3Service {
                 'Transaction not found in Network.',
             );
 
-        if (receipt.from !== from)
+        if (receipt.from.toLowerCase() !== from.toLowerCase())
             throw new UnprocessableEntityException(
                 'Transaction not from correct address',
             );
