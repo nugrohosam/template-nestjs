@@ -29,7 +29,7 @@ describe('Update Profile Test (PUT)', () => {
     });
 
     it('success update profile', (done) => {
-        return supertest("localhost:3000")
+        return supertest(process.env.LOCALHOST)
             .put('/profile')
             .set('Content-Type', 'application/json')
             .send(bodyRequest)

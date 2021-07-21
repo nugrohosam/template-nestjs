@@ -20,16 +20,14 @@ describe('Invite User to Party Test (POST)', () => {
         await app.init();
 
         bodyRequest = {
-            // todo: user address pindahkan ke .env
-            user_address: '0xf6d03bFCcC910B0575757aF934FC27e68e42ef4E',
+            user_address: process.env.USER_ADDRESS,
             invite_signature:
                 '0xf25473e87b9e8a040b655f992a4105f40a17bf9af08a39488798e01b57ae5d2e1a68bfacf5171a37a7904d34e02b3c722aef8cbb8aee61f84962c0a6c1afbd661c',
         };
     });
 
     it('success invite user to party', (done) => {
-        // todo: localhost:3000 pindahkan ke .env
-        return supertest('localhost:3000')
+        return supertest(process.env.LOCALHOST)
             .post('/parties/' + process.env.PARTY_ID + '/invitations')
             .set('Content-Type', 'application/json')
             .send(bodyRequest)

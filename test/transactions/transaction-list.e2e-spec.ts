@@ -21,7 +21,7 @@ describe('Transaction List Test (GET)', () => {
     });
 
     it('success list transaction', (done) => {
-        return supertest("localhost:3000")
+        return supertest(process.env.LOCALHOST)
             .get('/transactions/by-user-id/' + process.env.USER_ID)
             .expect(200)
             .then((response) => {

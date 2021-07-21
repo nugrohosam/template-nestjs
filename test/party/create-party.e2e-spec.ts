@@ -20,7 +20,7 @@ describe('Party Test (POST)', () => {
     });
 
     it('success create party', (done) => {
-        return supertest(app.getHttpServer())
+        return supertest(process.env.LOCALHOST)
             .post('/parties/create')
             .set('Content-Type', 'application/json')
             .send({
@@ -31,7 +31,7 @@ describe('Party Test (POST)', () => {
                 min_deposit: 1,
                 max_deposit: 3,
                 distribution: 'monthly',
-                member_address: '0x642307c5E87b6701C47586F6101Ce7F235F1F1cb', // todo: member address pindahkan ke .env
+                member_address: process.env.MEMBER_ADDRESS,
                 member_signature:
                     '0x848a851105906c3d6d63361751c180d3d2b6b58eb61ba97c5cda77815ec65df4446d4ab73019a2d49ad5ab71f881c15a288d4b3d6d4952d3728e98b97dc052b41c',
             })

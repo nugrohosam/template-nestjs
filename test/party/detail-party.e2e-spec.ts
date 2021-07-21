@@ -22,9 +22,8 @@ describe('Party Detail Test (GET)', () => {
     });
 
     it('success details party', (done) => {
-        // todo: localhost:3000 pindahkan ke .env
-        return supertest("localhost:3000")
-            .get('/parties/2324b2bd-ac55-4d01-92cb-3ca0c8a27e21') // todo: id party dibuat dinamis, ambil dari list party
+        return supertest(process.env.LOCALHOST)
+            .get('/parties/' + process.env.PARTY_ID) // todo: id party dibuat dinamis, ambil dari list party
             .expect(200)
             .then((response) => {
                 const validateResult = validateJsonSchema.validate(
@@ -37,8 +36,7 @@ describe('Party Detail Test (GET)', () => {
     });
 
     it('failed details party', (done) => {
-        // todo: localhost:3000 pindahkan ke .env
-        return supertest("localhost:3000")
+        return supertest(process.env.LOCALHOST)
             .get('/parties/1111-1111-1111')
             .set('Content-Type', 'application/json')
             .expect(404)
@@ -53,9 +51,8 @@ describe('Party Detail Test (GET)', () => {
     });
 
     it('private details party', (done) => {
-        // todo: localhost:3000 pindahkan ke .env
-        return supertest("localhost:3000")
-            .get('/parties/2324b2bd-ac55-4d01-92cb-3ca0c8a27e21') // todo: id party dibuat dinamis, ambil dari list party
+        return supertest(process.env.LOCALHOST)
+            .get('/parties/' + process.env.PARTY_ID) // todo: id party dibuat dinamis, ambil dari list party
             .set('Content-Type', 'application/json')
             .expect(403)
             .then((response) => {

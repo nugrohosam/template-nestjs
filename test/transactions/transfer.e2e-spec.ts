@@ -21,19 +21,20 @@ describe('Transfer Test (POST)', () => {
         await app.init();
 
         bodyRequest = {
-            from_address: "0xC3f289326CC63ca40e17deecA65553F36b047f6D",
-            to_address: "0xeA23f96a58850d375d43873A572df9C71e14eF52",
+            from_address: '0xC3f289326CC63ca40e17deecA65553F36b047f6D',
+            to_address: '0xeA23f96a58850d375d43873A572df9C71e14eF52',
             amount: 5000000000,
-            currency_id: 1,
-            type: "deposit",
-            description: "Initial deposit",
-            transaction_hash: "7d2f09078c82cefc2f63c55b3e19296a33e83e77d14d538368f8271a8ab1cd85",
-            transfer_signature: "adfadslfkadslfkajdsf"
+            currency_id: process.env.CURRENCY_ID,
+            type: 'deposit',
+            description: 'Initial deposit',
+            transaction_hash:
+                '7d2f09078c82cefc2f63c55b3e19296a33e83e77d14d538368f8271a8ab1cd85',
+            transfer_signature: 'adfadslfkadslfkajdsf',
         };
     });
 
     it('success transfer', (done) => {
-        return supertest("localhost:3000")
+        return supertest(process.env.LOCALHOST)
             .post('/transactions/transfer')
             .set('Content-Type', 'application/json')
             .send(bodyRequest)

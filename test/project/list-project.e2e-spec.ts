@@ -20,12 +20,12 @@ describe('Project List Test (GET)', () => {
         await app.init();
 
         bodyRequest = {
-            partyId: '2324b2bd-ac55-4d01-92cb-3ca0c8a27e21', // todo: id bikin dinamis
+            partyId: process.env.PARTY_ID, // todo: id bikin dinamis
         };
     });
 
     it('success get list project', (done) => {
-        return supertest(app.getHttpServer())
+        return supertest(process.env.LOCALHOST)
             .get('/projects/')
             .send(bodyRequest)
             .expect(200)
@@ -40,7 +40,7 @@ describe('Project List Test (GET)', () => {
     });
 
     it('failed get list project', (done) => {
-        return supertest(app.getHttpServer())
+        return supertest(process.env.LOCALHOST)
             .get('/projects/')
             .send(bodyRequest)
             .expect(403)

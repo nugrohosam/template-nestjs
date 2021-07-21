@@ -24,7 +24,7 @@ describe('Member List Test (GET)', () => {
     });
 
     it('success get member list', (done) => {
-        return supertest(app.getHttpServer())
+        return supertest(process.env.LOCALHOST)
             .get('/parties/' + process.env.PARTY_ID + '/members')
             .query({ per_page: 10, page: 1 })
             .send(bodyRequest)
