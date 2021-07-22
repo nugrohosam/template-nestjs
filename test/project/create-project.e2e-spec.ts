@@ -10,7 +10,13 @@ const validateJsonSchema = new Validator();
 describe('Create Project Test (POST)', () => {
     let app: INestApplication;
     let bodyRequest;
-    let dateTime;
+    let datetime;
+    let date;
+    let month;
+    let year;
+    let hour;
+    let minute;
+    let second;
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -19,7 +25,13 @@ describe('Create Project Test (POST)', () => {
 
         app = moduleFixture.createNestApplication();
         await app.init();
-        dateTime = new Date();
+        datetime = new Date();
+        date = datetime.getDate();
+        month = datetime.getMonth();
+        year = datetime.getFullYear();
+        hour = datetime.getHours();
+        minute = datetime.getMinutes();
+        second = datetime.getSeconds();
         bodyRequest = {
             title: 'MakiSwap',
             description:
@@ -30,10 +42,10 @@ describe('Create Project Test (POST)', () => {
             contract_address: '0x5FaD6fBBA4BbA686bA9B8052Cf0bd51699f38B93',
             attachment_url:
                 'https://drive.google.com/file/d/11YIetPS0fLXvtNjVMVNZ6MAWk7ZsaAS/view',
-            vote_start: dateTime.toLocaleString(), // todo: pakai date time today + 1 atau + 7
-            vote_end: dateTime.setDate(dateTime.getDate() + 1), // todo: pakai date time today + 1 atau + 7
-            project_start: dateTime.setDate(dateTime.getDate() + 1), // todo: pakai date time today + 1 atau + 7
-            project_end: dateTime.setDate(dateTime.getDate() + 7), // todo: pakai date time today + 1 atau + 7
+            vote_start: year + '-' + month + '-' + date + ' ' + hour + ':' + minute + ':' + second, // todo: pakai date time today + 1 atau + 7
+            vote_end: year + '-' + month + '-' + (date+1) + ' ' + hour + ':' + minute + ':' + second, // todo: pakai date time today + 1 atau + 7
+            project_start: year + '-' + month + '-' + (date+1) + ' ' + hour + ':' + minute + ':' + second, // todo: pakai date time today + 1 atau + 7
+            project_end: year + '-' + month + '-' + (date+7) + ' ' + hour + ':' + minute + ':' + second, // todo: pakai date time today + 1 atau + 7
             amount: 50000000000000,
             currency_id: process.env.CURRENCY_ID, // todo: currency ID dari API
         };
