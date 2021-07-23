@@ -5,6 +5,7 @@ import {
     DataType,
     Default,
     DeletedAt,
+    HasOne,
     Model,
     PrimaryKey,
     Table,
@@ -12,6 +13,7 @@ import {
 } from 'sequelize-typescript';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { ITransaction } from 'src/entities/transaction.entity';
+import { PartyMemberModel } from './party-member.model';
 
 @Table({ tableName: 'transactions', paranoid: true })
 export class TransactionModel
@@ -69,4 +71,7 @@ export class TransactionModel
     @DeletedAt
     @Column({ type: DataType.DATE, field: 'deleted_at' })
     deletedAt?: Date;
+
+    @HasOne(() => PartyMemberModel, 'depositTransactionId')
+    depositedPartyMember?: PartyMemberModel;
 }

@@ -13,4 +13,13 @@ export class GetPartyMemberService {
 
         return partyMember;
     }
+
+    async getByMemberParty(
+        memberId: string,
+        partyId: string,
+    ): Promise<PartyMemberModel> {
+        return await PartyMemberModel.findOne({
+            where: { partyId, memberId },
+        });
+    }
 }

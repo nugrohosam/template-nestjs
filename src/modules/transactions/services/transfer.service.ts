@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { Transaction } from 'sequelize/types';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { TransactionModel } from 'src/models/transaction.model';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
+import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { TransferRequest } from '../requests/transfer.request';
 
@@ -12,6 +16,8 @@ export class TransferService {
         @Inject(GetUserService) private readonly getUserService: GetUserService,
         @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
+        @Inject(PartyCalculationService)
+        private readonly partyCalculationService: PartyCalculationService,
     ) {}
 
     async generateSignatureMessage(request: TransferRequest): Promise<string> {
@@ -32,19 +38,26 @@ export class TransferService {
 
     async storeTransaction(
         request: TransferRequest,
+        t?: Transaction,
     ): Promise<TransactionModel> {
-        return await TransactionModel.create({
-            addressFrom: request.addressFrom,
-            addressTo: request.addressTo,
-            amount: request.amount,
-            currencyId: request.currencyId,
-            type: request.type,
-            description: request.description,
-            signature: request.transferSignature,
-        });
+        return await TransactionModel.create(
+            {
+                addressFrom: request.addressFrom,
+                addressTo: request.addressTo,
+                amount: request.amount,
+                currencyId: request.currencyId,
+                type: request.type,
+                description: request.description,
+                signature: request.transferSignature,
+            },
+            { transaction: t },
+        );
     }
 
-    async transfer(request: TransferRequest): Promise<TransactionModel> {
+    async transfer(
+        request: TransferRequest,
+        t?: Transaction,
+    ): Promise<TransactionModel> {
         const message = await this.generateSignatureMessage(request);
         // TODO: need to removed after testing
         console.log('message[platform-create-party]: ' + message);
@@ -55,6 +68,32 @@ export class TransferService {
             message,
         );
 
-        return await this.storeTransaction(request);
+        // TODO: need to research about db transaction on sequelize for current pattern
+
+        // begin db transaction, and receive passed transaction if any to used passed transaction instead
+        const dbTransaction = await localDatabase.transaction({
+            transaction: t,
+        });
+
+        try {
+            const transaction = await this.storeTransaction(
+                request,
+                dbTransaction,
+            );
+            if (transaction.type === TransactionTypeEnum.Deposit) {
+                await this.partyCalculationService.deposit(
+                    transaction.addressTo,
+                    transaction.addressFrom,
+                    transaction.amount,
+                    dbTransaction,
+                );
+            }
+
+            await dbTransaction.commit();
+            return transaction;
+        } catch (err) {
+            await dbTransaction.rollback();
+            throw err;
+        }
     }
 }

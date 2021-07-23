@@ -1,8 +1,5 @@
-import {
-    Inject,
-    InternalServerErrorException,
-    UnprocessableEntityException,
-} from '@nestjs/common';
+import { Inject, UnprocessableEntityException } from '@nestjs/common';
+import { Transaction } from 'sequelize/types';
 import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { JoinRequestModel } from 'src/models/join-request.model';
@@ -125,15 +122,19 @@ export class JoinPartyService {
         party: PartyModel,
         user: UserModel,
         request: JoinPartyRequest,
+        t: Transaction,
     ): Promise<PartyMemberModel> {
-        return await PartyMemberModel.create({
-            partyId: party.id,
-            memberId: user.id,
-            initialFund: request.initialDeposit,
-            totalFund: request.initialDeposit,
-            status: 'active', // TODO: need based on member status enum
-            signature: request.joinSignature,
-        });
+        return await PartyMemberModel.create(
+            {
+                partyId: party.id,
+                memberId: user.id,
+                initialFund: request.initialDeposit,
+                totalFund: request.initialDeposit,
+                status: 'active', // TODO: need based on member status enum
+                signature: request.joinSignature,
+            },
+            { transaction: t },
+        );
     }
 
     async join(
@@ -163,10 +164,14 @@ export class JoinPartyService {
 
         // TODO: validate transaction hash
 
-        let partyMember: PartyMemberModel;
         const transaction = await localDatabase.transaction();
         try {
-            partyMember = await this.storePartyMember(party, user, request);
+            const partyMember = await this.storePartyMember(
+                party,
+                user,
+                request,
+                transaction,
+            );
 
             const depositTransaction =
                 await this.transferService.storeTransaction(
@@ -175,18 +180,21 @@ export class JoinPartyService {
                         user,
                         request,
                     ),
+                    transaction,
                 );
 
             partyMember.depositTransactionId = depositTransaction.id;
-            await partyMember.save();
+            await partyMember.save({ transaction });
+
+            party.totalFund += request.initialDeposit;
+            await party.save({ transaction });
 
             await transaction.commit();
-        } catch (err: any) {
+            return partyMember;
+        } catch (err) {
             await transaction.rollback();
-            throw new InternalServerErrorException(err);
+            throw err;
         }
-
-        return partyMember;
     }
 
     async generatePlatformSignature(

@@ -4,6 +4,7 @@ import { UserModel } from 'src/models/user.model';
 export class ProfileResponse implements Omit<IUser, 'address'> {
     id: string;
     username: string;
+    address: string;
     firstname: string;
     lastname: string;
     imageUrl: string;
@@ -14,6 +15,7 @@ export class ProfileResponse implements Omit<IUser, 'address'> {
         return {
             id: user.id,
             username: user.username,
+            address: user.address,
             firstname: user.firstname,
             lastname: user.lastname,
             imageUrl: user.imageUrl,
