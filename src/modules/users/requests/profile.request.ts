@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { IUser } from 'src/entities/user.entity';
 
 export class ProfileRequest implements Omit<IUser, 'address'> {
@@ -33,4 +33,7 @@ export class ProfileRequest implements Omit<IUser, 'address'> {
     @IsOptional()
     @IsString()
     website?: string;
+
+    @IsNotEmpty()
+    signature: string;
 }
