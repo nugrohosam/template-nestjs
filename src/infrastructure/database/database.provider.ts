@@ -15,6 +15,7 @@ class DatabaseProviders {
         ...databaseConfig,
         ...{ logging: false },
     });
+
     private _databaseProviders = [
         {
             provide: 'DATABASE',

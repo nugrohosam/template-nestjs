@@ -1,15 +1,5 @@
-import {
-    Body,
-    Controller,
-    Get,
-    InternalServerErrorException,
-    Param,
-    Post,
-    Put,
-    Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { IndexTransactionRequest } from '../requests/index-transaction.request';
 import { TransferRequest } from '../requests/transfer.request';
 import { UpdateTransferRequest } from '../requests/update-transfer.request';
@@ -32,19 +22,12 @@ export class TransactionController {
     async transfer(
         @Body() request: TransferRequest,
     ): Promise<IApiResponse<TransactionResponse>> {
-        const dbTransaction = await localDatabase.transaction();
-        try {
-            const transaction = await this.transferService.transfer(request);
+        const transaction = await this.transferService.transfer(request);
 
-            await dbTransaction.commit();
-            return {
-                message: 'Transfer success.',
-                data: TransactionResponse.mapFromTransactionModel(transaction),
-            };
-        } catch (err) {
-            await dbTransaction.rollback();
-            throw new InternalServerErrorException(err);
-        }
+        return {
+            message: 'Transfer success.',
+            data: TransactionResponse.mapFromTransactionModel(transaction),
+        };
     }
 
     @Put(':transactionId')
