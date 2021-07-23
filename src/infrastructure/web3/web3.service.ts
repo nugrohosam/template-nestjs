@@ -121,9 +121,10 @@ export class Web3Service {
             throw new UnprocessableEntityException('Transaction has no logs');
 
         let decodedLog: { [key: string]: string };
-        receipt.logs.some((log) => {
-            const eventSignature = this.encodeEventSignature(abiItem);
+        const eventSignature = this.encodeEventSignature(abiItem);
 
+        receipt.logs.some((log) => {
+            console.log({ log });
             if (eventSignature == log.topics[0]) {
                 decodedLog = this.decodeTopicLog(
                     abiItem.inputs,
