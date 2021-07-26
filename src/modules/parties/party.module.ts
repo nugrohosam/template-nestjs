@@ -25,6 +25,8 @@ import { GetJoinRequestService } from './services/join-request/get-join-request.
 import { CommonModule } from '../commons/common.module';
 import { JoinRequestController } from './controllers/join-request.controller';
 import { PartyCalculationService } from './services/party-calculation.service';
+import { CreateProposalService } from './services/proposal/create-proposal.service';
+import { PartyProposalController } from './controllers/party-proposal.controller';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
@@ -34,6 +36,7 @@ import { PartyCalculationService } from './services/party-calculation.service';
         PartyInvitationController,
         PartyMemberController,
         JoinRequestController,
+        PartyProposalController,
     ],
     providers: [
         // Party Porviders
@@ -57,6 +60,8 @@ import { PartyCalculationService } from './services/party-calculation.service';
         UpdatePartyMemberService,
         GetPartyMemberService,
         IndexPartyMemberService,
+        // Proposal
+        CreateProposalService,
     ],
     exports: [GetPartyService, PartyCalculationService],
 })
