@@ -27,6 +27,7 @@ import { JoinRequestController } from './controllers/join-request.controller';
 import { PartyCalculationService } from './services/party-calculation.service';
 import { CreateProposalService } from './services/proposal/create-proposal.service';
 import { PartyProposalController } from './controllers/party-proposal.controller';
+import { IndexProposalService } from './services/proposal/index-proposal.service';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
@@ -62,6 +63,7 @@ import { PartyProposalController } from './controllers/party-proposal.controller
         IndexPartyMemberService,
         // Proposal
         CreateProposalService,
+        IndexProposalService,
     ],
     exports: [GetPartyService, PartyCalculationService],
 })
