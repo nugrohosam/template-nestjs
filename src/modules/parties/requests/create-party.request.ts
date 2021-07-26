@@ -10,6 +10,7 @@ import {
     DistributionTypeEnum,
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
+import { ValidationEnum } from 'src/common/enums/validation.enum';
 import { IParty } from 'src/entities/party.entity';
 
 export class CreatePartyRequest
@@ -31,14 +32,14 @@ export class CreatePartyRequest
 
     @IsNotEmpty()
     @Expose({ name: 'min_deposit' })
-    @Min(100)
-    @Max(1000000000000)
+    @Min(ValidationEnum.MinWei)
+    @Max(ValidationEnum.MaxWei)
     minDeposit: bigint;
 
     @IsNotEmpty()
     @Expose({ name: 'max_deposit' })
-    @Min(100)
-    @Max(1000000000000)
+    @Min(ValidationEnum.MinWei)
+    @Max(ValidationEnum.MaxWei)
     maxDeposit: bigint;
 
     @IsNotEmpty()
