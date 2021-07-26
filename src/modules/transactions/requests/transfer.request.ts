@@ -5,6 +5,8 @@ import {
     IsNotEmpty,
     IsNumber,
     IsOptional,
+    Max,
+    Min,
 } from 'class-validator';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -24,6 +26,8 @@ export class TransferRequest {
 
     @IsNumber()
     @IsNotEmpty()
+    @Min(100)
+    @Max(1000000000000)
     amount: bigint;
 
     @IsNumber()

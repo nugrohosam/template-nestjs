@@ -1,5 +1,11 @@
 import { Expose } from 'class-transformer';
-import { IsEnum, IsEthereumAddress, IsNotEmpty } from 'class-validator';
+import {
+    IsEnum,
+    IsEthereumAddress,
+    IsNotEmpty,
+    Max,
+    Min,
+} from 'class-validator';
 import {
     DistributionTypeEnum,
     PartyTypeEnum,
@@ -25,10 +31,14 @@ export class CreatePartyRequest
 
     @IsNotEmpty()
     @Expose({ name: 'min_deposit' })
+    @Min(100)
+    @Max(1000000000000)
     minDeposit: bigint;
 
     @IsNotEmpty()
     @Expose({ name: 'max_deposit' })
+    @Min(100)
+    @Max(1000000000000)
     maxDeposit: bigint;
 
     @IsNotEmpty()
