@@ -3,6 +3,7 @@ import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
+import { Proposal } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { UserModel } from 'src/models/user.model';
 import { WhitelistedAddressModel } from 'src/models/whitelisted-address.model';
@@ -37,6 +38,7 @@ class DatabaseProviders {
                     JoinRequestModel,
                     PartyInvitationModel,
                     TransactionModel,
+                    Proposal,
                 ]);
 
                 await sequelize.sync({ alter: true });
