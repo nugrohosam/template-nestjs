@@ -24,10 +24,7 @@ export class PartyProposalController {
         @Param('partyId') partyId: string,
         @Body() request: CreateProposalRequest,
     ): Promise<IApiResponse<{ id: string }>> {
-        const { id } = await this.createProposalService.create(
-            partyId,
-            request,
-        );
+        const { id } = await this.createProposalService.call(partyId, request);
         return {
             message: 'Success create proposal',
             data: { id },
