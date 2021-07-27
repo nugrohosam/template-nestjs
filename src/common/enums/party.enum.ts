@@ -16,3 +16,9 @@ export enum JoinRequestStatusEnum {
     Rejected = 'rejected',
     Pending = 'pending',
 }
+
+export enum ProposalStatusEnum {
+    Pending = 'pending',
+    Approved = 'approved',
+    Rejected = 'rejected',
+}

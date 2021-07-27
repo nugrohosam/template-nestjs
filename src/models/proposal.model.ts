@@ -12,6 +12,7 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
+import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { IProposal } from 'src/entities/proposal.entity';
 import { PartyModel } from './party.model';
 import { UserModel } from './user.model';
@@ -68,6 +69,14 @@ export class Proposal extends Model<IProposal, IProposal> implements IProposal {
     @Column({ type: DataType.STRING, field: 'transaction_hash' })
     transactionHash?: string;
 
+    @AllowNull(true)
+    @Column({ type: DataType.DATE, field: 'approved_at' })
+    approvedAt?: Date;
+
+    @AllowNull(true)
+    @Column({ type: DataType.DATE, field: 'rejected_at' })
+    rejectedAt?: Date;
+
     @CreatedAt
     @Column({ type: DataType.DATE, field: 'created_at' })
     createdAt: Date;
@@ -85,4 +94,15 @@ export class Proposal extends Model<IProposal, IProposal> implements IProposal {
 
     @BelongsTo(() => UserModel, 'creatorId')
     creator?: UserModel;
+
+    @Column({ type: DataType.VIRTUAL })
+    get status(): ProposalStatusEnum {
+        if (this.approvedAt) {
+            return ProposalStatusEnum.Approved;
+        } else if (this.rejectedAt) {
+            return ProposalStatusEnum.Rejected;
+        } else {
+            return ProposalStatusEnum.Pending;
+        }
+    }
 }
