@@ -66,7 +66,7 @@ export class CreateProposalService {
         );
     }
 
-    async create(
+    async call(
         partyId: string,
         request: CreateProposalRequest,
     ): Promise<Proposal> {

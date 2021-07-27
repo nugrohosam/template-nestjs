@@ -4,6 +4,7 @@ export interface IPartyMember {
     memberId: string;
     initialFund: bigint;
     totalFund: bigint;
+    totalDeposit: bigint;
     status: string;
     signature: string;
     transactionHash?: string;

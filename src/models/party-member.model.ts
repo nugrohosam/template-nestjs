@@ -47,6 +47,10 @@ export class PartyMemberModel
     totalFund: bigint;
 
     @AllowNull(false)
+    @Column(DataType.BIGINT)
+    totalDeposit: bigint;
+
+    @AllowNull(false)
     @Column(DataType.STRING)
     status: string; // TODO: use party member status enum instead
 

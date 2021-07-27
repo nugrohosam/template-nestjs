@@ -14,6 +14,8 @@ export interface IProposal {
     creatorId: string;
     signature: string;
     transactionHash?: string;
+    approvedAt?: Date;
+    rejectedAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;

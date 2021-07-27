@@ -7,13 +7,17 @@ import {
     Default,
     DeletedAt,
     ForeignKey,
+    HasMany,
     Model,
     PrimaryKey,
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
+import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { IProposal } from 'src/entities/proposal.entity';
 import { PartyModel } from './party.model';
+import { ProposalDistributionModel } from './proposal-distribution.model';
+import { ProposalVoteModel } from './proposal-vote.model';
 import { UserModel } from './user.model';
 
 @Table({ tableName: 'proposals', paranoid: true })
@@ -68,6 +72,14 @@ export class Proposal extends Model<IProposal, IProposal> implements IProposal {
     @Column({ type: DataType.STRING, field: 'transaction_hash' })
     transactionHash?: string;
 
+    @AllowNull(true)
+    @Column({ type: DataType.DATE, field: 'approved_at' })
+    approvedAt?: Date;
+
+    @AllowNull(true)
+    @Column({ type: DataType.DATE, field: 'rejected_at' })
+    rejectedAt?: Date;
+
     @CreatedAt
     @Column({ type: DataType.DATE, field: 'created_at' })
     createdAt: Date;
@@ -85,4 +97,21 @@ export class Proposal extends Model<IProposal, IProposal> implements IProposal {
 
     @BelongsTo(() => UserModel, 'creatorId')
     creator?: UserModel;
+
+    @HasMany(() => ProposalVoteModel, 'proposalId')
+    votes?: ProposalVoteModel[];
+
+    @HasMany(() => ProposalDistributionModel, 'proposalId')
+    distributions?: ProposalDistributionModel[];
+
+    @Column({ type: DataType.VIRTUAL })
+    get status(): ProposalStatusEnum {
+        if (this.approvedAt) {
+            return ProposalStatusEnum.Approved;
+        } else if (this.rejectedAt) {
+            return ProposalStatusEnum.Rejected;
+        } else {
+            return ProposalStatusEnum.Pending;
+        }
+    }
 }
