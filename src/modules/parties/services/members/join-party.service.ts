@@ -130,6 +130,7 @@ export class JoinPartyService {
                 memberId: user.id,
                 initialFund: request.initialDeposit,
                 totalFund: request.initialDeposit,
+                totalDeposit: request.initialDeposit,
                 status: 'active', // TODO: need based on member status enum
                 signature: request.joinSignature,
             },

@@ -47,6 +47,7 @@ export class TransactionModel
         DataType.ENUM(
             TransactionTypeEnum.Deposit,
             TransactionTypeEnum.Withdraw,
+            TransactionTypeEnum.Distribution,
         ),
     )
     type: TransactionTypeEnum;

@@ -1,8 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+    Inject,
+    Injectable,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import { Transaction } from 'sequelize/types';
+import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
+import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { Proposal } from 'src/models/proposal.model';
@@ -20,33 +26,23 @@ export class ApproveProposalService {
     ) {}
 
     // TODO: need to optimize this
-    private async initiateProposalDistribution(
+    private async processCalculation(
         party: PartyModel,
         proposal: Proposal,
+        { signature }: UpdateProposalStatusRequest,
         t: Transaction,
     ): Promise<void> {
         const members = await party.$get('partyMembers');
 
-        const partyDeposit = await TransactionModel.sum('amount', {
-            where: {
-                type: TransactionTypeEnum.Deposit,
-                addressTo: party.address,
-            },
+        const partyDeposit = await PartyMemberModel.sum('totalDeposit', {
+            where: { partyId: party.id },
         });
 
         for (const member of members) {
-            const user = await member.$get('member');
-            const memberDeposit = await TransactionModel.sum('amount', {
-                where: {
-                    type: TransactionTypeEnum.Deposit,
-                    addressTo: party.address,
-                    addressFrom: user.address,
-                },
-            });
-            const weight = memberDeposit / partyDeposit;
+            const weight = Number(member.totalDeposit) / partyDeposit;
             const amount = Number(proposal.amount) * weight;
 
-            await ProposalDistributionModel.create(
+            const distribution = await ProposalDistributionModel.create(
                 {
                     proposalId: proposal.id,
                     memberId: member.id,
@@ -55,6 +51,27 @@ export class ApproveProposalService {
                 },
                 { transaction: t },
             );
+
+            member.totalFund =
+                BigInt(member.totalFund) - BigInt(distribution.amount);
+            await member.save({ transaction: t });
+
+            const user = await member.$get('member');
+            const transaction = await TransactionModel.create(
+                {
+                    addressFrom: user.address,
+                    addressTo: proposal.contractAddress,
+                    amount: BigInt(Number(distribution.amount) * -1),
+                    type: TransactionTypeEnum.Distribution,
+                    description: `Distribution of proposal "${proposal.title}"`,
+                    currencyId: 1,
+                    signature,
+                },
+                { transaction: t },
+            );
+
+            party.totalFund += transaction.amount;
+            await party.save({ transaction: t });
         }
     }
 
@@ -66,6 +83,11 @@ export class ApproveProposalService {
         const party = await proposal.$get('party');
         const owner = await party.$get('owner');
 
+        if (proposal.status !== ProposalStatusEnum.Pending)
+            throw new UnprocessableEntityException(
+                'Proposal already processed.',
+            );
+
         // TODO: need to discuss who exactly approve the proposal based on party type
         await this.web3Service.validateSignature(
             signature,
@@ -73,15 +95,22 @@ export class ApproveProposalService {
             'approve',
         );
 
+        // validate party balance with proposal amount
+        if (party.totalFund < proposal.amount)
+            throw new UnprocessableEntityException(
+                'Party has insuficient balance.',
+            );
+
         const dbTransaction = await localDatabase.transaction();
 
         try {
             proposal.approvedAt = new Date();
-            await proposal.save();
+            await proposal.save({ transaction: dbTransaction });
 
-            await this.initiateProposalDistribution(
+            await this.processCalculation(
                 party,
                 proposal,
+                { signature },
                 dbTransaction,
             );
 
