@@ -1,3 +1,4 @@
+import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { IProposal } from 'src/entities/proposal.entity';
 import { Proposal } from 'src/models/proposal.model';
 import { MemberResponse } from 'src/modules/users/responses/member.response';
@@ -18,9 +19,10 @@ export class DetailProposalResponse
     amount: bigint;
     currencyId: number;
     transactionHash?: string;
+    status: ProposalStatusEnum;
     createdAt?: Date;
-    updatedAt?: Date;
-    deletedAt?: Date;
+    approvedAt?: Date;
+    rejectedAt?: Date;
     party?: IndexPartyResponse;
     creator?: MemberResponse;
 
@@ -39,7 +41,10 @@ export class DetailProposalResponse
             projectEnd: proposal.projectEnd,
             amount: proposal.amount,
             currencyId: proposal.currencyId,
+            status: proposal.status,
             createdAt: proposal.createdAt,
+            approvedAt: proposal.approvedAt,
+            rejectedAt: proposal.rejectedAt,
             party: IndexPartyResponse.mapFromPartyModel(
                 await proposal.$get('party'),
             ),
