@@ -4,6 +4,7 @@ export interface IProposalDistribution {
     memberId: string;
     weight: bigint;
     amount: bigint;
+    transactionHash?: string;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
