@@ -19,7 +19,6 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     distribution: DistributionTypeEnum;
     ownerId: string;
     createdAt: Date;
-    updatedAt: Date;
 
     static mapFromPartyModel(party: PartyModel): IndexPartyResponse {
         return {
@@ -36,7 +35,6 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             distribution: party.distribution,
             ownerId: party.ownerId,
             createdAt: party.createdAt,
-            updatedAt: party.updatedAt,
         };
     }
 }
