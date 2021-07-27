@@ -3,8 +3,10 @@ import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
 import { CreateProposalRequest } from '../requests/proposal/create-proposal.request';
 import { UpdateProposalTransactionRequest } from '../requests/proposal/update-proposal-transaction.request';
+import { DetailProposalResponse } from '../responses/proposal/detail-proposal.response';
 import { IndexProposalResponse } from '../responses/proposal/index-proposal.response';
 import { CreateProposalService } from '../services/proposal/create-proposal.service';
+import { GetProposalService } from '../services/proposal/get-proposal.service';
 import { IndexProposalService } from '../services/proposal/index-proposal.service';
 import { UpdateProposalTransactionService } from '../services/proposal/update-proposal-transaction.service';
 
@@ -14,6 +16,7 @@ export class PartyProposalController {
         private readonly createProposalService: CreateProposalService,
         private readonly indexProposalService: IndexProposalService,
         private readonly updateProposalTransactionService: UpdateProposalTransactionService,
+        private readonly getProposalService: GetProposalService,
     ) {}
 
     @Post()
@@ -55,6 +58,17 @@ export class PartyProposalController {
             message: 'Success fetch proposal',
             meta,
             data,
+        };
+    }
+
+    @Get(':proposalId')
+    async show(
+        @Param('proposalId') proposalId: string,
+    ): Promise<IApiResponse<DetailProposalResponse>> {
+        const proposal = await this.getProposalService.getById(proposalId);
+        return {
+            message: 'Success get proposal detail',
+            data: await DetailProposalResponse.mapFromProposalModel(proposal),
         };
     }
 }
