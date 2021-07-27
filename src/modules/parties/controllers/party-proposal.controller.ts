@@ -10,6 +10,7 @@ import { ApproveProposalService } from '../services/proposal/approve-proposal.se
 import { CreateProposalService } from '../services/proposal/create-proposal.service';
 import { GetProposalService } from '../services/proposal/get-proposal.service';
 import { IndexProposalService } from '../services/proposal/index-proposal.service';
+import { RejectProposalService } from '../services/proposal/reject-proposal.service';
 import { UpdateProposalTransactionService } from '../services/proposal/update-proposal-transaction.service';
 
 @Controller('parties/:partyId/proposals')
@@ -20,6 +21,7 @@ export class PartyProposalController {
         private readonly updateProposalTransactionService: UpdateProposalTransactionService,
         private readonly getProposalService: GetProposalService,
         private readonly approveProposalService: ApproveProposalService,
+        private readonly rejectProposalService: RejectProposalService,
     ) {}
 
     @Post()
@@ -82,5 +84,14 @@ export class PartyProposalController {
             message: 'Success approve proposal',
             data: null,
         };
+    }
+
+    @Post(':proposalId/reject')
+    async reject(
+        @Param('proposalId') proposalId: string,
+        @Body() request: UpdateProposalStatusRequest,
+    ): Promise<IApiResponse<null>> {
+        await this.rejectProposalService.reject(proposalId, request);
+        return { message: 'Success reject proposal', data: null };
     }
 }
