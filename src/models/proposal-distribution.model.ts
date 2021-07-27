@@ -39,6 +39,9 @@ export class ProposalDistributionModel
     @Column(DataType.BIGINT)
     amount: bigint;
 
+    @Column({ type: DataType.STRING, field: 'transaction_hash' })
+    transactionHash?: string;
+
     @CreatedAt
     @Column({ type: DataType.DATE, field: 'created_at' })
     createdAt?: Date;

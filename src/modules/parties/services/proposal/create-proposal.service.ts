@@ -31,7 +31,7 @@ export class CreateProposalService {
     ): string {
         return this.web3Service.soliditySha3([
             { t: 'string', v: title },
-            { t: 'int256', v: amount.toString() },
+            { t: 'uint256', v: amount.toString() },
             { t: 'string', v: partyId },
             { t: 'address', v: address },
         ]);
