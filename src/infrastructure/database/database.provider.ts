@@ -3,6 +3,7 @@ import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
+import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { ProposalVoteModel } from 'src/models/proposal-vote.model';
 import { Proposal } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
@@ -41,6 +42,7 @@ class DatabaseProviders {
                     TransactionModel,
                     Proposal,
                     ProposalVoteModel,
+                    ProposalDistributionModel,
                 ]);
 
                 await sequelize.sync({ alter: true });

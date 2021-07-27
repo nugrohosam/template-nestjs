@@ -7,6 +7,7 @@ import {
     Default,
     DeletedAt,
     ForeignKey,
+    HasMany,
     Model,
     PrimaryKey,
     Table,
@@ -15,6 +16,8 @@ import {
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { IProposal } from 'src/entities/proposal.entity';
 import { PartyModel } from './party.model';
+import { ProposalDistributionModel } from './proposal-distribution.model';
+import { ProposalVoteModel } from './proposal-vote.model';
 import { UserModel } from './user.model';
 
 @Table({ tableName: 'proposals', paranoid: true })
@@ -94,6 +97,12 @@ export class Proposal extends Model<IProposal, IProposal> implements IProposal {
 
     @BelongsTo(() => UserModel, 'creatorId')
     creator?: UserModel;
+
+    @HasMany(() => ProposalVoteModel, 'proposalId')
+    votes?: ProposalVoteModel[];
+
+    @HasMany(() => ProposalDistributionModel, 'proposalId')
+    distributions?: ProposalDistributionModel[];
 
     @Column({ type: DataType.VIRTUAL })
     get status(): ProposalStatusEnum {
