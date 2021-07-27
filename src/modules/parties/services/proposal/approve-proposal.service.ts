@@ -70,7 +70,8 @@ export class ApproveProposalService {
                 { transaction: t },
             );
 
-            party.totalFund += transaction.amount;
+            party.totalFund =
+                BigInt(party.totalFund) + BigInt(transaction.amount);
             await party.save({ transaction: t });
         }
     }
