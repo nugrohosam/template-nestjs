@@ -13,6 +13,7 @@ import { PartyModel } from 'src/models/party.model';
 import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { Proposal } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
+import { UserModel } from 'src/models/user.model';
 import { UpdateProposalStatusRequest } from '../../requests/proposal/update-proposal-status.request';
 import { GetProposalService } from './get-proposal.service';
 
@@ -25,6 +26,18 @@ export class ApproveProposalService {
         private readonly web3Service: Web3Service,
     ) {}
 
+    private generateSignatureMessage(
+        owner: UserModel,
+        proposal: Proposal,
+    ): string {
+        return this.web3Service.soliditySha3([
+            { t: 'address', v: owner.address },
+            { t: 'address', v: proposal.contractAddress },
+            { t: 'uint256', v: proposal.amount.toString() },
+            { t: 'string', v: proposal.id },
+        ]);
+    }
+
     // TODO: need to optimize this
     private async processCalculation(
         party: PartyModel,
@@ -33,7 +46,6 @@ export class ApproveProposalService {
         t: Transaction,
     ): Promise<void> {
         const members = await party.$get('partyMembers');
-
         const partyDeposit = await PartyMemberModel.sum('totalDeposit', {
             where: { partyId: party.id },
         });
@@ -84,16 +96,20 @@ export class ApproveProposalService {
         const party = await proposal.$get('party');
         const owner = await party.$get('owner');
 
+        // validate party must be on pending status
         if (proposal.status !== ProposalStatusEnum.Pending)
             throw new UnprocessableEntityException(
                 'Proposal already processed.',
             );
 
-        // TODO: need to discuss who exactly approve the proposal based on party type
+        // validate signature
+        const message = this.generateSignatureMessage(owner, proposal);
+        // TODO: need to removed after testing
+        console.log('message[approve-proposal]: ' + message);
         await this.web3Service.validateSignature(
             signature,
             owner.address,
-            'approve',
+            message,
         );
 
         // validate party balance with proposal amount
