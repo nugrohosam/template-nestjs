@@ -32,6 +32,7 @@ import { UpdateProposalTransactionService } from './services/proposal/update-pro
 import { GetProposalService } from './services/proposal/get-proposal.service';
 import { ApproveProposalService } from './services/proposal/approve-proposal.service';
 import { RejectProposalService } from './services/proposal/reject-proposal.service';
+import { UpdateApprovedProposalService } from './services/proposal/update-approved-proposal.service';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
@@ -72,6 +73,7 @@ import { RejectProposalService } from './services/proposal/reject-proposal.servi
         UpdateProposalTransactionService,
         ApproveProposalService,
         RejectProposalService,
+        UpdateApprovedProposalService,
     ],
     exports: [GetPartyService, PartyCalculationService],
 })
