@@ -20,7 +20,7 @@ export class PartyCalculationService {
         amount: bigint,
         t?: Transaction,
     ): Promise<PartyModel> {
-        party.totalFund += amount;
+        party.totalFund = BigInt(party.totalFund) + BigInt(amount);
         return await party.save({ transaction: t });
     }
 
@@ -29,7 +29,7 @@ export class PartyCalculationService {
         amount: bigint,
         t?: Transaction,
     ): Promise<PartyMemberModel> {
-        partyMember.totalFund += amount;
+        partyMember.totalFund = BigInt(partyMember.totalFund) + BigInt(amount);
         return await partyMember.save({ transaction: t });
     }
 
@@ -58,6 +58,44 @@ export class PartyCalculationService {
             await this.updatePartyMemberTotalFund(
                 partyMember,
                 amount,
+                dbTransaction,
+            );
+            dbTransaction.commit();
+        } catch (err) {
+            dbTransaction.rollback();
+            throw err;
+        }
+    }
+
+    async withdraw(
+        partyAddress: string,
+        memberAddress: string,
+        amount: bigint,
+        t: Transaction,
+    ): Promise<void> {
+        const dbTransaction: Transaction = await localDatabase.transaction({
+            transaction: t,
+        });
+
+        const party = await this.getPartyService.getByAddress(partyAddress);
+        const member = await this.getUserService.getUserByAddress(
+            memberAddress,
+        );
+        const partyMember = await this.getPartyMemberService.getByMemberParty(
+            member.id,
+            party.id,
+        );
+
+        const withdrawAmount = BigInt(Number(amount) * -1);
+        try {
+            await this.updatePartyTotalFund(
+                party,
+                withdrawAmount,
+                dbTransaction,
+            );
+            await this.updatePartyMemberTotalFund(
+                partyMember,
+                withdrawAmount,
                 dbTransaction,
             );
             dbTransaction.commit();
