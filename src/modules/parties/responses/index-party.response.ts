@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
@@ -12,10 +13,10 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     imageUrl: string | null;
     purpose: string;
     isPublic: boolean;
-    minDeposit: bigint;
-    maxDeposit: bigint;
+    minDeposit: BN;
+    maxDeposit: BN;
     totalMember: number;
-    totalFund: bigint;
+    totalFund: BN;
     distribution: DistributionTypeEnum;
     ownerId: string;
     createdAt: Date;

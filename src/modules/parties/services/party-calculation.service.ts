@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import BN from 'bn.js';
 import { Transaction } from 'sequelize/types';
 import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -17,26 +18,26 @@ export class PartyCalculationService {
 
     async updatePartyTotalFund(
         party: PartyModel,
-        amount: bigint,
+        amount: BN,
         t?: Transaction,
     ): Promise<PartyModel> {
-        party.totalFund = BigInt(party.totalFund) + BigInt(amount);
+        party.totalFund = party.totalFund.add(amount);
         return await party.save({ transaction: t });
     }
 
     async updatePartyMemberTotalFund(
         partyMember: PartyMemberModel,
-        amount: bigint,
+        amount: BN,
         t?: Transaction,
     ): Promise<PartyMemberModel> {
-        partyMember.totalFund = BigInt(partyMember.totalFund) + BigInt(amount);
+        partyMember.totalFund = partyMember.totalFund.add(amount);
         return await partyMember.save({ transaction: t });
     }
 
     async deposit(
         partyAddress: string,
         memberAddress: string,
-        amount: bigint,
+        amount: BN,
         t?: Transaction,
     ): Promise<void> {
         // begin db transaction, and receive passed transaction if any to used passed transaction instead
@@ -70,7 +71,7 @@ export class PartyCalculationService {
     async withdraw(
         partyAddress: string,
         memberAddress: string,
-        amount: bigint,
+        amount: BN,
         t: Transaction,
     ): Promise<void> {
         const dbTransaction: Transaction = await localDatabase.transaction({
@@ -86,7 +87,7 @@ export class PartyCalculationService {
             party.id,
         );
 
-        const withdrawAmount = BigInt(Number(amount) * -1);
+        const withdrawAmount = amount.muln(-1);
         try {
             await this.updatePartyTotalFund(
                 party,

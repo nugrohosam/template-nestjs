@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     BelongsTo,
     Column,
@@ -34,10 +35,10 @@ export class ProposalDistributionModel
     memberId: string;
 
     @Column(DataType.BIGINT)
-    weight: bigint;
+    weight: BN;
 
     @Column(DataType.BIGINT)
-    amount: bigint;
+    amount: BN;
 
     @Column({ type: DataType.STRING, field: 'transaction_hash' })
     transactionHash?: string;

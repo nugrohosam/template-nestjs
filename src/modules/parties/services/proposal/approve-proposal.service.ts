@@ -3,6 +3,7 @@ import {
     Injectable,
     UnprocessableEntityException,
 } from '@nestjs/common';
+import BN from 'bn.js';
 import { Transaction } from 'sequelize/types';
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
@@ -51,21 +52,20 @@ export class ApproveProposalService {
         });
 
         for (const member of members) {
-            const weight = Number(member.totalDeposit) / partyDeposit;
-            const amount = Number(proposal.amount) * weight;
+            const weight = member.totalDeposit.divRound(new BN(partyDeposit));
+            const amount = proposal.amount.mul(weight);
 
             const distribution = await ProposalDistributionModel.create(
                 {
                     proposalId: proposal.id,
                     memberId: member.id,
-                    weight: BigInt(Math.floor(weight * 10 ** 2)),
-                    amount: BigInt(Math.floor(amount)),
+                    weight: weight.muln(10 ** 2),
+                    amount: amount,
                 },
                 { transaction: t },
             );
 
-            member.totalFund =
-                BigInt(member.totalFund) - BigInt(distribution.amount);
+            member.totalFund = member.totalFund.add(distribution.amount);
             await member.save({ transaction: t });
 
             const user = await member.$get('member');
@@ -73,7 +73,7 @@ export class ApproveProposalService {
                 {
                     addressFrom: user.address,
                     addressTo: proposal.contractAddress,
-                    amount: BigInt(Number(distribution.amount) * -1),
+                    amount: distribution.amount.muln(-1),
                     type: TransactionTypeEnum.Distribution,
                     description: `Distribution of proposal "${proposal.title}"`,
                     currencyId: 1,
@@ -82,8 +82,7 @@ export class ApproveProposalService {
                 { transaction: t },
             );
 
-            party.totalFund =
-                BigInt(party.totalFund) + BigInt(transaction.amount);
+            party.totalFund = party.totalFund.add(transaction.amount);
             await party.save({ transaction: t });
         }
     }

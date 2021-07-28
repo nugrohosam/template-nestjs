@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { Expose } from 'class-transformer';
 import { IsEnum, IsEthereumAddress, IsNotEmpty } from 'class-validator';
 import {
@@ -25,11 +26,11 @@ export class CreatePartyRequest
 
     @IsNotEmpty()
     @Expose({ name: 'min_deposit' })
-    minDeposit: bigint;
+    minDeposit: BN;
 
     @IsNotEmpty()
     @Expose({ name: 'max_deposit' })
-    maxDeposit: bigint;
+    maxDeposit: BN;
 
     @IsNotEmpty()
     @IsEnum(DistributionTypeEnum)

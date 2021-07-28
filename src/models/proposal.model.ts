@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     AllowNull,
     BelongsTo,
@@ -56,7 +57,7 @@ export class Proposal extends Model<IProposal, IProposal> implements IProposal {
     projectEnd: Date;
 
     @Column(DataType.BIGINT)
-    amount: bigint;
+    amount: BN;
 
     @Column({ type: DataType.INTEGER, field: 'currency_id' })
     currencyId: number;

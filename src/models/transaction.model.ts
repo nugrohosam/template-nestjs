@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     AllowNull,
     Column,
@@ -36,7 +37,7 @@ export class TransactionModel
 
     @AllowNull(false)
     @Column(DataType.BIGINT)
-    amount: bigint;
+    amount: BN;
 
     @AllowNull(false)
     @Column({ type: DataType.INTEGER, field: 'currency_id' })

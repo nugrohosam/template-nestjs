@@ -1,10 +1,12 @@
+import BN from 'bn.js';
+
 export interface IPartyMember {
     id?: string;
     partyId: string;
     memberId: string;
-    initialFund: bigint;
-    totalFund: bigint;
-    totalDeposit: bigint;
+    initialFund: BN;
+    totalFund: BN;
+    totalDeposit: BN;
     status: string;
     signature: string;
     transactionHash?: string;

@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { Expose } from 'class-transformer';
 import { IsEthereumAddress, IsNotEmpty } from 'class-validator';
 
@@ -9,7 +10,7 @@ export class JoinPartyRequest {
 
     @IsNotEmpty()
     @Expose({ name: 'initial_deposit' })
-    initialDeposit: bigint;
+    initialDeposit: BN;
 
     @IsNotEmpty()
     @Expose({ name: 'join_signature' })
