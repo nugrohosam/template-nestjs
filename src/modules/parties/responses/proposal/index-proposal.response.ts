@@ -8,6 +8,9 @@ export class IndexProposalResponse {
     title: string;
     description: string;
     status: ProposalStatusEnum;
+    contractAddress: string;
+    amount: bigint;
+    attachmentUrl: string;
     createdAt?: Date;
     party: IndexPartyResponse;
     creator: MemberResponse;
@@ -20,6 +23,9 @@ export class IndexProposalResponse {
             title: proposal.title,
             description: proposal.description,
             status: proposal.status,
+            contractAddress: proposal.contractAddress,
+            amount: proposal.amount,
+            attachmentUrl: proposal.attachmentUrl,
             createdAt: proposal.createdAt,
             party: IndexPartyResponse.mapFromPartyModel(
                 await proposal.$get('party'),
