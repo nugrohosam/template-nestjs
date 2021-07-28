@@ -1,5 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
 import BN from 'bn.js';
+import {
+    Inject,
+    Injectable,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import { Transaction } from 'sequelize/types';
 import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -15,6 +19,13 @@ export class PartyCalculationService {
         @Inject(GetUserService) private readonly getUserService: GetUserService,
         private readonly getPartyMemberService: GetPartyMemberService,
     ) {}
+
+    validateDepositAmount(amount: BN, party: PartyModel): void {
+        if (amount > party.maxDeposit || amount < party.minDeposit)
+            throw new UnprocessableEntityException(
+                `Deposit amount must be between ${party.minDeposit} and ${party.maxDeposit}`,
+            );
+    }
 
     async updatePartyTotalFund(
         party: PartyModel,
@@ -53,6 +64,8 @@ export class PartyCalculationService {
             member.id,
             party.id,
         );
+
+        this.validateDepositAmount(amount, party);
 
         try {
             await this.updatePartyTotalFund(party, amount, dbTransaction);

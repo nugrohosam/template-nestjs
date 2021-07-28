@@ -1,10 +1,17 @@
 import BN from 'bn.js';
 import { Expose } from 'class-transformer';
-import { IsEnum, IsEthereumAddress, IsNotEmpty } from 'class-validator';
+import {
+    IsEnum,
+    IsEthereumAddress,
+    IsNotEmpty,
+    Max,
+    Min,
+} from 'class-validator';
 import {
     DistributionTypeEnum,
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
+import { ValidationEnum } from 'src/common/enums/validation.enum';
 import { IParty } from 'src/entities/party.entity';
 
 export class CreatePartyRequest
@@ -26,10 +33,14 @@ export class CreatePartyRequest
 
     @IsNotEmpty()
     @Expose({ name: 'min_deposit' })
+    @Min(ValidationEnum.MinWei)
+    @Max(ValidationEnum.MaxWei)
     minDeposit: BN;
 
     @IsNotEmpty()
     @Expose({ name: 'max_deposit' })
+    @Min(ValidationEnum.MinWei)
+    @Max(ValidationEnum.MaxWei)
     maxDeposit: BN;
 
     @IsNotEmpty()
