@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     AllowNull,
     BelongsTo,
@@ -40,15 +41,15 @@ export class PartyMemberModel
 
     @AllowNull(false)
     @Column(DataType.BIGINT)
-    initialFund: bigint;
+    initialFund: BN;
 
     @AllowNull(false)
     @Column(DataType.BIGINT)
-    totalFund: bigint;
+    totalFund: BN;
 
     @AllowNull(false)
     @Column(DataType.BIGINT)
-    totalDeposit: bigint;
+    totalDeposit: BN;
 
     @AllowNull(false)
     @Column(DataType.STRING)

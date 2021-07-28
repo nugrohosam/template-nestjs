@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     BelongsTo,
     BelongsToMany,
@@ -95,7 +96,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    totalFund?: bigint;
+    totalFund?: BN;
 
     @Column({
         field: 'min_deposit',
@@ -103,7 +104,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    minDeposit?: bigint;
+    minDeposit?: BN;
 
     @Column({
         field: 'max_deposit',
@@ -111,7 +112,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    maxDeposit?: bigint;
+    maxDeposit?: BN;
 
     @Column({
         field: 'total_member',

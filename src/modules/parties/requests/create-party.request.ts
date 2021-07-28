@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { Expose } from 'class-transformer';
 import {
     IsEnum,
@@ -34,13 +35,13 @@ export class CreatePartyRequest
     @Expose({ name: 'min_deposit' })
     @Min(ValidationEnum.MinWei)
     @Max(ValidationEnum.MaxWei)
-    minDeposit: bigint;
+    minDeposit: BN;
 
     @IsNotEmpty()
     @Expose({ name: 'max_deposit' })
     @Min(ValidationEnum.MinWei)
     @Max(ValidationEnum.MaxWei)
-    maxDeposit: bigint;
+    maxDeposit: BN;
 
     @IsNotEmpty()
     @IsEnum(DistributionTypeEnum)

@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
@@ -18,9 +19,9 @@ export class DetailPartyResponse
     purpose: string;
     imageUrl: string;
     isPublic: boolean;
-    totalFund: bigint;
-    minDeposit: bigint;
-    maxDeposit: bigint;
+    totalFund: BN;
+    minDeposit: BN;
+    maxDeposit: BN;
     totalMember: number;
     distribution: DistributionTypeEnum;
     creator: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;

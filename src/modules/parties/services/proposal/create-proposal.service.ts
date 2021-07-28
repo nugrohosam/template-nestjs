@@ -3,6 +3,7 @@ import {
     Injectable,
     UnprocessableEntityException,
 } from '@nestjs/common';
+import BN from 'bn.js';
 import { Transaction } from 'sequelize/types';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
@@ -25,7 +26,7 @@ export class CreateProposalService {
 
     generateSignatureMessage(
         title: string,
-        amount: bigint,
+        amount: BN,
         partyId: string,
         address: string,
     ): string {

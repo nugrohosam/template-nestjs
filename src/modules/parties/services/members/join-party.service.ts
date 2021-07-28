@@ -1,4 +1,5 @@
 import { Inject, UnprocessableEntityException } from '@nestjs/common';
+import BN from 'bn.js';
 import { Transaction } from 'sequelize/types';
 import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
@@ -24,7 +25,7 @@ export class JoinPartyService {
     generateJoinSignature(
         user: UserModel,
         party: PartyModel,
-        deposit: bigint,
+        deposit: BN,
     ): string {
         return this.web3Service.soliditySha3([
             { t: 'address', v: user.address },
@@ -107,10 +108,7 @@ export class JoinPartyService {
         }
     }
 
-    private validateUserInitialDeposit(
-        party: PartyModel,
-        deposit: bigint,
-    ): void {
+    private validateUserInitialDeposit(party: PartyModel, deposit: BN): void {
         if (deposit < party.minDeposit || deposit > party.maxDeposit) {
             throw new UnprocessableEntityException(
                 `Deposit must be between ${party.minDeposit} and ${party.maxDeposit}`,
@@ -187,7 +185,7 @@ export class JoinPartyService {
             partyMember.depositTransactionId = depositTransaction.id;
             await partyMember.save({ transaction });
 
-            party.totalFund += request.initialDeposit;
+            party.totalFund = party.totalFund.add(request.initialDeposit);
             await party.save({ transaction });
 
             await transaction.commit();

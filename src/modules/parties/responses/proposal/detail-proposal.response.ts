@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { IProposal } from 'src/entities/proposal.entity';
 import { Proposal } from 'src/models/proposal.model';
@@ -16,7 +17,7 @@ export class DetailProposalResponse
     voteEnd: Date;
     projectStart: Date;
     projectEnd: Date;
-    amount: bigint;
+    amount: BN;
     currencyId: number;
     transactionHash?: string;
     status: ProposalStatusEnum;
