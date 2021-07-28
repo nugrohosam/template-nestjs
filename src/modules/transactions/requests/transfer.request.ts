@@ -5,11 +5,14 @@ import {
     IsNotEmpty,
     IsNumber,
     IsOptional,
+    Max,
+    Min,
 } from 'class-validator';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { JoinPartyRequest } from 'src/modules/parties/requests/member/join-party.request';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { ValidationEnum } from 'src/common/enums/validation.enum';
 
 export class TransferRequest {
     @IsEthereumAddress()
@@ -24,6 +27,8 @@ export class TransferRequest {
 
     @IsNumber()
     @IsNotEmpty()
+    @Min(ValidationEnum.MinWei)
+    @Max(ValidationEnum.MaxWei)
     amount: bigint;
 
     @IsNumber()
