@@ -27,7 +27,7 @@ export class IndexPartyService {
         } else {
             if (query.search) {
                 where.name = {
-                    [Op.iLike]: `%${query.search}%`,
+                    [Op.like]: `%${query.search}%`,
                 };
             }
         }
