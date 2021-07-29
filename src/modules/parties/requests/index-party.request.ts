@@ -7,12 +7,12 @@ import {
     IsUUID,
 } from 'class-validator';
 import { OrderDirectionEnum } from 'src/common/enums/index.enum';
-import {
-    IPaginateRequest,
-    ISortRequest,
-} from 'src/common/interface/index.interface';
+import { ISortRequest } from 'src/common/interface/index.interface';
+import { PaginationMeta } from 'sequelize-typescript-paginator';
 
-export class IndexPartyRequest implements IPaginateRequest, ISortRequest {
+export class IndexPartyRequest
+    implements Partial<PaginationMeta>, ISortRequest
+{
     @IsString()
     @IsOptional()
     sort?: string;
@@ -23,11 +23,12 @@ export class IndexPartyRequest implements IPaginateRequest, ISortRequest {
 
     @IsNumber()
     @IsOptional()
-    limit?: number;
+    @Expose({ name: 'per_page' })
+    perPage?: number;
 
     @IsNumber()
     @IsOptional()
-    offset?: number;
+    page?: number;
 
     @IsUUID()
     @IsOptional()

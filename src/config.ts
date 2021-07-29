@@ -17,6 +17,11 @@ export const config = {
         database: process.env.DB_DATABASE,
     },
 
+    // Storage
+    storage: {
+        path: './storages',
+    },
+
     // Services
     web3: {
         httpProvider: process.env.RPC_SERVER,

@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     DistributionTypeEnum,
     PartyTypeEnum,
@@ -13,9 +14,9 @@ export interface IParty {
     creatorId: string;
     ownerId: string;
     isPublic: boolean;
-    totalFund?: number;
-    minDeposit?: number;
-    maxDeposit?: number;
+    totalFund?: BN;
+    minDeposit?: BN;
+    maxDeposit?: BN;
     totalMember?: number;
     distribution: DistributionTypeEnum;
     signature?: string;

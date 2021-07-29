@@ -8,12 +8,12 @@ export class RegisterService {
         @Inject(Web3Service) private readonly web3Service: Web3Service,
     ) {}
 
-    generateRegisterSignatureMessage(): string {
+    private generateRegisterSignatureMessage(): string {
         // TODO: need to fixed with fe and sc
         return 'register';
     }
 
-    async validateRegisterSignature(
+    private async validateRegisterSignature(
         registerRequest: RegisterRequest,
     ): Promise<void> {
         const signedAddress = await this.web3Service.recover(
@@ -25,7 +25,7 @@ export class RegisterService {
             throw new UnprocessableEntityException('Signature is invalid.');
     }
 
-    async validateAddressMustUnique(address: string): Promise<void> {
+    private async validateAddressMustUnique(address: string): Promise<void> {
         const user = await UserModel.findOne({
             where: { address },
         });
@@ -36,14 +36,17 @@ export class RegisterService {
             );
     }
 
+    async storeUserAddress(address: string): Promise<UserModel> {
+        return UserModel.create({
+            address,
+            username: address,
+        });
+    }
+
     async register(request: RegisterRequest): Promise<UserModel> {
         await this.validateRegisterSignature(request);
         await this.validateAddressMustUnique(request.tokenAddress);
 
-        const user = new UserModel();
-        user.address = request.tokenAddress;
-        await user.save();
-
-        return user;
+        return this.storeUserAddress(request.tokenAddress);
     }
 }

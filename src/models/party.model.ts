@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     BelongsTo,
     BelongsToMany,
@@ -95,7 +96,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    totalFund?: number;
+    totalFund?: BN;
 
     @Column({
         field: 'min_deposit',
@@ -103,7 +104,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    minDeposit?: number;
+    minDeposit?: BN;
 
     @Column({
         field: 'max_deposit',
@@ -111,7 +112,7 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
         defaultValue: 0,
     })
-    maxDeposit?: number;
+    maxDeposit?: BN;
 
     @Column({
         field: 'total_member',
@@ -173,51 +174,37 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @BelongsTo(() => UserModel, 'creatorId')
     readonly creator?: UserModel;
 
+    @HasMany(() => PartyMemberModel, 'partyId')
+    readonly partyMembers?: PartyMemberModel[];
+
     @BelongsToMany(
         () => UserModel,
         () => PartyMemberModel,
         'partyId',
         'memberId',
     )
-    readonly members?: PartyMemberModel[];
+    readonly members?: UserModel[];
 
     @HasMany(() => PartyInvitationModel)
     readonly invitations?: PartyInvitationModel[];
 
-    /**
-     * TODO: need to confirm to PO about distribution schedule
-     * get next distribution schedule based on created date
-     * and distribution type
-     */
-    get nextDistributionOn(): Date | null {
-        return this.createdAt;
+    async isActive(): Promise<boolean> {
+        if (!this.address || !this.transactionHash) return false;
 
-        // switch (this.distribution) {
-        //     case DistributionTypeEnum.Daily:
-        //         date =
-        //             date.getHours() > new Date().getHours()
-        //                 ? new Date(date.setDate(new Date().getDate() + 1))
-        //                 : new Date(new Date().setTime(date.getTime()));
-        //         break;
-        //     case DistributionTypeEnum.Monthly:
-        //         date =
-        //             date.getDate() > new Date().getDate()
-        //                 ? new Date(date.setMonth(new Date().getMonth() + 1))
-        //                 : new Date(new Date().setTime(date.getTime()));
-        //         break;
-        //     case DistributionTypeEnum.Yearly:
-        //         date =
-        //             date.getDate() > new Date().getDate()
-        //                 ? new Date(
-        //                       date.setFullYear(new Date().getFullYear() + 1),
-        //                   )
-        //                 : new Date(new Date().setTime(date.getTime()));
-        //         break;
-        //     default:
-        //         date = null;
-        //         break;
-        // }
+        const partyMembers = await PartyMemberModel.findOne({
+            where: { memberId: this.ownerId, partyId: this.id },
+        });
+        if (!partyMembers) return false;
+        if (!partyMembers.depositTransactionId) return false;
 
-        // return date;
+        return true;
+    }
+
+    async isMember(user: UserModel): Promise<boolean> {
+        const partyMembers = await PartyMemberModel.findOne({
+            where: { memberId: user.id, partyId: this.id },
+        });
+
+        return partyMembers !== null;
     }
 }

@@ -4,7 +4,7 @@ import { UserModel } from 'src/models/user.model';
 
 @Injectable()
 export class GetPartyService {
-    async getPartyById(partyId: string): Promise<PartyModel> {
+    async getById(partyId: string): Promise<PartyModel> {
         const party = await PartyModel.findOne({
             include: [
                 {
@@ -20,6 +20,14 @@ export class GetPartyService {
         });
 
         if (!party) throw new NotFoundException('Party not found.');
+        return party;
+    }
+
+    async getByAddress(address: string): Promise<PartyModel> {
+        const party = await PartyModel.findOne({
+            where: { address },
+        });
+        if (!party) throw new NotFoundException('Party not found');
         return party;
     }
 }

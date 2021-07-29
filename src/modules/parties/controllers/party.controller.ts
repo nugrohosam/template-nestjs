@@ -1,17 +1,31 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Headers,
+    Inject,
+    Param,
+    Post,
+    Put,
+    Query,
+} from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { IndexRequest } from 'src/common/request/index.request';
+import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
+import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
+import { IndexTransactionService } from 'src/modules/transactions/services/index-transaction.service';
 import { CreatePartyRequest } from '../requests/create-party.request';
+import { DeletePartyRequest } from '../requests/delete-party.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
-import { JoinPartyRequest } from '../requests/join-party.request';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
 import { IndexPartyResponse } from '../responses/index-party.response';
-import { JoinPartyResponse } from '../responses/join-party.response';
 import { CreatePartyService } from '../services/create-party.service';
+import { DeletePartyService } from '../services/delete-party.service';
 import { GetPartyService } from '../services/get-party.service';
 import { IndexPartyService } from '../services/index-party.service';
-import { JoinPartyService } from '../services/join-party.service';
 import { UpdateTransactionHashService } from '../services/update-transaction-hash.service';
 
 @Controller('parties')
@@ -21,7 +35,11 @@ export class PartyController {
         private readonly getPartyService: GetPartyService,
         private readonly createPartyService: CreatePartyService,
         private readonly updateTransactionHashService: UpdateTransactionHashService,
-        private readonly joinPartyService: JoinPartyService,
+        private readonly deletePartyService: DeletePartyService,
+        @Inject(GetSignerService)
+        private readonly getSignerService: GetSignerService,
+        @Inject(IndexTransactionService)
+        private readonly indexTransactionService: IndexTransactionService,
     ) {}
 
     @Post('/create')
@@ -57,6 +75,18 @@ export class PartyController {
         };
     }
 
+    @Delete('/:partyId')
+    async delete(
+        @Param('partyId') partyId: string,
+        @Body() request: DeletePartyRequest,
+    ): Promise<IApiResponse<null>> {
+        await this.deletePartyService.delete(partyId, request);
+        return {
+            message: 'Success delete party',
+            data: null,
+        };
+    }
+
     @Get('/')
     async index(
         @Query() query: IndexPartyRequest,
@@ -70,30 +100,33 @@ export class PartyController {
 
     @Get('/:partyId')
     async show(
+        @Headers('Signature') signature: string,
         @Param('partyId') partyId: string,
     ): Promise<IApiResponse<DetailPartyResponse>> {
-        const party = await this.getPartyService.getPartyById(partyId);
+        // TODO: need to research about this
+        const signer = await this.getSignerService.get(signature);
+
+        const party = await this.getPartyService.getById(partyId);
         return {
             message: 'Success get party',
-            data: DetailPartyResponse.mapFromPartyModel(party),
+            data: await DetailPartyResponse.mapFromPartyModel(party, signer),
         };
     }
 
-    @Post('/:partyId/join')
-    async join(
+    @Get('/:partyId/transactions')
+    async transactions(
         @Param('partyId') partyId: string,
-        @Body() request: JoinPartyRequest,
-    ): Promise<IApiResponse<JoinPartyResponse>> {
-        const partyMember = await this.joinPartyService.join(partyId, request);
-        const platformSignature =
-            await this.joinPartyService.generatePlatformSignature(partyMember);
-
+        @Query() query: IndexRequest,
+    ): Promise<IApiResponse<TransactionResponse[]>> {
+        const party = await this.getPartyService.getById(partyId);
+        const { data, meta } = await this.indexTransactionService.fetchByParty(
+            party,
+            query,
+        );
         return {
-            message: 'Success add user to party',
-            data: JoinPartyResponse.mapFromPartyMemberModel(
-                partyMember,
-                platformSignature,
-            ),
+            message: "Success fetch party's transactions",
+            meta,
+            data,
         };
     }
 }

@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
@@ -12,12 +13,13 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     imageUrl: string | null;
     purpose: string;
     isPublic: boolean;
+    minDeposit: BN;
+    maxDeposit: BN;
     totalMember: number;
-    totalFund: number;
+    totalFund: BN;
     distribution: DistributionTypeEnum;
     ownerId: string;
     createdAt: Date;
-    updatedAt: Date;
 
     static mapFromPartyModel(party: PartyModel): IndexPartyResponse {
         return {
@@ -27,12 +29,13 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             imageUrl: party.imageUrl,
             purpose: party.purpose,
             isPublic: party.isPublic,
+            minDeposit: party.minDeposit,
+            maxDeposit: party.maxDeposit,
             totalMember: party.totalMember,
             totalFund: party.totalFund,
             distribution: party.distribution,
             ownerId: party.ownerId,
             createdAt: party.createdAt,
-            updatedAt: party.updatedAt,
         };
     }
 }

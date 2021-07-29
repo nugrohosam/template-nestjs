@@ -10,3 +10,15 @@ export enum DistributionTypeEnum {
     Monthly = 'monthly',
     Yearly = 'yearly',
 }
+
+export enum JoinRequestStatusEnum {
+    Accepted = 'accepted',
+    Rejected = 'rejected',
+    Pending = 'pending',
+}
+
+export enum ProposalStatusEnum {
+    Pending = 'pending',
+    Approved = 'approved',
+    Rejected = 'rejected',
+}

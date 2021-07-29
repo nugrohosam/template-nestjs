@@ -2,8 +2,8 @@ import { Inject, UnprocessableEntityException } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyModel } from 'src/models/party.model';
-import { InviteUserRequest } from '../requests/invite-user.request';
-import { GetPartyService } from './get-party.service';
+import { InviteUserRequest } from '../../requests/invitation/invite-user.request';
+import { GetPartyService } from '../get-party.service';
 
 export class InvitePartyService {
     constructor(
@@ -54,11 +54,19 @@ export class InvitePartyService {
         partyId: string,
         request: InviteUserRequest,
     ): Promise<PartyInvitationModel> {
-        const party = await this.getPartyService.getPartyById(partyId);
+        const party = await this.getPartyService.getById(partyId);
+        const message = this.generateInvitePartyMessage(
+            request.userAddress,
+            party,
+        );
+
+        // TODO: need to removed after testing
+        console.log('message[invite-party]: ' + message);
+
         await this.web3Service.validateSignature(
             request.inviteSignature,
-            request.userAddress,
-            this.generateInvitePartyMessage(request.userAddress, party),
+            party.owner.address,
+            message,
         );
         await this.validateUserAddress(request.userAddress, party);
         return await this.storeInvitation(party, request);

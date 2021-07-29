@@ -1,7 +1,11 @@
 import { Sequelize } from 'sequelize-typescript';
+import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyInvitationModel } from 'src/models/party-invitation.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
+import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
+import { ProposalVoteModel } from 'src/models/proposal-vote.model';
+import { Proposal } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { UserModel } from 'src/models/user.model';
 import { WhitelistedAddressModel } from 'src/models/whitelisted-address.model';
@@ -10,10 +14,11 @@ import { databaseConfig } from './database.config';
 class DatabaseProviders {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    private readonly _primeSequelize = new Sequelize({
+    private readonly _localSequelize = new Sequelize({
         ...databaseConfig,
         ...{ logging: false },
     });
+
     private _databaseProviders = [
         {
             provide: 'DATABASE',
@@ -32,8 +37,12 @@ class DatabaseProviders {
                     WhitelistedAddressModel,
                     PartyModel,
                     PartyMemberModel,
+                    JoinRequestModel,
                     PartyInvitationModel,
                     TransactionModel,
+                    Proposal,
+                    ProposalVoteModel,
+                    ProposalDistributionModel,
                 ]);
 
                 await sequelize.sync({ alter: true });
@@ -47,10 +56,10 @@ class DatabaseProviders {
         return this._databaseProviders;
     }
 
-    getPrimeSequelize() {
-        return this._primeSequelize;
+    getLocalSequelize() {
+        return this._localSequelize;
     }
 }
 
 export const databaseProviders = new DatabaseProviders().getDatabaseProviders();
-export const localDatabase = new DatabaseProviders().getPrimeSequelize();
+export const localDatabase = new DatabaseProviders().getLocalSequelize();

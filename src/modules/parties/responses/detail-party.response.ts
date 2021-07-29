@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
@@ -10,18 +11,19 @@ export class DetailPartyResponse
     implements Omit<IParty, 'creatorId' | 'ownerId'>
 {
     id: string;
+    isActive: boolean;
+    isMember: boolean;
     address: string;
     name: string;
     type: PartyTypeEnum;
     purpose: string;
     imageUrl: string;
     isPublic: boolean;
-    totalFund: number;
-    minDeposit: number;
-    maxDeposit: number;
+    totalFund: BN;
+    minDeposit: BN;
+    maxDeposit: BN;
     totalMember: number;
     distribution: DistributionTypeEnum;
-    nextDistributionOn: Date;
     creator: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;
     owner: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;
     projects: Record<string, any> | [];
@@ -29,9 +31,14 @@ export class DetailPartyResponse
     updatedAt: Date;
     deletedAt: Date | null;
 
-    static mapFromPartyModel(party: PartyModel): DetailPartyResponse {
+    static async mapFromPartyModel(
+        party: PartyModel,
+        user?: UserModel,
+    ): Promise<DetailPartyResponse> {
         return {
             id: party.id,
+            isActive: await party.isActive(),
+            isMember: user ? await party.isMember(user) : false,
             address: party.address,
             name: party.name,
             type: party.type,
@@ -43,7 +50,6 @@ export class DetailPartyResponse
             maxDeposit: party.maxDeposit,
             totalMember: party.totalMember,
             distribution: party.distribution,
-            nextDistributionOn: party.nextDistributionOn,
             creator: {
                 id: party.creator.id,
                 firstname: party.creator.firstname,

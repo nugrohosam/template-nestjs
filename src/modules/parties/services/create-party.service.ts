@@ -4,6 +4,7 @@ import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { config } from 'src/config';
+import BN from 'bn.js';
 
 export class CreatePartyService {
     constructor(
@@ -21,6 +22,10 @@ export class CreatePartyService {
         request: CreatePartyRequest,
     ): Promise<string> {
         const message = this.generateCreatePartySignatureMessage(request);
+
+        // TODO: need to removed after testing
+        console.log('message[create-party]: ' + message);
+
         const signer = await this.web3Service.recover(
             request.memberSignature,
             message,
@@ -52,7 +57,7 @@ export class CreatePartyService {
             signature: request.memberSignature,
             creatorId: creator.id,
             ownerId: creator.id,
-            totalFund: 0,
+            totalFund: new BN(0),
             totalMember: 0,
         });
 
@@ -71,6 +76,8 @@ export class CreatePartyService {
             { t: 'string', v: creator.id },
             { t: 'bool', v: party.isPublic ? 1 : 0 },
         ]);
+        // TODO: need to removed after testing
+        console.log('message[platform-create-party]: ' + message);
         return await this.web3Service.sign(message);
     }
 }

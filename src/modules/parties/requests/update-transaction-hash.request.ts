@@ -1,8 +1,8 @@
 import { Expose } from 'class-transformer';
-import { IsEthereumAddress, IsNotEmpty } from 'class-validator';
+import { IsEthereumAddress, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class UpdateDeployedPartyDataRequest {
-    @IsNotEmpty()
+    @IsOptional()
     @IsEthereumAddress()
     @Expose({ name: 'party_address' })
     partyAddress: string;

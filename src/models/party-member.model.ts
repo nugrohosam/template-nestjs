@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     AllowNull,
     BelongsTo,
@@ -14,6 +15,7 @@ import {
 } from 'sequelize-typescript';
 import { IPartyMember } from 'src/entities/party-member.entity';
 import { PartyModel } from './party.model';
+import { TransactionModel } from './transaction.model';
 import { UserModel } from './user.model';
 
 @Table({ tableName: 'party_members', paranoid: true })
@@ -39,19 +41,30 @@ export class PartyMemberModel
 
     @AllowNull(false)
     @Column(DataType.BIGINT)
-    initialFund: bigint;
+    initialFund: BN;
 
     @AllowNull(false)
     @Column(DataType.BIGINT)
-    totalFund: bigint;
+    totalFund: BN;
+
+    @AllowNull(false)
+    @Column(DataType.BIGINT)
+    totalDeposit: BN;
 
     @AllowNull(false)
     @Column(DataType.STRING)
     status: string; // TODO: use party member status enum instead
 
     @AllowNull(false)
+    @Column(DataType.STRING)
+    signature: string;
+
     @Column({ type: DataType.STRING, field: 'transaction_hash' })
-    transactionHash: string;
+    transactionHash?: string;
+
+    @ForeignKey(() => TransactionModel)
+    @Column({ type: DataType.UUID, field: 'transaction_id' })
+    depositTransactionId?: string;
 
     @CreatedAt
     @Column({ type: DataType.DATE, field: 'created_at' })
@@ -70,4 +83,7 @@ export class PartyMemberModel
 
     @BelongsTo(() => UserModel, 'memberId')
     readonly member?: UserModel;
+
+    @BelongsTo(() => TransactionModel, 'depositTransactionId')
+    readonly depositTransaction?: TransactionModel;
 }

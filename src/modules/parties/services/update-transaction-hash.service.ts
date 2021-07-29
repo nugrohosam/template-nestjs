@@ -2,11 +2,12 @@ import {
     Inject,
     NotFoundException,
     UnauthorizedException,
-    UnprocessableEntityException,
 } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
+import { createPartyEvent } from 'src/contracts/CreatePartyEvent.json';
+import { AbiItem } from 'web3-utils';
 
 export class UpdateTransactionHashService {
     constructor(
@@ -16,17 +17,6 @@ export class UpdateTransactionHashService {
     validateSignature(signature: string, party: PartyModel): void {
         if (signature !== party.signature)
             throw new UnauthorizedException('Signature not valid.');
-    }
-
-    async validateTransactionHash(transactionHash: string): Promise<void> {
-        const transaction = await this.web3Service.getTransaction(
-            transactionHash,
-        );
-
-        if (!transaction)
-            throw new UnprocessableEntityException(
-                'Transaction not found in Network.',
-            );
     }
 
     async updateParty(
@@ -39,8 +29,15 @@ export class UpdateTransactionHashService {
         if (!party) throw new NotFoundException('Party not found.');
 
         this.validateSignature(request.memberSignature, party);
-        await this.validateTransactionHash(request.transactionHash);
-        // TODO: validate log event check the transactionHash is belongs to party data
+
+        const creator = await party.$get('creator');
+        await this.web3Service.validateTransaction(
+            request.transactionHash,
+            creator.address,
+            createPartyEvent as AbiItem,
+            2,
+            party.id,
+        );
 
         party.address = request.partyAddress;
         party.transactionHash = request.transactionHash;

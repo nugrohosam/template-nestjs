@@ -8,8 +8,8 @@ export interface ISortRequest {
 }
 
 export interface IPaginateRequest {
-    limit?: number;
-    offset?: number;
+    perPage?: number;
+    page?: number;
 }
 
 // Index Response
