@@ -34,4 +34,8 @@ export class IndexPartyRequest
     @IsOptional()
     @Expose({ name: 'owner_id' })
     ownerId?: string;
+
+    @IsString()
+    @IsOptional()
+    search?: string;
 }

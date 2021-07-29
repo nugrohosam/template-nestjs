@@ -24,6 +24,12 @@ export class IndexPartyService {
 
         if (query.ownerId) {
             where.ownerId = query.ownerId;
+        } else {
+            if (query.search) {
+                where.name = {
+                    [Op.iLike]: `%${query.search}%`,
+                };
+            }
         }
 
         return {
