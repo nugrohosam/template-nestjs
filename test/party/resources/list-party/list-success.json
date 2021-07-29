@@ -1,0 +1,588 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "message": {
+            "type": "string"
+        },
+        "data": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "purpose": {
+                            "type": "string"
+                        },
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "image_url": {
+                            "type": "null"
+                        },
+                        "is_public": {
+                            "type": "boolean"
+                        },
+                        "total_member": {
+                            "type": "integer"
+                        },
+                        "total_fund": {
+                            "type": "integer"
+                        },
+                        "owner_id": {
+                            "type": "string"
+                        },
+                        "created_at": {
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "purpose",
+                        "distribution",
+                        "image_url",
+                        "is_public",
+                        "total_member",
+                        "total_fund",
+                        "owner_id",
+                        "created_at",
+                        "updated_at"
+                    ]
+                }
+            ]
+        },
+        "meta": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "offset": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "limit",
+                "offset",
+                "total"
+            ]
+        }
+    },
+    "required": [
+        "message",
+        "data",
+        "meta"
+    ]
+}

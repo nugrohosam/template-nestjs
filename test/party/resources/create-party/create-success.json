@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "message": {
+            "type": "string"
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "platformSignature": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "platformSignature"
+            ]
+        }
+    },
+    "required": [
+        "message",
+        "data"
+    ]
+}

@@ -1,0 +1,85 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "message": {
+            "type": "string"
+        },
+        "meta": {
+            "type": "object",
+            "properties": {
+                "perPage": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "totalPage": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "perPage",
+                "page",
+                "totalPage",
+                "total"
+            ]
+        },
+        "data": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "string"
+                        },
+                        "user": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "username": {
+                                    "type": "string"
+                                },
+                                "address": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "username",
+                                "address"
+                            ]
+                        },
+                        "accepted_at": {
+                            "type": "null"
+                        },
+                        "rejected_at": {
+                            "type": "null"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "status",
+                        "user",
+                        "accepted_at",
+                        "rejected_at"
+                    ]
+                }
+            ]
+        }
+    },
+    "required": [
+        "message",
+        "meta",
+        "data"
+    ]
+}

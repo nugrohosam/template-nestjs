@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "message": {
+            "type": "string"
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "null"
+                },
+                "status": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "user_id",
+                "created_at",
+                "updated_at",
+                "deleted_at",
+                "status"
+            ]
+        }
+    },
+    "required": [
+        "message",
+        "data"
+    ]
+}
