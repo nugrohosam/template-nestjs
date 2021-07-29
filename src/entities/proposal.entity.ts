@@ -1,3 +1,5 @@
+import BN from 'bn.js';
+
 export interface IProposal {
     id?: string;
     partyId: string;
@@ -9,7 +11,7 @@ export interface IProposal {
     voteEnd: Date;
     projectStart: Date;
     projectEnd: Date;
-    amount: bigint;
+    amount: BN;
     currencyId: number;
     creatorId: string;
     signature: string;

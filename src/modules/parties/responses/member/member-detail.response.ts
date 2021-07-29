@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { ProfileResponse } from 'src/modules/users/responses/profile.response';
 
@@ -5,8 +6,8 @@ export class MemberDetailRespose {
     id: string;
     user: ProfileResponse;
     status: string;
-    initialFund: bigint;
-    totalFund: bigint;
+    initialFund: BN;
+    totalFund: BN;
     createdAt: Date;
     updatedAt: Date;
 

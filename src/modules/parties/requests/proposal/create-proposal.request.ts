@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { Expose } from 'class-transformer';
 import {
     IsDate,
@@ -57,7 +58,7 @@ export class CreateProposalRequest
 
     @IsNotEmpty()
     @IsNumber()
-    amount: bigint;
+    amount: BN;
 
     @IsNotEmpty()
     @IsNumber()

@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { ITransaction } from 'src/entities/transaction.entity';
 import { TransactionModel } from 'src/models/transaction.model';
@@ -8,7 +9,7 @@ export class TransactionResponse
     id: string;
     addressFrom: string;
     addressTo: string;
-    amount: bigint;
+    amount: BN;
     type: TransactionTypeEnum;
     description: string;
     createdAt: Date;

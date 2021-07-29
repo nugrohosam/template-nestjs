@@ -21,16 +21,24 @@ export class TransferService {
     ) {}
 
     async generateSignatureMessage(request: TransferRequest): Promise<string> {
+        const memberAddress =
+            request.type === TransactionTypeEnum.Withdraw
+                ? request.addressTo
+                : request.addressFrom;
+        const partyAddress =
+            request.type === TransactionTypeEnum.Withdraw
+                ? request.addressFrom
+                : request.addressTo;
+
         const fromUser = await this.getUserService.getUserByAddress(
-            request.addressFrom,
+            memberAddress,
         );
-        const party = await this.getPartyService.getByAddress(
-            request.addressTo,
-        );
+        const party = await this.getPartyService.getByAddress(partyAddress);
+
         return this.web3Service.soliditySha3([
-            { t: 'address', v: request.addressFrom },
+            { t: 'address', v: memberAddress },
             { t: 'string', v: fromUser.id },
-            { t: 'address', v: request.addressTo },
+            { t: 'address', v: partyAddress },
             { t: 'string', v: party.id },
             { t: 'uint256', v: request.amount.toString() },
         ]);
@@ -62,12 +70,6 @@ export class TransferService {
         // TODO: need to removed after testing
         console.log('message[platform-create-party]: ' + message);
 
-        await this.web3Service.validateSignature(
-            request.transferSignature,
-            request.addressFrom,
-            message,
-        );
-
         // TODO: need to research about db transaction on sequelize for current pattern
 
         // begin db transaction, and receive passed transaction if any to used passed transaction instead
@@ -80,10 +82,30 @@ export class TransferService {
                 request,
                 dbTransaction,
             );
+
             if (transaction.type === TransactionTypeEnum.Deposit) {
+                await this.web3Service.validateSignature(
+                    request.transferSignature,
+                    request.addressFrom,
+                    message,
+                );
+
                 await this.partyCalculationService.deposit(
                     transaction.addressTo,
                     transaction.addressFrom,
+                    transaction.amount,
+                    dbTransaction,
+                );
+            } else if (transaction.type === TransactionTypeEnum.Withdraw) {
+                await this.web3Service.validateSignature(
+                    request.transferSignature,
+                    request.addressTo,
+                    message,
+                );
+
+                await this.partyCalculationService.withdraw(
+                    transaction.addressFrom,
+                    transaction.addressTo,
                     transaction.amount,
                     dbTransaction,
                 );

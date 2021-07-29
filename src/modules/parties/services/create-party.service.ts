@@ -4,6 +4,7 @@ import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { config } from 'src/config';
+import BN from 'bn.js';
 
 export class CreatePartyService {
     constructor(
@@ -56,7 +57,7 @@ export class CreatePartyService {
             signature: request.memberSignature,
             creatorId: creator.id,
             ownerId: creator.id,
-            totalFund: BigInt(0),
+            totalFund: new BN(0),
             totalMember: 0,
         });
 
