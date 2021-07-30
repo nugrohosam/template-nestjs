@@ -185,6 +185,7 @@ export class JoinPartyService {
             partyMember.depositTransactionId = depositTransaction.id;
             await partyMember.save({ transaction });
 
+            console.log(typeof request.initialDeposit);
             party.totalFund = party.totalFund.add(request.initialDeposit);
             await party.save({ transaction });
 

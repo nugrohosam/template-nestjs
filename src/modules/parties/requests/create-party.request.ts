@@ -1,17 +1,13 @@
 import BN from 'bn.js';
-import { Expose } from 'class-transformer';
-import {
-    IsEnum,
-    IsEthereumAddress,
-    IsNotEmpty,
-    Max,
-    Min,
-} from 'class-validator';
+import { Expose, Transform } from 'class-transformer';
+import { IsEnum, IsEthereumAddress, IsNotEmpty } from 'class-validator';
 import {
     DistributionTypeEnum,
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
 import { ValidationEnum } from 'src/common/enums/validation.enum';
+import { BigIntMax } from 'src/common/rules/string-number-max.rule copy';
+import { BigIntMin } from 'src/common/rules/string-number-min.rule';
 import { IParty } from 'src/entities/party.entity';
 
 export class CreatePartyRequest
@@ -32,15 +28,17 @@ export class CreatePartyRequest
     isPublic: boolean;
 
     @IsNotEmpty()
+    @BigIntMin(ValidationEnum.MinWei)
+    @BigIntMax(ValidationEnum.MaxWei)
+    @Transform(({ value }) => new BN(value.toString()))
     @Expose({ name: 'min_deposit' })
-    @Min(ValidationEnum.MinWei)
-    @Max(ValidationEnum.MaxWei)
     minDeposit: BN;
 
     @IsNotEmpty()
+    @BigIntMin(ValidationEnum.MinWei)
+    @BigIntMax(ValidationEnum.MaxWei)
+    @Transform(({ value }) => new BN(value.toString()))
     @Expose({ name: 'max_deposit' })
-    @Min(ValidationEnum.MinWei)
-    @Max(ValidationEnum.MaxWei)
     maxDeposit: BN;
 
     @IsNotEmpty()

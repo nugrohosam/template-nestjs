@@ -1,12 +1,10 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import {
     IsEnum,
     IsEthereumAddress,
     IsNotEmpty,
     IsNumber,
     IsOptional,
-    Max,
-    Min,
 } from 'class-validator';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -14,6 +12,8 @@ import { JoinPartyRequest } from 'src/modules/parties/requests/member/join-party
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import BN from 'bn.js';
 import { ValidationEnum } from 'src/common/enums/validation.enum';
+import { BigIntMin } from 'src/common/rules/string-number-min.rule';
+import { BigIntMax } from 'src/common/rules/string-number-max.rule copy';
 
 export class TransferRequest {
     @IsEthereumAddress()
@@ -26,10 +26,10 @@ export class TransferRequest {
     @Expose({ name: 'to_address' })
     addressTo: string;
 
-    @IsNumber()
     @IsNotEmpty()
-    @Min(ValidationEnum.MinWei)
-    @Max(ValidationEnum.MaxWei)
+    @BigIntMin(ValidationEnum.MinWei)
+    @BigIntMax(ValidationEnum.MaxWei)
+    @Transform(({ value }) => new BN(value.toString()))
     amount: BN;
 
     @IsNumber()
