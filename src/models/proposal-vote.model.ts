@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
     BelongsTo,
     Column,
@@ -35,7 +36,7 @@ export class ProposalVoteModel
     memberId: string;
 
     @Column(useBigIntColumn(ProposalVoteModel, 'weight'))
-    weight: bigint;
+    weight: BN;
 
     @CreatedAt
     @Column({ type: DataType.DATE, field: 'created_at' })

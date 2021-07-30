@@ -2,8 +2,8 @@ import BN from 'bn.js';
 import { Expose, Transform } from 'class-transformer';
 import { IsEthereumAddress, IsNotEmpty } from 'class-validator';
 import { ValidationEnum } from 'src/common/enums/validation.enum';
-import { BigIntMax } from 'src/common/rules/string-number-max.rule copy';
-import { BigIntMin } from 'src/common/rules/string-number-min.rule';
+import { BigIntMax } from 'src/common/rules/big-int-max.rule';
+import { BigIntMin } from 'src/common/rules/big-int-min.rule';
 
 export class JoinPartyRequest {
     @IsNotEmpty()

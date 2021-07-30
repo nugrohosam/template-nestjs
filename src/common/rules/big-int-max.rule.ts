@@ -13,7 +13,7 @@ export const BigIntMax = (
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     return (object: any, propertyName: string): void => {
         registerDecorator({
-            name: 'stringNumberMax',
+            name: 'bigIntMax',
             target: object.constructor,
             propertyName: propertyName,
             constraints: [number],

@@ -12,8 +12,8 @@ import { JoinPartyRequest } from 'src/modules/parties/requests/member/join-party
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import BN from 'bn.js';
 import { ValidationEnum } from 'src/common/enums/validation.enum';
-import { BigIntMin } from 'src/common/rules/string-number-min.rule';
-import { BigIntMax } from 'src/common/rules/string-number-max.rule copy';
+import { BigIntMin } from 'src/common/rules/big-int-min.rule';
+import { BigIntMax } from 'src/common/rules/big-int-max.rule';
 
 export class TransferRequest {
     @IsEthereumAddress()
