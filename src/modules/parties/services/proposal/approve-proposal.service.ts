@@ -3,7 +3,6 @@ import {
     Injectable,
     UnprocessableEntityException,
 } from '@nestjs/common';
-import BN from 'bn.js';
 import { Transaction } from 'sequelize/types';
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
@@ -26,6 +25,8 @@ export class ApproveProposalService {
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
     ) {}
+
+    private readonly WeiPercentage = 10 ** 4;
 
     private generateSignatureMessage(
         owner: UserModel,
@@ -52,8 +53,13 @@ export class ApproveProposalService {
         });
 
         for (const member of members) {
-            const weight = member.totalDeposit.divRound(new BN(partyDeposit));
-            const amount = proposal.amount.mul(weight);
+            // to precist the wei number, we format percentage with it's smaller
+            // value based of agreement with FE and BE.
+            // then we deformat the amount.
+            const weight = member.totalDeposit
+                .muln(this.WeiPercentage)
+                .divn(partyDeposit);
+            const amount = proposal.amount.mul(weight).divn(this.WeiPercentage);
 
             const distribution = await ProposalDistributionModel.create(
                 {
@@ -112,7 +118,7 @@ export class ApproveProposalService {
         );
 
         // validate party balance with proposal amount
-        if (party.totalFund < proposal.amount)
+        if (party.totalFund.lt(proposal.amount))
             throw new UnprocessableEntityException(
                 'Party has insuficient balance.',
             );

@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import {
     IsDate,
     IsEthereumAddress,
@@ -9,6 +9,9 @@ import {
     IsUrl,
     MinDate,
 } from 'class-validator';
+import { ValidationEnum } from 'src/common/enums/validation.enum';
+import { BigIntMax } from 'src/common/rules/big-int-max.rule';
+import { BigIntMin } from 'src/common/rules/big-int-min.rule';
 import { IProposal } from 'src/entities/proposal.entity';
 
 export class CreateProposalRequest
@@ -57,7 +60,9 @@ export class CreateProposalRequest
     projectEnd: Date;
 
     @IsNotEmpty()
-    @IsNumber()
+    @BigIntMin(ValidationEnum.MinWei)
+    @BigIntMax(ValidationEnum.MaxWei)
+    @Transform(({ value }) => new BN(value.toString()))
     amount: BN;
 
     @IsNotEmpty()

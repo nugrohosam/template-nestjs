@@ -12,6 +12,7 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
+import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IProposalDistribution } from 'src/entities/proposal-distribution.entity';
 import { PartyMemberModel } from './party-member.model';
 import { Proposal } from './proposal.model';
@@ -34,10 +35,10 @@ export class ProposalDistributionModel
     @Column({ type: DataType.UUID, field: 'member_id' })
     memberId: string;
 
-    @Column(DataType.BIGINT)
+    @Column(useBigIntColumn(ProposalDistributionModel, 'weight'))
     weight: BN;
 
-    @Column(DataType.BIGINT)
+    @Column(useBigIntColumn(ProposalDistributionModel, 'amount'))
     amount: BN;
 
     @Column({ type: DataType.STRING, field: 'transaction_hash' })

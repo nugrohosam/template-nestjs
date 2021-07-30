@@ -13,6 +13,7 @@ import {
     UpdatedAt,
 } from 'sequelize-typescript';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { ITransaction } from 'src/entities/transaction.entity';
 import { PartyMemberModel } from './party-member.model';
 
@@ -35,8 +36,7 @@ export class TransactionModel
     @Column({ type: DataType.STRING, field: 'address_to' })
     addressTo: string;
 
-    @AllowNull(false)
-    @Column(DataType.BIGINT)
+    @Column(useBigIntColumn(TransactionModel, 'amount'))
     amount: BN;
 
     @AllowNull(false)

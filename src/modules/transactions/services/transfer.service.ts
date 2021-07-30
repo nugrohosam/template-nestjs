@@ -68,7 +68,7 @@ export class TransferService {
     ): Promise<TransactionModel> {
         const message = await this.generateSignatureMessage(request);
         // TODO: need to removed after testing
-        console.log('message[platform-create-party]: ' + message);
+        console.log('message[transfer]: ' + message);
 
         // TODO: need to research about db transaction on sequelize for current pattern
 

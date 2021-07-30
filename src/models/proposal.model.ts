@@ -15,6 +15,7 @@ import {
     UpdatedAt,
 } from 'sequelize-typescript';
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
+import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IProposal } from 'src/entities/proposal.entity';
 import { PartyModel } from './party.model';
 import { ProposalDistributionModel } from './proposal-distribution.model';
@@ -56,7 +57,7 @@ export class Proposal extends Model<IProposal, IProposal> implements IProposal {
     @Column({ type: DataType.DATE, field: 'project_end' })
     projectEnd: Date;
 
-    @Column(DataType.BIGINT)
+    @Column(useBigIntColumn(Proposal, 'amount'))
     amount: BN;
 
     @Column({ type: DataType.INTEGER, field: 'currency_id' })

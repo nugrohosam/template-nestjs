@@ -1,7 +1,9 @@
 import BN from 'bn.js';
-import { Expose } from 'class-transformer';
-import { IsEthereumAddress, IsNotEmpty, Max, Min } from 'class-validator';
+import { Expose, Transform } from 'class-transformer';
+import { IsEthereumAddress, IsNotEmpty } from 'class-validator';
 import { ValidationEnum } from 'src/common/enums/validation.enum';
+import { BigIntMax } from 'src/common/rules/big-int-max.rule';
+import { BigIntMin } from 'src/common/rules/big-int-min.rule';
 
 export class JoinPartyRequest {
     @IsNotEmpty()
@@ -10,9 +12,10 @@ export class JoinPartyRequest {
     userAddress: string;
 
     @IsNotEmpty()
+    @BigIntMin(ValidationEnum.MinWei)
+    @BigIntMax(ValidationEnum.MaxWei)
+    @Transform(({ value }) => new BN(value.toString()))
     @Expose({ name: 'initial_deposit' })
-    @Min(ValidationEnum.MinWei)
-    @Max(ValidationEnum.MaxWei)
     initialDeposit: BN;
 
     @IsNotEmpty()
