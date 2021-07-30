@@ -21,27 +21,13 @@ export class TransferService {
     ) {}
 
     async generateSignatureMessage(request: TransferRequest): Promise<string> {
-        const memberAddress =
-            request.type === TransactionTypeEnum.Withdraw
-                ? request.addressTo
-                : request.addressFrom;
         const partyAddress =
             request.type === TransactionTypeEnum.Withdraw
                 ? request.addressFrom
                 : request.addressTo;
-
-        const fromUser = await this.getUserService.getUserByAddress(
-            memberAddress,
-        );
         const party = await this.getPartyService.getByAddress(partyAddress);
 
-        return this.web3Service.soliditySha3([
-            { t: 'address', v: memberAddress },
-            { t: 'string', v: fromUser.id },
-            { t: 'address', v: partyAddress },
-            { t: 'string', v: party.id },
-            { t: 'uint256', v: request.amount.toString() },
-        ]);
+        return `I want to ${request.type} money at ${party.name} with amount of ${request.amount} mwei`;
     }
 
     async storeTransaction(

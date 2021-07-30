@@ -18,8 +18,13 @@ export class GetPartyMemberService {
         memberId: string,
         partyId: string,
     ): Promise<PartyMemberModel> {
-        return await PartyMemberModel.findOne({
+        console.log({ partyId, memberId });
+        const partyMember = await PartyMemberModel.findOne({
             where: { partyId, memberId },
         });
+
+        if (!partyMember) throw new NotFoundException('Party Member not found');
+
+        return partyMember;
     }
 }
