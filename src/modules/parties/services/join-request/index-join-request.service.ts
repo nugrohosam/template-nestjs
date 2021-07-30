@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Op } from 'sequelize';
 import {
     PaginationResponse,
     SequelizePaginator,
@@ -52,7 +53,12 @@ export class IndexJoinRequestService {
                 perPage: query.perPage ?? 10,
                 page: query.page ?? 1,
                 options: {
-                    where: { partyId },
+                    where: {
+                        partyId,
+                        acceptedAt: {
+                            [Op.ne]: null,
+                        },
+                    },
                     order: [
                         [query.sort ?? 'created_at', query.order ?? 'desc'],
                     ],
