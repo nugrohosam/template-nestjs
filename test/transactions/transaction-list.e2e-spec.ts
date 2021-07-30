@@ -5,7 +5,6 @@ import { AppModule } from '../../src/app.module';
 import { Validator } from 'jsonschema';
 import schemaSuccess from './resources/transaction-list/list-success.json';
 
-
 const validateJsonSchema = new Validator();
 
 describe('Transaction List Test (GET)', () => {

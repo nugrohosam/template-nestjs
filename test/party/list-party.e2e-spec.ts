@@ -23,7 +23,7 @@ describe('Party List Test (GET)', () => {
         return supertest(process.env.LOCALHOST)
             .get('/parties')
             .set('Content-Type', 'application/json')
-            .query({per_page:10,page:1,owner_id:process.env.OWNER_ID}) // todo: owner id buat dinamis, ambil detail user
+            .query({ per_page: 10, page: 1, owner_id: process.env.OWNER_ID }) // todo: owner id buat dinamis, ambil detail user
             .expect(200)
             .then((response) => {
                 const validateResult = validateJsonSchema.validate(

@@ -42,10 +42,54 @@ describe('Create Project Test (POST)', () => {
             contract_address: '0x5FaD6fBBA4BbA686bA9B8052Cf0bd51699f38B93',
             attachment_url:
                 'https://drive.google.com/file/d/11YIetPS0fLXvtNjVMVNZ6MAWk7ZsaAS/view',
-            vote_start: year + '-' + month + '-' + date + ' ' + hour + ':' + minute + ':' + second, // todo: pakai date time today + 1 atau + 7
-            vote_end: year + '-' + month + '-' + (date+1) + ' ' + hour + ':' + minute + ':' + second, // todo: pakai date time today + 1 atau + 7
-            project_start: year + '-' + month + '-' + (date+1) + ' ' + hour + ':' + minute + ':' + second, // todo: pakai date time today + 1 atau + 7
-            project_end: year + '-' + month + '-' + (date+7) + ' ' + hour + ':' + minute + ':' + second, // todo: pakai date time today + 1 atau + 7
+            vote_start:
+                year +
+                '-' +
+                month +
+                '-' +
+                date +
+                ' ' +
+                hour +
+                ':' +
+                minute +
+                ':' +
+                second, // todo: pakai date time today + 1 atau + 7
+            vote_end:
+                year +
+                '-' +
+                month +
+                '-' +
+                (date + 1) +
+                ' ' +
+                hour +
+                ':' +
+                minute +
+                ':' +
+                second, // todo: pakai date time today + 1 atau + 7
+            project_start:
+                year +
+                '-' +
+                month +
+                '-' +
+                (date + 1) +
+                ' ' +
+                hour +
+                ':' +
+                minute +
+                ':' +
+                second, // todo: pakai date time today + 1 atau + 7
+            project_end:
+                year +
+                '-' +
+                month +
+                '-' +
+                (date + 7) +
+                ' ' +
+                hour +
+                ':' +
+                minute +
+                ':' +
+                second, // todo: pakai date time today + 1 atau + 7
             amount: 50000000000000,
             currency_id: process.env.CURRENCY_ID, // todo: currency ID dari API
         };

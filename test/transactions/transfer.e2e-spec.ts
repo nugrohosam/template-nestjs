@@ -5,7 +5,6 @@ import { AppModule } from '../../src/app.module';
 import { Validator } from 'jsonschema';
 import schemaSuccess from './resources/transfer/transfer-success.json';
 
-
 const validateJsonSchema = new Validator();
 
 describe('Transfer Test (POST)', () => {
