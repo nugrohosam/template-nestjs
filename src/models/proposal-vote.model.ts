@@ -11,6 +11,7 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
+import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IProposalVote } from 'src/entities/proposal-vote.entity';
 import { PartyMemberModel } from './party-member.model';
 import { Proposal } from './proposal.model';
@@ -33,7 +34,7 @@ export class ProposalVoteModel
     @Column({ type: DataType.UUID, field: 'member_id' })
     memberId: string;
 
-    @Column(DataType.BIGINT)
+    @Column(useBigIntColumn(ProposalVoteModel, 'weight'))
     weight: bigint;
 
     @CreatedAt
