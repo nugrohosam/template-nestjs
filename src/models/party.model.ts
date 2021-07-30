@@ -16,6 +16,7 @@ import {
     DistributionTypeEnum,
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
+import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IParty } from 'src/entities/party.entity';
 import { PartyInvitationModel } from './party-invitation.model';
 import { PartyMemberModel } from './party-member.model';
@@ -90,28 +91,13 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     })
     isPublic: boolean;
 
-    @Column({
-        field: 'total_fund',
-        type: DataType.BIGINT,
-        allowNull: false,
-        defaultValue: 0,
-    })
+    @Column(useBigIntColumn(PartyModel, 'totalFund', 'total_fund'))
     totalFund?: BN;
 
-    @Column({
-        field: 'min_deposit',
-        type: DataType.BIGINT,
-        allowNull: false,
-        defaultValue: 0,
-    })
+    @Column(useBigIntColumn(PartyModel, 'minDeposit', 'min_deposit'))
     minDeposit?: BN;
 
-    @Column({
-        field: 'max_deposit',
-        type: DataType.BIGINT,
-        allowNull: false,
-        defaultValue: 0,
-    })
+    @Column(useBigIntColumn(PartyModel, 'maxDeposit', 'max_deposit'))
     maxDeposit?: BN;
 
     @Column({

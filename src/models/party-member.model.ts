@@ -13,6 +13,7 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
+import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IPartyMember } from 'src/entities/party-member.entity';
 import { PartyModel } from './party.model';
 import { TransactionModel } from './transaction.model';
@@ -40,15 +41,15 @@ export class PartyMemberModel
     memberId: string;
 
     @AllowNull(false)
-    @Column(DataType.BIGINT)
+    @Column(useBigIntColumn(PartyMemberModel, 'initialFund', 'initial_fund'))
     initialFund: BN;
 
     @AllowNull(false)
-    @Column(DataType.BIGINT)
+    @Column(useBigIntColumn(PartyMemberModel, 'totalFund', 'total_fund'))
     totalFund: BN;
 
     @AllowNull(false)
-    @Column(DataType.BIGINT)
+    @Column(useBigIntColumn(PartyMemberModel, 'totalDeposit', 'total_deposit'))
     totalDeposit: BN;
 
     @AllowNull(false)
