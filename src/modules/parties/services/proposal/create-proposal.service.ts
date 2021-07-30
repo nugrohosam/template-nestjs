@@ -81,4 +81,16 @@ export class CreateProposalService {
 
         return this.store(party, request, user);
     }
+
+    async generatePlatformSignature(proposal: Proposal): Promise<string> {
+        const party = await proposal.$get('party');
+        const message = this.web3Service.soliditySha3([
+            { t: 'string', v: party.id },
+            { t: 'address', v: party.address },
+            { t: 'string', v: proposal.id },
+        ]);
+
+        console.log('message[create-proposal]: ' + message);
+        return this.web3Service.sign(message);
+    }
 }

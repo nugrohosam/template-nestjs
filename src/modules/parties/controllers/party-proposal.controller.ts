@@ -30,11 +30,18 @@ export class PartyProposalController {
     async store(
         @Param('partyId') partyId: string,
         @Body() request: CreateProposalRequest,
-    ): Promise<IApiResponse<{ id: string }>> {
-        const { id } = await this.createProposalService.call(partyId, request);
+    ): Promise<IApiResponse<{ id: string; platformSignature: string }>> {
+        const proposal = await this.createProposalService.call(
+            partyId,
+            request,
+        );
+        const platformSignature =
+            await this.createProposalService.generatePlatformSignature(
+                proposal,
+            );
         return {
             message: 'Success create proposal',
-            data: { id },
+            data: { id: proposal.id, platformSignature },
         };
     }
 
