@@ -11,11 +11,13 @@ import {
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexPartyMemberRequest } from '../requests/member/index-party-member.request';
 import { JoinPartyRequest } from '../requests/member/join-party.request';
+import { LeavePartyRequest } from '../requests/member/leave-party.request';
 import { UpdatePartyMemberRequest } from '../requests/member/update-party-member.request';
 import { JoinPartyResponse } from '../responses/member/join-party.response';
 import { MemberDetailRespose } from '../responses/member/member-detail.response';
 import { IndexPartyMemberService } from '../services/members/index-party-member.service';
 import { JoinPartyService } from '../services/members/join-party.service';
+import { LeavePartyService } from '../services/members/leave-party.service';
 import { UpdatePartyMemberService } from '../services/members/update-party-member.service';
 
 @Controller('parties/:partyId')
@@ -27,6 +29,8 @@ export class PartyMemberController {
         private readonly updatePartyMemberService: UpdatePartyMemberService,
         @Inject(IndexPartyMemberService)
         private readonly indexPartyMemberService: IndexPartyMemberService,
+        @Inject(LeavePartyService)
+        private readonly leavePartyService: LeavePartyService,
     ) {}
 
     @Post('join')
@@ -69,6 +73,21 @@ export class PartyMemberController {
         return {
             message: 'Success get user members',
             ...result,
+        };
+    }
+
+    @Put('leave')
+    async leave(
+        @Param('partyId') partyId: string,
+        @Body() request: LeavePartyRequest,
+    ): Promise<IApiResponse<{ id: string; deletedAt: Date }>> {
+        const member = await this.leavePartyService.leave(partyId, request);
+        return {
+            message: 'Success leaving party',
+            data: {
+                id: member.id,
+                deletedAt: member.deletedAt,
+            },
         };
     }
 }

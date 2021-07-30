@@ -18,7 +18,6 @@ export class GetPartyMemberService {
         memberId: string,
         partyId: string,
     ): Promise<PartyMemberModel> {
-        console.log({ partyId, memberId });
         const partyMember = await PartyMemberModel.findOne({
             where: { partyId, memberId },
         });

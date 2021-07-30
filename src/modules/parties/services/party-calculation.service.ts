@@ -85,7 +85,7 @@ export class PartyCalculationService {
         partyAddress: string,
         memberAddress: string,
         amount: BN,
-        t: Transaction,
+        t?: Transaction,
     ): Promise<void> {
         const dbTransaction: Transaction = await localDatabase.transaction({
             transaction: t,
