@@ -25,6 +25,7 @@ export class TransferService {
             request.type === TransactionTypeEnum.Withdraw
                 ? request.addressFrom
                 : request.addressTo;
+
         const party = await this.getPartyService.getByAddress(partyAddress);
 
         return `I want to ${request.type} money at ${party.name} with amount of ${request.amount} mwei`;

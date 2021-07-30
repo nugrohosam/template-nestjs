@@ -14,6 +14,7 @@ import BN from 'bn.js';
 import { ValidationEnum } from 'src/common/enums/validation.enum';
 import { BigIntMin } from 'src/common/rules/big-int-min.rule';
 import { BigIntMax } from 'src/common/rules/big-int-max.rule';
+import { PartyMemberModel } from 'src/models/party-member.model';
 
 export class TransferRequest {
     @IsEthereumAddress()
@@ -58,9 +59,26 @@ export class TransferRequest {
             addressTo: party.address,
             amount: request.initialDeposit,
             type: TransactionTypeEnum.Deposit,
-            description: 'Initial Deposit', // TODO: default description based on type enum
-            currencyId: 0, // TODO: need to confirm about party currency
+            description: 'Initial Deposit',
+            currencyId: 1, // TODO: still hardcoded to default USDC token
             transferSignature: request.joinSignature,
+        };
+    }
+
+    static mapFromLeavePartyRequest(
+        party: PartyModel,
+        user: UserModel,
+        member: PartyMemberModel,
+        signature: string,
+    ): TransferRequest {
+        return {
+            addressFrom: party.address,
+            addressTo: user.address,
+            amount: member.totalFund,
+            type: TransactionTypeEnum.Withdraw,
+            description: 'Leave Withdraw', // TODO: default description based on type enum
+            currencyId: 1, // TODO: still hardcoded to default USDC token
+            transferSignature: signature,
         };
     }
 }
