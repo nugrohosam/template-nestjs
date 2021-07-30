@@ -13,7 +13,6 @@ import { PartyModel } from 'src/models/party.model';
 import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { Proposal } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
-import { UserModel } from 'src/models/user.model';
 import { UpdateProposalStatusRequest } from '../../requests/proposal/update-proposal-status.request';
 import { GetProposalService } from './get-proposal.service';
 
@@ -29,15 +28,10 @@ export class ApproveProposalService {
     private readonly WeiPercentage = 10 ** 4;
 
     private generateSignatureMessage(
-        owner: UserModel,
+        party: PartyModel,
         proposal: Proposal,
     ): string {
-        return this.web3Service.soliditySha3([
-            { t: 'address', v: owner.address },
-            { t: 'address', v: proposal.contractAddress },
-            { t: 'uint256', v: proposal.amount.toString() },
-            { t: 'string', v: proposal.id },
-        ]);
+        return `I want to approve a proposal in ${party.name} with title ${proposal.title}`;
     }
 
     // TODO: need to optimize this
@@ -59,7 +53,10 @@ export class ApproveProposalService {
             const weight = member.totalDeposit
                 .muln(this.WeiPercentage)
                 .divn(partyDeposit);
-            const amount = proposal.amount.mul(weight).divn(this.WeiPercentage);
+            const amount = proposal.amount
+                .mul(weight)
+                .divn(this.WeiPercentage)
+                .neg();
 
             const distribution = await ProposalDistributionModel.create(
                 {
@@ -79,7 +76,7 @@ export class ApproveProposalService {
                 {
                     addressFrom: user.address,
                     addressTo: proposal.contractAddress,
-                    amount: distribution.amount.muln(-1),
+                    amount: distribution.amount,
                     type: TransactionTypeEnum.Distribution,
                     description: `Distribution of proposal "${proposal.title}"`,
                     currencyId: 1,
@@ -108,7 +105,7 @@ export class ApproveProposalService {
             );
 
         // validate signature
-        const message = this.generateSignatureMessage(owner, proposal);
+        const message = this.generateSignatureMessage(party, proposal);
         // TODO: need to removed after testing
         console.log('message[approve-proposal]: ' + message);
         await this.web3Service.validateSignature(

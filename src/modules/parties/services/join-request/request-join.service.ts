@@ -81,7 +81,7 @@ export class RequestJoinService {
 
         await this.canUserRequestJoinParty(user, party);
 
-        const message = `I would like to make join request to this Party.${user.address} ${partyId}`;
+        const message = `I want to request permission to join party with id ${party.id}`;
         // TODO: need to removed after testing
         console.log('message[request-join]: ' + message);
 

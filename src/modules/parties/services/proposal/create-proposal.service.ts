@@ -3,7 +3,6 @@ import {
     Injectable,
     UnprocessableEntityException,
 } from '@nestjs/common';
-import BN from 'bn.js';
 import { Transaction } from 'sequelize/types';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
@@ -25,17 +24,10 @@ export class CreateProposalService {
     ) {}
 
     generateSignatureMessage(
-        title: string,
-        amount: BN,
-        partyId: string,
-        address: string,
+        party: PartyModel,
+        request: CreateProposalRequest,
     ): string {
-        return this.web3Service.soliditySha3([
-            { t: 'string', v: title },
-            { t: 'uint256', v: amount.toString() },
-            { t: 'string', v: partyId },
-            { t: 'address', v: address },
-        ]);
+        return `I want to create a proposal in ${party.name} with title ${request.title}`;
     }
 
     async validateUserIsPartyMember(
@@ -76,12 +68,7 @@ export class CreateProposalService {
             request.signerAddress,
         );
 
-        const message = this.generateSignatureMessage(
-            request.title,
-            request.amount,
-            party.id,
-            user.address,
-        );
+        const message = this.generateSignatureMessage(party, request);
         // TODO: need to removed after testing
         console.log('message[create-proposal]: ' + message);
         await this.web3Service.validateSignature(

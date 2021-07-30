@@ -8,9 +8,8 @@ export class RegisterService {
         @Inject(Web3Service) private readonly web3Service: Web3Service,
     ) {}
 
-    private generateRegisterSignatureMessage(): string {
-        // TODO: need to fixed with fe and sc
-        return 'register';
+    private generateRegisterSignatureMessage(userAddress: string): string {
+        return `I want to register to PolkaParty with address ${userAddress}`;
     }
 
     private async validateRegisterSignature(
@@ -18,7 +17,7 @@ export class RegisterService {
     ): Promise<void> {
         const signedAddress = await this.web3Service.recover(
             registerRequest.signature,
-            this.generateRegisterSignatureMessage(),
+            this.generateRegisterSignatureMessage(registerRequest.tokenAddress),
         );
 
         if (signedAddress !== registerRequest.tokenAddress)

@@ -11,11 +11,8 @@ export class CreatePartyService {
         @Inject(Web3Service) private readonly web3Service: Web3Service,
     ) {}
 
-    generateCreatePartySignatureMessage(request: CreatePartyRequest): string {
-        return this.web3Service.soliditySha3([
-            { t: 'address', v: request.memberAddress },
-            { t: 'string', v: request.name },
-        ]);
+    generateCreatePartySignatureMessage({ name }: CreatePartyRequest): string {
+        return `I want to create party with name ${name}`;
     }
 
     async validateCreatePartySignature(

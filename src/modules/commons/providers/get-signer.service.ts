@@ -9,7 +9,7 @@ export class GetSignerService {
     ) {}
 
     private generateGlobalSignature(): string {
-        return 'I would like to access private information';
+        return `I want to access private information of PolkaParty`;
     }
 
     async get(signature: string): Promise<UserModel | null> {
