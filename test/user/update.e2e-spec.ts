@@ -22,7 +22,8 @@ describe('Update Profile Test (PUT)', () => {
         bodyRequest = {
             username: 'jimbeglin',
             name: 'Sir Jim Beglin',
-            image_url: 'http://polkaparty.io/media/profile/ec9476c9347cb432134a9e81776dsacsx',
+            image_url:
+                'http://polkaparty.io/media/profile/ec9476c9347cb432134a9e81776dsacsx',
             about: 'Simple ruthless. Hello John, hello everyone',
             website: 'https://callmejim.me/about',
         };
