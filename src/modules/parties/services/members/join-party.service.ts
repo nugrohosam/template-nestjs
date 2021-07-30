@@ -22,17 +22,10 @@ export class JoinPartyService {
         private readonly web3Service: Web3Service,
     ) {}
 
-    generateJoinSignature(
-        user: UserModel,
-        party: PartyModel,
-        deposit: BN,
-    ): string {
-        return this.web3Service.soliditySha3([
-            { t: 'address', v: user.address },
-            { t: 'uint', v: deposit.toString() }, // need to persist the digits
-            { t: 'string', v: user.id },
-            { t: 'address', v: party.address },
-        ]);
+    generateJoinSignature(party: PartyModel, deposit: BN): string {
+        return `I want to join ${
+            party.name
+        } party with initial deposit of ${deposit.toString()} mwei`;
     }
 
     private async checkOwnerHasJoin(party: PartyModel): Promise<void> {
@@ -149,7 +142,6 @@ export class JoinPartyService {
         this.validateUserInitialDeposit(party, request.initialDeposit);
 
         const message = this.generateJoinSignature(
-            user,
             party,
             request.initialDeposit,
         );
