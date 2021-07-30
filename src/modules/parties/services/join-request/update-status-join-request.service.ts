@@ -12,16 +12,6 @@ export class UpdateStatusJoinRequestService {
         private readonly web3Service: Web3Service,
     ) {}
 
-    private generateSignatureMessage(
-        joinRequest: JoinRequestModel,
-        accept: boolean,
-    ): string {
-        return this.web3Service.soliditySha3([
-            { t: 'string', v: joinRequest.id },
-            { t: 'bool', v: accept ? 1 : 0 },
-        ]);
-    }
-
     async call(
         joinRequestId: string,
         request: UpdateStatusJoinRequestRequest,
@@ -30,8 +20,8 @@ export class UpdateStatusJoinRequestService {
             joinRequestId,
         );
         const message = request.accept
-            ? `I'm accepting join request ${joinRequestId}`
-            : `I'm rejecting join request ${joinRequestId}`;
+            ? `I want to accept join request with id ${joinRequestId}`
+            : `I want to reject join request with id ${joinRequestId}`;
 
         // TODO: need to removed after testing
         console.log('message[update-status-join-request]: ' + message);
