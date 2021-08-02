@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
@@ -19,9 +18,9 @@ export class DetailPartyResponse
     purpose: string;
     imageUrl: string;
     isPublic: boolean;
-    totalFund: BN;
-    minDeposit: BN;
-    maxDeposit: BN;
+    totalFund: string;
+    minDeposit: string;
+    maxDeposit: string;
     totalMember: number;
     distribution: DistributionTypeEnum;
     creator: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;
@@ -45,9 +44,9 @@ export class DetailPartyResponse
             purpose: party.purpose,
             imageUrl: party.imageUrl,
             isPublic: party.isPublic,
-            totalFund: party.totalFund,
-            minDeposit: party.minDeposit,
-            maxDeposit: party.maxDeposit,
+            totalFund: party.totalFund.toString(),
+            minDeposit: party.minDeposit.toString(),
+            maxDeposit: party.maxDeposit.toString(),
             totalMember: party.totalMember,
             distribution: party.distribution,
             creator: {
