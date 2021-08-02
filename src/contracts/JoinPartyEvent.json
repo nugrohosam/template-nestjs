@@ -31,15 +31,9 @@
                 "internalType": "uint256",
                 "name": "timestamp",
                 "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "bool",
-                "name": "tokenTransferStatus",
-                "type": "bool"
             }
         ],
-        "name": "join_event",
+        "name": "JoinEvent",
         "type": "event"
     }
 }

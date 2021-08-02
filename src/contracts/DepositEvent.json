@@ -37,15 +37,9 @@
                 "internalType": "uint256",
                 "name": "timestamp",
                 "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "bool",
-                "name": "tokenTransferStatus",
-                "type": "bool"
             }
         ],
-        "name": "deposit_event",
+        "name": "DepositEvent",
         "type": "event"
     }
 }

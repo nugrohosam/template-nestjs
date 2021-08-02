@@ -33,7 +33,7 @@
                 "type": "address"
             }
         ],
-        "name": "create_proposal_event",
+        "name": "CreateProposalEvent",
         "type": "event"
     }
 }
