@@ -1,22 +1,20 @@
-import BN from 'bn.js';
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
 } from 'src/common/enums/party.enum';
-import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 
-export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
+export class IndexPartyResponse {
     id: string;
     name: string;
     type: PartyTypeEnum;
     imageUrl: string | null;
     purpose: string;
     isPublic: boolean;
-    minDeposit: BN;
-    maxDeposit: BN;
+    minDeposit: string;
+    maxDeposit: string;
     totalMember: number;
-    totalFund: BN;
+    totalFund: string;
     distribution: DistributionTypeEnum;
     ownerId: string;
     createdAt: Date;
@@ -29,10 +27,10 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             imageUrl: party.imageUrl,
             purpose: party.purpose,
             isPublic: party.isPublic,
-            minDeposit: party.minDeposit,
-            maxDeposit: party.maxDeposit,
+            minDeposit: party.minDeposit.toString(),
+            maxDeposit: party.maxDeposit.toString(),
             totalMember: party.totalMember,
-            totalFund: party.totalFund,
+            totalFund: party.totalFund.toString(),
             distribution: party.distribution,
             ownerId: party.ownerId,
             createdAt: party.createdAt,
