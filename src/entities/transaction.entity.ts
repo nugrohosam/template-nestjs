@@ -5,7 +5,7 @@ export interface ITransaction {
     id?: string;
     addressFrom: string;
     addressTo: string;
-    amount: BN;
+    amount: BN | string;
     currencyId: number;
     type: TransactionTypeEnum;
     description?: string;

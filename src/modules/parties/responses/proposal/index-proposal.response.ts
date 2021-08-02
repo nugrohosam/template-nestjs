@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { Proposal } from 'src/models/proposal.model';
 import { MemberResponse } from 'src/modules/users/responses/member.response';
@@ -10,7 +9,7 @@ export class IndexProposalResponse {
     description: string;
     status: ProposalStatusEnum;
     contractAddress: string;
-    amount: BN;
+    amount: string;
     attachmentUrl: string;
     createdAt?: Date;
     party: IndexPartyResponse;
@@ -25,7 +24,7 @@ export class IndexProposalResponse {
             description: proposal.description,
             status: proposal.status,
             contractAddress: proposal.contractAddress,
-            amount: proposal.amount,
+            amount: proposal.amount.toString(),
             attachmentUrl: proposal.attachmentUrl,
             createdAt: proposal.createdAt,
             party: IndexPartyResponse.mapFromPartyModel(
