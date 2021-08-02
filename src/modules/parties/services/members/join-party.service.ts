@@ -102,7 +102,7 @@ export class JoinPartyService {
     }
 
     private validateUserInitialDeposit(party: PartyModel, deposit: BN): void {
-        if (deposit.gte(party.minDeposit) || deposit.lte(party.maxDeposit)) {
+        if (deposit.lt(party.minDeposit) || deposit.gt(party.maxDeposit)) {
             throw new UnprocessableEntityException(
                 `Deposit must be between ${party.minDeposit} and ${party.maxDeposit}`,
             );
