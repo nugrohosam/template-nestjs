@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { ProfileResponse } from 'src/modules/users/responses/profile.response';
 
@@ -6,8 +5,8 @@ export class MemberDetailRespose {
     id: string;
     user: ProfileResponse;
     status: string;
-    initialFund: BN;
-    totalFund: BN;
+    initialFund: string;
+    totalFund: string;
     createdAt: Date;
     updatedAt: Date;
 
@@ -22,8 +21,8 @@ export class MemberDetailRespose {
             id: partyMember.id,
             user: ProfileResponse.mapFromUserModel(user),
             status: partyMember.status,
-            initialFund: partyMember.initialFund,
-            totalFund: partyMember.totalFund,
+            initialFund: partyMember.initialFund.toString(),
+            totalFund: partyMember.totalFund.toString(),
             createdAt: partyMember.createdAt,
             updatedAt: partyMember.updatedAt,
         };

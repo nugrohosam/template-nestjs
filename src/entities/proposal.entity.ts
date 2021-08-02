@@ -11,7 +11,7 @@ export interface IProposal {
     voteEnd: Date;
     projectStart: Date;
     projectEnd: Date;
-    amount: BN;
+    amount: BN | string;
     currencyId: number;
     creatorId: string;
     signature: string;
