@@ -2,9 +2,10 @@ import {
     PartyTypeEnum,
     DistributionTypeEnum,
 } from 'src/common/enums/party.enum';
+import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 
-export class IndexPartyResponse {
+export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     id: string;
     name: string;
     type: PartyTypeEnum;
