@@ -4,7 +4,6 @@ import {
     SequelizePaginator,
 } from 'sequelize-typescript-paginator';
 import { IndexRequest } from 'src/common/request/index.request';
-import { PartyModel } from 'src/models/party.model';
 import { Proposal } from 'src/models/proposal.model';
 import { IndexProposalResponse } from '../../responses/proposal/index-proposal.response';
 import { GetPartyService } from '../get-party.service';
