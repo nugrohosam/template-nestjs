@@ -3,6 +3,7 @@ import {
     Injectable,
     UnprocessableEntityException,
 } from '@nestjs/common';
+import { BN } from 'bn.js';
 import { Transaction } from 'sequelize/types';
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
@@ -51,11 +52,11 @@ export class ApproveProposalService {
             // value based of agreement with FE and BE.
             // then we deformat the amount.
             const weight = member.totalDeposit
-                .muln(this.WeiPercentage)
-                .divn(partyDeposit);
+                .mul(new BN(this.WeiPercentage))
+                .div(new BN(partyDeposit));
             const amount = proposal.amount
                 .mul(weight)
-                .divn(this.WeiPercentage)
+                .div(new BN(this.WeiPercentage))
                 .neg();
 
             const distribution = await ProposalDistributionModel.create(

@@ -23,14 +23,14 @@ export class CreateProposalService {
         private readonly web3Service: Web3Service,
     ) {}
 
-    generateSignatureMessage(
+    private generateSignatureMessage(
         party: PartyModel,
         request: CreateProposalRequest,
     ): string {
         return `I want to create a proposal in ${party.name} with title ${request.title}`;
     }
 
-    async validateUserIsPartyMember(
+    private async validateUserIsPartyMember(
         user: UserModel,
         party: PartyModel,
     ): Promise<void> {
@@ -40,6 +40,16 @@ export class CreateProposalService {
         if (members.length <= 0)
             throw new UnprocessableEntityException(
                 'User is not a party member',
+            );
+    }
+
+    private validateProposalAmount(
+        party: PartyModel,
+        { amount }: CreateProposalRequest,
+    ): void {
+        if (amount.gt(party.totalFund))
+            throw new UnprocessableEntityException(
+                'Proposal amount exceed curent party fund',
             );
     }
 
@@ -78,6 +88,7 @@ export class CreateProposalService {
         );
 
         await this.validateUserIsPartyMember(user, party);
+        this.validateProposalAmount(party, request);
 
         return this.store(party, request, user);
     }
