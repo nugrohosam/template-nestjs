@@ -6,6 +6,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { ValidationPipe } from './common/pipes/validation.pipe';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { CommonModule } from './modules/commons/common.module';
+import { MeModule } from './modules/me/me.module';
 import { PartyModule } from './modules/parties/party.module';
 import { TransactionModule } from './modules/transactions/transaction.module';
 import { UserModule } from './modules/users/user.module';
@@ -18,6 +19,7 @@ import { UserModule } from './modules/users/user.module';
         PartyModule,
         TransactionModule,
         CommonModule,
+        MeModule,
     ],
     providers: [
         {

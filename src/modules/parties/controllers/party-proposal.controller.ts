@@ -62,9 +62,13 @@ export class PartyProposalController {
 
     @Get()
     async index(
+        @Param('partyId') partyId: string,
         @Query() query: IndexRequest,
     ): Promise<IApiResponse<IndexProposalResponse[]>> {
-        const { data, meta } = await this.indexProposalService.fetch(query);
+        const { data, meta } = await this.indexProposalService.fetch(
+            partyId,
+            query,
+        );
         return {
             message: 'Success fetch proposal',
             meta,
