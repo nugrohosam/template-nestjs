@@ -1,20 +1,46 @@
 import { Injectable } from '@nestjs/common';
+import { WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 import {
     PaginationResponse,
     SequelizePaginator,
 } from 'sequelize-typescript-paginator';
-import { IndexRequest } from 'src/common/request/index.request';
+import { JoinRequestStatusEnum } from 'src/common/enums/party.enum';
 import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
+import { IndexJoinRequestRequest } from '../../requests/join-request/index-join-request.request';
 import { JoinRequestResponse } from '../../responses/join-request/join-request.response';
 
 @Injectable()
 export class IndexJoinRequestService {
+    private getWhereOptions(
+        query: IndexJoinRequestRequest,
+    ): WhereOptions<JoinRequestModel> {
+        const whereOptions: WhereOptions<JoinRequestModel> = {};
+
+        switch (query.status) {
+            case JoinRequestStatusEnum.Accepted:
+                whereOptions.acceptedAt = { [Op.ne]: null };
+                whereOptions.rejectedAt = { [Op.eq]: null };
+                break;
+            case JoinRequestStatusEnum.Rejected:
+                whereOptions.acceptedAt = { [Op.eq]: null };
+                whereOptions.rejectedAt = { [Op.ne]: null };
+                break;
+
+            default:
+                whereOptions.acceptedAt = { [Op.eq]: null };
+                whereOptions.rejectedAt = { [Op.eq]: null };
+                break;
+        }
+
+        return whereOptions;
+    }
+
     async fetchByUserId(
         userId: string,
-        query: IndexRequest,
+        query: IndexJoinRequestRequest,
     ): Promise<PaginationResponse<JoinRequestResponse>> {
         const { data, meta } = await SequelizePaginator.paginate(
             JoinRequestModel,
@@ -22,7 +48,7 @@ export class IndexJoinRequestService {
                 perPage: query.perPage ?? 10,
                 page: query.page ?? 1,
                 options: {
-                    where: { userId },
+                    where: { userId, ...this.getWhereOptions(query) },
                     order: [
                         [query.sort ?? 'created_at', query.order ?? 'desc'],
                     ],
@@ -45,7 +71,7 @@ export class IndexJoinRequestService {
 
     async fetchByPartyId(
         partyId: string,
-        query: IndexRequest,
+        query: IndexJoinRequestRequest,
     ): Promise<PaginationResponse<JoinRequestResponse>> {
         const { data, meta } = await SequelizePaginator.paginate(
             JoinRequestModel,
@@ -55,9 +81,7 @@ export class IndexJoinRequestService {
                 options: {
                     where: {
                         partyId,
-                        acceptedAt: {
-                            [Op.ne]: null,
-                        },
+                        ...this.getWhereOptions(query),
                     },
                     order: [
                         [query.sort ?? 'created_at', query.order ?? 'desc'],
