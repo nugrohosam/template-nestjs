@@ -59,8 +59,11 @@ export class IndexJoinRequestService {
             },
         );
 
-        const response = data.map((datum) =>
-            JoinRequestResponse.mapFromJoinRequestModel(datum),
+        const response = await Promise.all(
+            data.map(
+                async (datum) =>
+                    await JoinRequestResponse.mapFromJoinRequestModel(datum),
+            ),
         );
 
         return {
@@ -91,8 +94,11 @@ export class IndexJoinRequestService {
             },
         );
 
-        const response = data.map((datum) =>
-            JoinRequestResponse.mapFromJoinRequestModel(datum),
+        const response = await Promise.all(
+            data.map(
+                async (datum) =>
+                    await JoinRequestResponse.mapFromJoinRequestModel(datum),
+            ),
         );
 
         return {

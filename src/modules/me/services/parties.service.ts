@@ -46,9 +46,12 @@ export class MePartiesService {
         return options;
     }
 
-    private mapMeParties(parties: PartyModel[]): IndexPartyResponse[] {
-        return parties.map((party) =>
-            IndexPartyResponse.mapFromPartyModel(party),
+    private mapMeParties(parties: PartyModel[]): Promise<IndexPartyResponse[]> {
+        return Promise.all(
+            parties.map(
+                async (party) =>
+                    await IndexPartyResponse.mapFromPartyModel(party),
+            ),
         );
     }
 
@@ -70,7 +73,7 @@ export class MePartiesService {
             offset,
             subQuery: false,
         });
-        const data = this.mapMeParties(rows);
+        const data = await this.mapMeParties(rows);
 
         return {
             data,

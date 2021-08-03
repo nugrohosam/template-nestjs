@@ -28,7 +28,9 @@ export class PartyJoinRequestController {
 
         return {
             message: 'Success request join a party.',
-            data: JoinRequestResponse.mapFromJoinRequestModel(joinRequest),
+            data: await JoinRequestResponse.mapFromJoinRequestModel(
+                joinRequest,
+            ),
         };
     }
 
@@ -60,7 +62,9 @@ export class PartyJoinRequestController {
         );
         return {
             message: 'Success update join party request status',
-            data: JoinRequestResponse.mapFromJoinRequestModel(joinRequest),
+            data: await JoinRequestResponse.mapFromJoinRequestModel(
+                joinRequest,
+            ),
         };
     }
 }
