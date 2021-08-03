@@ -4,11 +4,9 @@ import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { IndexPartyResponse } from '../responses/index-party.response';
-import {
-    PaginationResponse,
-    SequelizePaginator,
-} from 'sequelize-typescript-paginator';
+import { PaginationResponse } from 'sequelize-typescript-paginator';
 import { Op } from 'sequelize';
+import { PartyMemberModel } from 'src/models/party-member.model';
 
 export class IndexPartyService {
     private getFindOptions(query: IndexPartyRequest): FindOptions<IParty> {
@@ -40,6 +38,11 @@ export class IndexPartyService {
                     as: 'owner',
                     required: true,
                 },
+                {
+                    model: PartyMemberModel,
+                    as: 'partyMembers',
+                    required: true,
+                },
             ],
         };
     }
@@ -53,16 +56,28 @@ export class IndexPartyService {
     async fetch(
         query: IndexPartyRequest,
     ): Promise<PaginationResponse<IndexPartyResponse>> {
-        const { data, meta } = await SequelizePaginator.paginate(PartyModel, {
-            perPage: query.perPage ?? 10,
-            page: query.page ?? 1,
-            options: this.getFindOptions(query),
+        const limit = query.perPage ?? 10;
+        const offset = query.page ? (query.page - 1) * limit : 0;
+        const rows = await PartyModel.findAll({
+            ...this.getFindOptions(query),
+            limit,
+            offset,
+            subQuery: false,
         });
-        const response = this.mapParties(data);
+        const count = await PartyModel.count({
+            ...this.getFindOptions(query),
+            distinct: true,
+        });
+        const response = this.mapParties(rows);
 
         return {
             data: response,
-            meta,
+            meta: {
+                perPage: limit,
+                page: query.page ?? 1,
+                total: count,
+                totalPage: Math.ceil(count / limit),
+            },
         };
     }
 }
