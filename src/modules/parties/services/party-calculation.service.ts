@@ -21,7 +21,7 @@ export class PartyCalculationService {
     ) {}
 
     validateDepositAmount(amount: BN, party: PartyModel): void {
-        if (amount.lte(party.maxDeposit) || amount.gte(party.minDeposit))
+        if (amount.gt(party.maxDeposit) || amount.lt(party.minDeposit))
             throw new UnprocessableEntityException(
                 `Deposit amount must be between ${party.minDeposit} and ${party.maxDeposit}`,
             );
