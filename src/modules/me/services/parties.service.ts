@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Injectable } from '@nestjs/common';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import { FindOptions } from 'sequelize';
 import { PaginationResponse } from 'sequelize-typescript-paginator';
 import { PartyModel } from 'src/models/party.model';
@@ -13,15 +14,32 @@ export class MePartiesService {
         user: UserModel,
         query: IndexMePartyRequest,
     ): FindOptions<PartyModel> {
-        const options: FindOptions<PartyModel> = {
-            include: { all: true },
-            where: {
-                [Op.or]: {
+        let where: WhereOptions<PartyModel> = {
+            [Op.or]: {
+                ownerId: user.id,
+                '$partyMembers.member_id$': user.id,
+            },
+        };
+
+        if (query.onlyOwner && !query.onlyMember) {
+            where = {
+                [Op.and]: {
                     ownerId: user.id,
-                    // eslint-disable-next-line @typescript-eslint/naming-convention
                     '$partyMembers.member_id$': user.id,
                 },
-            },
+            };
+        } else if (!query.onlyOwner && query.onlyMember) {
+            where = {
+                [Op.and]: {
+                    ownerId: { [Op.ne]: user.id },
+                    '$partyMembers.member_id$': user.id,
+                },
+            };
+        }
+
+        const options: FindOptions<PartyModel> = {
+            include: { all: true },
+            where,
             order: [[query.sort ?? 'created_at', query.order ?? 'desc']],
         };
 
