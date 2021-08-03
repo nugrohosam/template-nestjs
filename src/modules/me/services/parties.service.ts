@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { Op } from 'sequelize';
 import { FindOptions } from 'sequelize';
-import {
-    PaginationResponse,
-    SequelizePaginator,
-} from 'sequelize-typescript-paginator';
-import { PartyMemberModel } from 'src/models/party-member.model';
+import { PaginationResponse } from 'sequelize-typescript-paginator';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
@@ -17,14 +14,14 @@ export class MePartiesService {
         query: IndexMePartyRequest,
     ): FindOptions<PartyModel> {
         const options: FindOptions<PartyModel> = {
-            include: [
-                {
-                    model: PartyMemberModel,
-                    as: 'partyMembers',
-                    where: { memberId: user.id },
+            include: { all: true },
+            where: {
+                [Op.or]: {
+                    ownerId: user.id,
+                    // eslint-disable-next-line @typescript-eslint/naming-convention
+                    '$partyMembers.member_id$': user.id,
                 },
-            ],
-            where: { creatorId: user.id },
+            },
             order: [[query.sort ?? 'created_at', query.order ?? 'desc']],
         };
 
@@ -42,13 +39,29 @@ export class MePartiesService {
         query: IndexMePartyRequest,
     ): Promise<PaginationResponse<IndexPartyResponse>> {
         const options = this.getFindOptions(user, query);
-        const result = await SequelizePaginator.paginate(PartyModel, {
-            perPage: query.perPage ?? 10,
-            page: query.page ?? 1,
-            options,
-        });
-        const data = this.mapMeParties(result.data);
+        const limit = query.perPage ?? 10;
+        const offset = query.page ? (query.page - 1) * limit : 0;
 
-        return { data, meta: result.meta };
+        const count = await PartyModel.count({
+            ...options,
+            distinct: true,
+        });
+        const rows = await PartyModel.findAll({
+            ...options,
+            limit,
+            offset,
+            subQuery: false,
+        });
+        const data = this.mapMeParties(rows);
+
+        return {
+            data,
+            meta: {
+                page: query.page ?? 1,
+                perPage: limit,
+                total: count,
+                totalPage: Math.ceil(count / limit),
+            },
+        };
     }
 }
