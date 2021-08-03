@@ -1,5 +1,6 @@
 import {
     Injectable,
+    InternalServerErrorException,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -97,8 +98,8 @@ export class Web3Service {
         transactionHash: string,
         from: string,
         abiItem: AbiItem,
-        inputIndex: number,
-        validator: string,
+        inputIndex: number | number[],
+        validator: string | string[],
     ): Promise<void> {
         const receipt = await this.getTransactionReceipt(transactionHash);
 
@@ -124,7 +125,6 @@ export class Web3Service {
         const eventSignature = this.encodeEventSignature(abiItem);
 
         receipt.logs.some((log) => {
-            console.log({ log });
             if (eventSignature == log.topics[0]) {
                 decodedLog = this.decodeTopicLog(
                     abiItem.inputs,
@@ -139,10 +139,28 @@ export class Web3Service {
         if (!decodedLog)
             throw new UnprocessableEntityException('Fail decode log event');
 
-        const identifier = decodedLog[inputIndex.toString()];
-        if (identifier !== validator)
-            throw new UnprocessableEntityException(
-                'Transaction not belongs to validator',
+        console.log({ decodedLog, validator });
+        if (Array.isArray(inputIndex) && Array.isArray(validator)) {
+            for (const index in inputIndex) {
+                const identifier = decodedLog[inputIndex[index].toString()];
+                if (identifier !== validator[index])
+                    throw new UnprocessableEntityException(
+                        'Transaction not belongs to validator',
+                    );
+            }
+        } else if (
+            typeof inputIndex === 'number' &&
+            typeof validator === 'string'
+        ) {
+            const identifier = decodedLog[inputIndex.toString()];
+            if (identifier !== validator)
+                throw new UnprocessableEntityException(
+                    'Transaction not belongs to validator',
+                );
+        } else {
+            throw new InternalServerErrorException(
+                'inputIndex and validator type invalid.',
             );
+        }
     }
 }
