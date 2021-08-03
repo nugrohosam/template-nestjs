@@ -36,7 +36,7 @@ export class DetailPartyResponse
     ): Promise<DetailPartyResponse> {
         return {
             id: party.id,
-            isActive: await party.isActive(),
+            isActive: party.isActive,
             isMember: user ? await party.isMember(user) : false,
             address: party.address,
             name: party.name,
@@ -47,7 +47,10 @@ export class DetailPartyResponse
             totalFund: party.totalFund.toString(),
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
-            totalMember: party.totalMember,
+            totalMember:
+                party.totalMember === 0
+                    ? party.partyMembers.length ?? 1
+                    : party.totalMember,
             distribution: party.distribution,
             creator: {
                 id: party.creator.id,

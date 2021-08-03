@@ -1,12 +1,12 @@
 import { FindOptions, WhereOptions } from 'sequelize';
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
-import { UserModel } from 'src/models/user.model';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { IndexPartyResponse } from '../responses/index-party.response';
 import { PaginationResponse } from 'sequelize-typescript-paginator';
 import { Op } from 'sequelize';
 import { PartyMemberModel } from 'src/models/party-member.model';
+import { OrderDirectionEnum } from 'src/common/enums/index.enum';
 
 export class IndexPartyService {
     private getFindOptions(query: IndexPartyRequest): FindOptions<IParty> {
@@ -34,15 +34,16 @@ export class IndexPartyService {
             where,
             include: [
                 {
-                    model: UserModel,
-                    as: 'owner',
-                    required: true,
-                },
-                {
                     model: PartyMemberModel,
                     as: 'partyMembers',
                     required: true,
                 },
+            ],
+            order: [
+                [
+                    query.sort ?? 'createdAt',
+                    query.order ?? OrderDirectionEnum.Desc,
+                ],
             ],
         };
     }
