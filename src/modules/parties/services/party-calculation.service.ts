@@ -27,6 +27,13 @@ export class PartyCalculationService {
             );
     }
 
+    validateWithdrawAmount(amount: BN, partyMember: PartyMemberModel): void {
+        if (amount.gt(partyMember.totalFund))
+            throw new UnprocessableEntityException(
+                `Withdraw amount must be less then or equal to current total fund in the party`,
+            );
+    }
+
     async updatePartyTotalFund(
         party: PartyModel,
         amount: BN,
@@ -99,6 +106,8 @@ export class PartyCalculationService {
             member.id,
             party.id,
         );
+
+        this.validateWithdrawAmount(amount, partyMember);
 
         const withdrawAmount = amount.muln(-1);
         try {
