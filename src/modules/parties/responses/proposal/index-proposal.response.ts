@@ -27,7 +27,7 @@ export class IndexProposalResponse {
             amount: proposal.amount.toString(),
             attachmentUrl: proposal.attachmentUrl,
             createdAt: proposal.createdAt,
-            party: IndexPartyResponse.mapFromPartyModel(
+            party: await IndexPartyResponse.mapFromPartyModel(
                 await proposal.$get('party'),
             ),
             creator: MemberResponse.mapFromUserModel(

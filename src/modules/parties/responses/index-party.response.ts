@@ -19,8 +19,11 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     distribution: DistributionTypeEnum;
     ownerId: string;
     createdAt: Date;
+    isActive: boolean;
 
-    static mapFromPartyModel(party: PartyModel): IndexPartyResponse {
+    static async mapFromPartyModel(
+        party: PartyModel,
+    ): Promise<IndexPartyResponse> {
         return {
             id: party.id,
             name: party.name,
@@ -35,6 +38,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             distribution: party.distribution,
             ownerId: party.ownerId,
             createdAt: party.createdAt,
+            isActive: await party.isActive(),
         };
     }
 }

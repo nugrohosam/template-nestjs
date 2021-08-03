@@ -45,7 +45,7 @@ export class DetailProposalResponse
             createdAt: proposal.createdAt,
             approvedAt: proposal.approvedAt,
             rejectedAt: proposal.rejectedAt,
-            party: IndexPartyResponse.mapFromPartyModel(
+            party: await IndexPartyResponse.mapFromPartyModel(
                 await proposal.$get('party'),
             ),
             creator: MemberResponse.mapFromUserModel(

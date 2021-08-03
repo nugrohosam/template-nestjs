@@ -47,10 +47,14 @@ export class IndexPartyService {
         };
     }
 
-    private mapParties(parties: PartyModel[]): Array<IndexPartyResponse> {
-        return parties.map((party) => {
-            return IndexPartyResponse.mapFromPartyModel(party);
-        });
+    private async mapParties(
+        parties: PartyModel[],
+    ): Promise<Array<IndexPartyResponse>> {
+        return Promise.all(
+            parties.map(async (party) => {
+                return await IndexPartyResponse.mapFromPartyModel(party);
+            }),
+        );
     }
 
     async fetch(
@@ -68,7 +72,7 @@ export class IndexPartyService {
             ...this.getFindOptions(query),
             distinct: true,
         });
-        const response = this.mapParties(rows);
+        const response = await this.mapParties(rows);
 
         return {
             data: response,
