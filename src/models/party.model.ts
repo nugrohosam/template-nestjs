@@ -5,6 +5,7 @@ import {
     Column,
     CreatedAt,
     DataType,
+    DefaultScope,
     DeletedAt,
     ForeignKey,
     HasMany,
@@ -22,6 +23,12 @@ import { PartyInvitationModel } from './party-invitation.model';
 import { PartyMemberModel } from './party-member.model';
 import { UserModel } from './user.model';
 
+@DefaultScope(() => ({
+    include: [
+        { model: PartyMemberModel, as: 'partyMembers' },
+        { model: UserModel, as: 'owner', required: true },
+    ],
+}))
 @Table({ tableName: 'parties', paranoid: true })
 export class PartyModel extends Model<IParty, IParty> implements IParty {
     @Column({
@@ -174,21 +181,13 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @HasMany(() => PartyInvitationModel)
     readonly invitations?: PartyInvitationModel[];
 
-    // TODO: Gunakan raw query buat calculate isActive direct di DB.
-    // Problemnya cara yg sekarang cost-nya N, kalau ada 100 hasil query, waktu di convert ke response, harus 100x query untuk dapetin `isActive`.
-    // Proposed solution:
-    //   - Gunakan Scope:
-    //   - Dalam scope itu ada query
-    //     `attributes`: {include: [[Sequelize.literal(RAW_QUERY, 'is_active')]] }
-    //   - Jadi dalam sekalin Party.findAll() , udah calculated isActive column.
-    async isActive(): Promise<boolean> {
+    get isActive(): boolean {
         if (!this.address || !this.transactionHash) return false;
 
-        const partyMembers = await PartyMemberModel.findOne({
-            where: { memberId: this.ownerId, partyId: this.id },
-        });
-        if (!partyMembers) return false;
-        if (!partyMembers.depositTransactionId) return false;
+        const partyMembers = this.partyMembers.filter(
+            (partyMember) => partyMember.memberId === this.ownerId,
+        );
+        if (partyMembers.length <= 0) return false;
 
         return true;
     }

@@ -33,12 +33,15 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             isPublic: party.isPublic,
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
-            totalMember: party.totalMember,
+            totalMember:
+                party.totalMember === 0
+                    ? party.partyMembers.length ?? 1
+                    : party.totalMember,
             totalFund: party.totalFund.toString(),
             distribution: party.distribution,
             ownerId: party.ownerId,
             createdAt: party.createdAt,
-            isActive: await party.isActive(),
+            isActive: party.isActive,
         };
     }
 }
