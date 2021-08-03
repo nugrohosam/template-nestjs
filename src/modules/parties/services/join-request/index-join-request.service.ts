@@ -14,17 +14,12 @@ import { JoinRequestResponse } from '../../responses/join-request/join-request.r
 
 @Injectable()
 export class IndexJoinRequestService {
-    async fetchByUserId(
-        userId: string,
+    private getWhereOptions(
         query: IndexJoinRequestRequest,
-    ): Promise<PaginationResponse<JoinRequestResponse>> {
+    ): WhereOptions<JoinRequestModel> {
         const whereOptions: WhereOptions<JoinRequestModel> = {};
 
         switch (query.status) {
-            case JoinRequestStatusEnum.Pending:
-                whereOptions.acceptedAt = { [Op.eq]: null };
-                whereOptions.rejectedAt = { [Op.eq]: null };
-                break;
             case JoinRequestStatusEnum.Accepted:
                 whereOptions.acceptedAt = { [Op.ne]: null };
                 whereOptions.rejectedAt = { [Op.eq]: null };
@@ -35,16 +30,25 @@ export class IndexJoinRequestService {
                 break;
 
             default:
+                whereOptions.acceptedAt = { [Op.eq]: null };
+                whereOptions.rejectedAt = { [Op.eq]: null };
                 break;
         }
 
+        return whereOptions;
+    }
+
+    async fetchByUserId(
+        userId: string,
+        query: IndexJoinRequestRequest,
+    ): Promise<PaginationResponse<JoinRequestResponse>> {
         const { data, meta } = await SequelizePaginator.paginate(
             JoinRequestModel,
             {
                 perPage: query.perPage ?? 10,
                 page: query.page ?? 1,
                 options: {
-                    where: { userId, ...whereOptions },
+                    where: { userId, ...this.getWhereOptions(query) },
                     order: [
                         [query.sort ?? 'created_at', query.order ?? 'desc'],
                     ],
@@ -77,9 +81,7 @@ export class IndexJoinRequestService {
                 options: {
                     where: {
                         partyId,
-                        acceptedAt: {
-                            [Op.ne]: null,
-                        },
+                        ...this.getWhereOptions(query),
                     },
                     order: [
                         [query.sort ?? 'created_at', query.order ?? 'desc'],
