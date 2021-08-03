@@ -35,7 +35,7 @@ export class UpdateApprovedProposalService {
                 'Proposal not approved yet.',
             );
 
-        if (proposal.signature !== request.signature)
+        if (proposal.approveSignature !== request.signature)
             throw new UnauthorizedException('Signature not valid.');
 
         await this.web3Service.validateTransaction(
@@ -54,6 +54,9 @@ export class UpdateApprovedProposalService {
                 distribution.transactionHash = request.transactionHash;
                 await distribution.save({ transaction: dbTransaction });
             }
+
+            proposal.approveTransactionHash = request.transactionHash;
+            await proposal.save();
 
             await dbTransaction.commit();
             return proposal;
