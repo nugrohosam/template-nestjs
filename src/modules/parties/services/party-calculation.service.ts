@@ -21,9 +21,16 @@ export class PartyCalculationService {
     ) {}
 
     validateDepositAmount(amount: BN, party: PartyModel): void {
-        if (amount.lte(party.maxDeposit) || amount.gte(party.minDeposit))
+        if (amount.gt(party.maxDeposit) || amount.lt(party.minDeposit))
             throw new UnprocessableEntityException(
                 `Deposit amount must be between ${party.minDeposit} and ${party.maxDeposit}`,
+            );
+    }
+
+    validateWithdrawAmount(amount: BN, partyMember: PartyMemberModel): void {
+        if (amount.gt(partyMember.totalFund))
+            throw new UnprocessableEntityException(
+                `Withdraw amount must be less then or equal to current total fund in the party`,
             );
     }
 
@@ -99,6 +106,8 @@ export class PartyCalculationService {
             member.id,
             party.id,
         );
+
+        this.validateWithdrawAmount(amount, partyMember);
 
         const withdrawAmount = amount.muln(-1);
         try {

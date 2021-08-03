@@ -177,10 +177,10 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     // TODO: Gunakan raw query buat calculate isActive direct di DB.
     // Problemnya cara yg sekarang cost-nya N, kalau ada 100 hasil query, waktu di convert ke response, harus 100x query untuk dapetin `isActive`.
     // Proposed solution:
-    //   - Gunakan Scope: 
-    //   - Dalam scope itu ada query 
+    //   - Gunakan Scope:
+    //   - Dalam scope itu ada query
     //     `attributes`: {include: [[Sequelize.literal(RAW_QUERY, 'is_active')]] }
-    //   - Jadi dalam sekalin Party.findAll() , udah calculated isActive column. 
+    //   - Jadi dalam sekalin Party.findAll() , udah calculated isActive column.
     async isActive(): Promise<boolean> {
         if (!this.address || !this.transactionHash) return false;
 
