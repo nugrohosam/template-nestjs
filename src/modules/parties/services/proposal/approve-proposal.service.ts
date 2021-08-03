@@ -125,6 +125,7 @@ export class ApproveProposalService {
 
         try {
             proposal.approvedAt = new Date();
+            proposal.approveSignature = signature;
             await proposal.save({ transaction: dbTransaction });
 
             await this.processCalculation(

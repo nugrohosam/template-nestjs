@@ -75,6 +75,14 @@ export class Proposal extends Model<IProposal, IProposal> implements IProposal {
     transactionHash?: string;
 
     @AllowNull(true)
+    @Column({ type: DataType.STRING, field: 'approve_signature' })
+    approveSignature?: string;
+
+    @AllowNull(true)
+    @Column({ type: DataType.STRING, field: 'approve_transaction_hash' })
+    approveTransactionHash?: string;
+
+    @AllowNull(true)
     @Column({ type: DataType.DATE, field: 'approved_at' })
     approvedAt?: Date;
 
