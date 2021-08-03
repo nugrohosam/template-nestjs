@@ -76,6 +76,10 @@ export class LeavePartyService {
             );
 
             await member.destroy({ transaction: dbTransaction });
+
+            party.totalMember -= 1;
+            await party.save();
+
             await dbTransaction.commit();
             return member;
         } catch (err) {

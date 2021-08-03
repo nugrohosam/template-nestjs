@@ -178,6 +178,7 @@ export class JoinPartyService {
             await partyMember.save({ transaction });
 
             party.totalFund = party.totalFund.add(request.initialDeposit);
+            party.totalMember += 1;
             await party.save({ transaction });
 
             await transaction.commit();
