@@ -7,8 +7,6 @@ import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
-import { TransferRequest } from 'src/modules/transactions/requests/transfer.request';
-import { TransferService } from 'src/modules/transactions/services/transfer.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { JoinPartyRequest } from '../../requests/member/join-party.request';
 import { GetPartyService } from '../get-party.service';
@@ -18,7 +16,6 @@ export class JoinPartyService {
         @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
         private readonly getUserService: GetUserService,
-        private readonly transferService: TransferService,
         private readonly web3Service: Web3Service,
     ) {}
 
@@ -163,23 +160,6 @@ export class JoinPartyService {
                 request,
                 transaction,
             );
-
-            const depositTransaction =
-                await this.transferService.storeTransaction(
-                    TransferRequest.mapFromJoinPartyRequest(
-                        party,
-                        user,
-                        request,
-                    ),
-                    transaction,
-                );
-
-            partyMember.depositTransactionId = depositTransaction.id;
-            await partyMember.save({ transaction });
-
-            party.totalFund = party.totalFund.add(request.initialDeposit);
-            party.totalMember += 1;
-            await party.save({ transaction });
 
             await transaction.commit();
             return partyMember;
