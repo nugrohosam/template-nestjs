@@ -60,7 +60,10 @@ export class TransactionModel
     signature: string;
 
     @Column({ type: DataType.STRING, field: 'transaction_hash' })
-    transactionHash?: string;
+    transactionHash: string;
+
+    @Column({ type: DataType.BOOLEAN, field: 'transaction_hash_status' })
+    transactionHashStatus: boolean;
 
     @CreatedAt
     @Column({ type: DataType.DATE, field: 'created_at' })

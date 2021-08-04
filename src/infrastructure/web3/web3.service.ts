@@ -100,7 +100,7 @@ export class Web3Service {
         abiItem: AbiItem,
         inputIndex: number | number[],
         validator: string | string[],
-    ): Promise<void> {
+    ): Promise<boolean> {
         const receipt = await this.getTransactionReceipt(transactionHash);
 
         if (!receipt)
@@ -111,11 +111,6 @@ export class Web3Service {
         if (receipt.from.toLowerCase() !== from.toLowerCase())
             throw new UnprocessableEntityException(
                 'Transaction not from correct address',
-            );
-
-        if (!receipt.status)
-            throw new UnprocessableEntityException(
-                'Transaction status failed.',
             );
 
         if (receipt.logs.length <= 0)
@@ -139,7 +134,6 @@ export class Web3Service {
         if (!decodedLog)
             throw new UnprocessableEntityException('Fail decode log event');
 
-        console.log({ decodedLog, validator });
         if (Array.isArray(inputIndex) && Array.isArray(validator)) {
             for (const index in inputIndex) {
                 const identifier = decodedLog[inputIndex[index].toString()];
@@ -162,5 +156,7 @@ export class Web3Service {
                 'inputIndex and validator type invalid.',
             );
         }
+
+        return receipt.status;
     }
 }

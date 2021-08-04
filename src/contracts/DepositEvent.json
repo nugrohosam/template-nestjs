@@ -16,26 +16,8 @@
             },
             {
                 "indexed": false,
-                "internalType": "string",
-                "name": "userId",
-                "type": "string"
-            },
-            {
-                "indexed": false,
-                "internalType": "string",
-                "name": "partyId",
-                "type": "string"
-            },
-            {
-                "indexed": false,
                 "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "timestamp",
+                "name": "amount",
                 "type": "uint256"
             }
         ],

@@ -46,13 +46,18 @@ export class TransferRequest {
 
     @IsNotEmpty()
     @Expose({ name: 'transfer_signature' })
-    transferSignature: string;
+    signature: string;
+
+    @IsNotEmpty()
+    @Expose({ name: 'transaction_hash' })
+    transactionHash: string;
 
     static mapFromJoinPartyRequest(
         party: PartyModel,
         user: UserModel,
         deposit: BN,
         signature: string,
+        transactionHash: string,
     ): TransferRequest {
         return {
             addressFrom: user.address,
@@ -61,7 +66,8 @@ export class TransferRequest {
             type: TransactionTypeEnum.Deposit,
             description: 'Initial Deposit',
             currencyId: 1, // TODO: still hardcoded to default USDC token
-            transferSignature: signature,
+            signature: signature,
+            transactionHash: transactionHash,
         };
     }
 
@@ -70,6 +76,7 @@ export class TransferRequest {
         user: UserModel,
         member: PartyMemberModel,
         signature: string,
+        transactionHash: string,
     ): TransferRequest {
         return {
             addressFrom: party.address,
@@ -78,7 +85,8 @@ export class TransferRequest {
             type: TransactionTypeEnum.Withdraw,
             description: 'Leave Withdraw', // TODO: default description based on type enum
             currencyId: 1, // TODO: still hardcoded to default USDC token
-            transferSignature: signature,
+            signature: signature,
+            transactionHash: transactionHash,
         };
     }
 }

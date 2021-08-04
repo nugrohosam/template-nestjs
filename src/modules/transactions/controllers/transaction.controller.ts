@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Post,
+    Query,
+} from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
 import { IndexTransactionRequest } from '../requests/index-transaction.request';
 import { TransferRequest } from '../requests/transfer.request';
-import { UpdateTransferRequest } from '../requests/update-transfer.request';
 import { TransactionResponse } from '../responses/transaction.response';
 import { GetTransactionService } from '../services/get-transaction.service';
 import { IndexTransactionService } from '../services/index-transaction.service';
@@ -19,7 +27,7 @@ export class TransactionController {
     ) {}
 
     @Post('transfer')
-    async transfer(
+    async prepareTransfer(
         @Body() request: TransferRequest,
     ): Promise<IApiResponse<TransactionResponse>> {
         const transaction = await this.transferService.transfer(request);
@@ -30,22 +38,18 @@ export class TransactionController {
         };
     }
 
-    @Put(':transactionId')
-    async update(
+    @Delete(':transactionId/transaction-hash')
+    async deleteIncompleteTransfer(
         @Param('transactionId') transactionId: string,
-        @Body() request: UpdateTransferRequest,
-    ): Promise<IApiResponse<{ id: string }>> {
+        @Body() { signature }: DeleteIncompleteDataRequest,
+    ): Promise<IApiResponse<null>> {
         const transaction = await this.getTransactionService.getById(
             transactionId,
         );
-        await this.updateTransferService.update(transaction, request);
-
-        // TODO: need to specify the transfer response
+        await this.updateTransferService.delete(transaction, signature);
         return {
-            message: 'Update transfer transaction success',
-            data: {
-                id: transaction.id,
-            },
+            message: 'Success delete incomplete transfer data',
+            data: null,
         };
     }
 
