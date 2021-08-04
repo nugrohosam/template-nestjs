@@ -73,7 +73,7 @@ export class UpdatePartyMemberService {
             await partyMember.save({ transaction: dbTransaction });
 
             party.totalFund = party.totalFund.add(partyMember.initialFund);
-            party.totalMember += 1;
+            party.totalMember += 1; // TODO: use raw query to increment value
             await party.save({ transaction: dbTransaction });
 
             await dbTransaction.commit();

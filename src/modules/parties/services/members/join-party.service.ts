@@ -1,7 +1,6 @@
 import { Inject, UnprocessableEntityException } from '@nestjs/common';
 import BN from 'bn.js';
 import { Transaction } from 'sequelize/types';
-import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -110,7 +109,7 @@ export class JoinPartyService {
         party: PartyModel,
         user: UserModel,
         request: JoinPartyRequest,
-        t: Transaction,
+        t?: Transaction,
     ): Promise<PartyMemberModel> {
         return await PartyMemberModel.create(
             {
@@ -150,23 +149,9 @@ export class JoinPartyService {
             message,
         );
 
-        // TODO: validate transaction hash
+        const partyMember = await this.storePartyMember(party, user, request);
 
-        const transaction = await localDatabase.transaction();
-        try {
-            const partyMember = await this.storePartyMember(
-                party,
-                user,
-                request,
-                transaction,
-            );
-
-            await transaction.commit();
-            return partyMember;
-        } catch (err) {
-            await transaction.rollback();
-            throw err;
-        }
+        return partyMember;
     }
 
     async generatePlatformSignature(
