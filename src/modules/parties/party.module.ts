@@ -7,13 +7,11 @@ import { PartyInvitationController } from './controllers/party-invitation.contro
 import { PartyController } from './controllers/party.controller';
 import { AcceptInvitationService } from './services/invitation/accept-invitation.service';
 import { CreatePartyService } from './services/create-party.service';
-import { DeletePartyService } from './services/delete-party.service';
 import { GetPartyService } from './services/get-party.service';
 import { IndexPartyInvitationService } from './services/invitation/index-party-invitation.service';
 import { IndexPartyMemberService } from './services/members/index-party-member.service';
 import { IndexPartyService } from './services/index-party.service';
 import { JoinPartyService } from './services/members/join-party.service';
-import { UpdateTransactionHashService } from './services/update-transaction-hash.service';
 import { UpdatePartyMemberService } from './services/members/update-party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
 import { InvitePartyService } from './services/invitation/invite-party.service';
@@ -48,8 +46,6 @@ import { LeavePartyService } from './services/members/leave-party.service';
         IndexPartyService,
         GetPartyService,
         CreatePartyService,
-        UpdateTransactionHashService,
-        DeletePartyService,
         PartyCalculationService,
         // Join Request Providers
         RequestJoinService,
