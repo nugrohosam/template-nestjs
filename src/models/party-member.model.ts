@@ -67,17 +67,23 @@ export class PartyMemberModel
     @Column({ type: DataType.UUID, field: 'transaction_id' })
     depositTransactionId?: string;
 
+    @Column({ type: DataType.DATE, field: 'leaved_at' })
+    leavedAt?: Date;
+
+    @Column({ type: DataType.STRING, field: 'leave_transaction_hash' })
+    leaveTransactionHash?: string;
+
     @CreatedAt
     @Column({ type: DataType.DATE, field: 'created_at' })
-    createdAt?: Date | null;
+    createdAt?: Date;
 
     @UpdatedAt
     @Column({ type: DataType.DATE, field: 'updated_at' })
-    updatedAt?: Date | null;
+    updatedAt?: Date;
 
     @DeletedAt
     @Column({ type: DataType.DATE, field: 'deleted_at' })
-    deletedAt?: Date | null;
+    deletedAt?: Date;
 
     @BelongsTo(() => PartyModel, 'partyId')
     readonly party?: PartyModel;

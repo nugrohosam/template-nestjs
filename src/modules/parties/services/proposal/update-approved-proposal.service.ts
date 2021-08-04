@@ -42,8 +42,7 @@ export class UpdateApprovedProposalService {
             request.transactionHash,
             owner.address,
             approveProposalEvent as AbiItem,
-            0,
-            proposal.id,
+            { 0: proposal.id },
         );
 
         const dbTransaction = await localDatabase.transaction();

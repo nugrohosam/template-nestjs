@@ -35,8 +35,7 @@ export class UpdateTransactionHashService {
             request.transactionHash,
             creator.address,
             createPartyEvent as AbiItem,
-            2,
-            party.id,
+            { 2: party.id },
         );
 
         party.address = request.partyAddress;

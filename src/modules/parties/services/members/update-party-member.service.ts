@@ -49,8 +49,7 @@ export class UpdatePartyMemberService {
             request.transactionHash,
             member.address,
             joinPartyEvent as AbiItem,
-            2,
-            partyMemberId,
+            { 2: partyMemberId },
         );
 
         const dbTransaction = await localDatabase.transaction();

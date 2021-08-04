@@ -104,4 +104,16 @@ export class PartyMemberController {
             },
         };
     }
+
+    @Delete('leave')
+    async revertLeave(
+        @Param('partyId') partyId: string,
+        @Body() request: LeavePartyRequest,
+    ): Promise<IApiResponse<null>> {
+        await this.leavePartyService.revert(partyId, request);
+        return {
+            message: 'Success revert leave party action',
+            data: null,
+        };
+    }
 }

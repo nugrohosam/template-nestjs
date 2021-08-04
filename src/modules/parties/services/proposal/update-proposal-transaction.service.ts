@@ -36,8 +36,7 @@ export class UpdateProposalTransactionService {
             request.transactionHash,
             signer.address,
             createProposalEvent as AbiItem,
-            0,
-            proposal.id,
+            { 0: proposal.id },
         );
 
         proposal.transactionHash = request.transactionHash;
