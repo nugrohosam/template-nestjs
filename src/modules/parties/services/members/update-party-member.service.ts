@@ -65,7 +65,9 @@ export class UpdatePartyMemberService {
                         member,
                         partyMember.initialFund,
                         partyMember.signature,
+                        request.transactionHash,
                     ),
+                    true, // TODO: need to clear this!
                     dbTransaction,
                 );
 

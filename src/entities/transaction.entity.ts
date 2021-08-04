@@ -10,7 +10,8 @@ export interface ITransaction {
     type: TransactionTypeEnum;
     description?: string;
     signature: string;
-    transactionHash?: string;
+    transactionHash: string;
+    transactionHashStatus: boolean;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;

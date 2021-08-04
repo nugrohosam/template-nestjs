@@ -5,14 +5,12 @@ import {
     Get,
     Param,
     Post,
-    Put,
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
 import { IndexTransactionRequest } from '../requests/index-transaction.request';
 import { TransferRequest } from '../requests/transfer.request';
-import { UpdateTransferRequest } from '../requests/update-transfer.request';
 import { TransactionResponse } from '../responses/transaction.response';
 import { GetTransactionService } from '../services/get-transaction.service';
 import { IndexTransactionService } from '../services/index-transaction.service';
@@ -37,25 +35,6 @@ export class TransactionController {
         return {
             message: 'Transfer success.',
             data: TransactionResponse.mapFromTransactionModel(transaction),
-        };
-    }
-
-    @Put(':transactionId/transaction-hash')
-    async updateIncompleteTransfer(
-        @Param('transactionId') transactionId: string,
-        @Body() request: UpdateTransferRequest,
-    ): Promise<IApiResponse<{ id: string }>> {
-        const transaction = await this.getTransactionService.getById(
-            transactionId,
-        );
-        await this.updateTransferService.update(transaction, request);
-
-        // TODO: need to specify the transfer response
-        return {
-            message: 'Update transfer transaction success',
-            data: {
-                id: transaction.id,
-            },
         };
     }
 

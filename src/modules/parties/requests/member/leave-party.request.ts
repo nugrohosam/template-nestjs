@@ -11,4 +11,9 @@ export class LeavePartyRequest {
     @IsString()
     @Expose({ name: 'leave_signature' })
     signature: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Expose({ name: 'transaction_hash' })
+    transactionHash: string;
 }

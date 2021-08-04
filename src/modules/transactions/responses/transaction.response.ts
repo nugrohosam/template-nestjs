@@ -3,7 +3,14 @@ import { ITransaction } from 'src/entities/transaction.entity';
 import { TransactionModel } from 'src/models/transaction.model';
 
 export class TransactionResponse
-    implements Omit<ITransaction, 'currencyId' | 'signature'>
+    implements
+        Omit<
+            ITransaction,
+            | 'currencyId'
+            | 'signature'
+            | 'transactionHash'
+            | 'transactionHashStatus'
+        >
 {
     id: string;
     addressFrom: string;

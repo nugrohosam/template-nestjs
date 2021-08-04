@@ -34,7 +34,7 @@ export class LeavePartyService {
 
     async leave(
         partyId: string,
-        { userAddress, signature }: LeavePartyRequest,
+        { userAddress, signature, transactionHash }: LeavePartyRequest,
     ): Promise<PartyMemberModel> {
         const party = await this.getPartyService.getById(partyId);
         const user = await this.getUserService.getUserByAddress(userAddress);
@@ -64,7 +64,9 @@ export class LeavePartyService {
                     user,
                     member,
                     signature,
+                    transactionHash,
                 ),
+                true, // TODO: need to clear this!
                 dbTransaction,
             );
 
@@ -75,7 +77,7 @@ export class LeavePartyService {
                 dbTransaction,
             );
 
-            await member.destroy({ transaction: dbTransaction });
+            await member.destroy({ force: true, transaction: dbTransaction });
 
             party.totalMember -= 1;
             await party.save();

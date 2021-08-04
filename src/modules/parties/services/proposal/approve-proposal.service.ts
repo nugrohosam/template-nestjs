@@ -82,6 +82,8 @@ export class ApproveProposalService {
                     description: `Distribution of proposal "${proposal.title}"`,
                     currencyId: 1,
                     signature,
+                    transactionHash: '0x0', // TODO: need to clear this!
+                    transactionHashStatus: true,
                 },
                 { transaction: t },
             );
