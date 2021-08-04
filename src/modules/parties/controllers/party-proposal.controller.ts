@@ -20,7 +20,6 @@ import { CreateProposalService } from '../services/proposal/create-proposal.serv
 import { GetProposalService } from '../services/proposal/get-proposal.service';
 import { IndexProposalService } from '../services/proposal/index-proposal.service';
 import { RejectProposalService } from '../services/proposal/reject-proposal.service';
-import { UpdateApprovedProposalService } from '../services/proposal/update-approved-proposal.service';
 
 @Controller('parties/:partyId/proposals')
 export class PartyProposalController {
@@ -30,7 +29,6 @@ export class PartyProposalController {
         private readonly getProposalService: GetProposalService,
         private readonly approveProposalService: ApproveProposalService,
         private readonly rejectProposalService: RejectProposalService,
-        private readonly updateApprovedProposalService: UpdateApprovedProposalService,
     ) {}
 
     @Post()
@@ -118,14 +116,14 @@ export class PartyProposalController {
         };
     }
 
-    @Put(':proposalId/approve')
-    async updateApprovedProposal(
+    @Delete(':proposalId/approve')
+    async revertApprove(
         @Param('proposalId') proposalId: string,
-        @Body() request: UpdateProposalTransactionRequest,
+        @Body() request: UpdateProposalStatusRequest,
     ): Promise<IApiResponse<null>> {
-        await this.updateApprovedProposalService.update(proposalId, request);
+        await this.approveProposalService.revert(proposalId, request);
         return {
-            message: 'Success update approved proposal transaction hash',
+            message: 'Success revert approve proposal transaction',
             data: null,
         };
     }

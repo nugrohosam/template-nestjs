@@ -31,7 +31,6 @@ import { IndexProposalService } from './services/proposal/index-proposal.service
 import { GetProposalService } from './services/proposal/get-proposal.service';
 import { ApproveProposalService } from './services/proposal/approve-proposal.service';
 import { RejectProposalService } from './services/proposal/reject-proposal.service';
-import { UpdateApprovedProposalService } from './services/proposal/update-approved-proposal.service';
 import { LeavePartyService } from './services/members/leave-party.service';
 
 @Module({
@@ -73,7 +72,6 @@ import { LeavePartyService } from './services/members/leave-party.service';
         GetProposalService,
         ApproveProposalService,
         RejectProposalService,
-        UpdateApprovedProposalService,
     ],
     exports: [GetPartyService, PartyCalculationService],
 })
