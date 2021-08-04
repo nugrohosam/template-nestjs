@@ -156,6 +156,14 @@ export class CreatePartyService {
         if (memberSignature !== party.signature)
             throw new UnauthorizedException('Invalid Signature');
 
+        const transactionReceipt = await this.web3Service.getTransactionReceipt(
+            transactionHash,
+        );
+        if (transactionReceipt.status)
+            throw new UnprocessableEntityException(
+                'This party has a success transaction hash.',
+            );
+
         await party.destroy({ force: true });
     }
 }
