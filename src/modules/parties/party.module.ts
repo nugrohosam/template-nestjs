@@ -28,7 +28,6 @@ import { PartyCalculationService } from './services/party-calculation.service';
 import { CreateProposalService } from './services/proposal/create-proposal.service';
 import { PartyProposalController } from './controllers/party-proposal.controller';
 import { IndexProposalService } from './services/proposal/index-proposal.service';
-import { UpdateProposalTransactionService } from './services/proposal/update-proposal-transaction.service';
 import { GetProposalService } from './services/proposal/get-proposal.service';
 import { ApproveProposalService } from './services/proposal/approve-proposal.service';
 import { RejectProposalService } from './services/proposal/reject-proposal.service';
@@ -72,7 +71,6 @@ import { LeavePartyService } from './services/members/leave-party.service';
         CreateProposalService,
         IndexProposalService,
         GetProposalService,
-        UpdateProposalTransactionService,
         ApproveProposalService,
         RejectProposalService,
         UpdateApprovedProposalService,

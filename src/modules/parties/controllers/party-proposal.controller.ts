@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Post,
+    Put,
+    Query,
+} from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
 import { CreateProposalRequest } from '../requests/proposal/create-proposal.request';
@@ -12,14 +21,12 @@ import { GetProposalService } from '../services/proposal/get-proposal.service';
 import { IndexProposalService } from '../services/proposal/index-proposal.service';
 import { RejectProposalService } from '../services/proposal/reject-proposal.service';
 import { UpdateApprovedProposalService } from '../services/proposal/update-approved-proposal.service';
-import { UpdateProposalTransactionService } from '../services/proposal/update-proposal-transaction.service';
 
 @Controller('parties/:partyId/proposals')
 export class PartyProposalController {
     constructor(
         private readonly createProposalService: CreateProposalService,
         private readonly indexProposalService: IndexProposalService,
-        private readonly updateProposalTransactionService: UpdateProposalTransactionService,
         private readonly getProposalService: GetProposalService,
         private readonly approveProposalService: ApproveProposalService,
         private readonly rejectProposalService: RejectProposalService,
@@ -50,13 +57,25 @@ export class PartyProposalController {
         @Param('proposalId') proposalId: string,
         @Body() request: UpdateProposalTransactionRequest,
     ): Promise<IApiResponse<{ id: string }>> {
-        const { id } = await this.updateProposalTransactionService.update(
+        const { id } = await this.createProposalService.updateTransactionHash(
             proposalId,
             request,
         );
         return {
             message: 'Success update proposal transaction hash',
             data: { id },
+        };
+    }
+
+    @Delete(':proposalId/transaction-hash')
+    async revertCreate(
+        @Param('proposalId') proposalId: string,
+        @Body() request: UpdateProposalTransactionRequest,
+    ): Promise<IApiResponse<null>> {
+        await this.createProposalService.revert(proposalId, request);
+        return {
+            message: 'Success revert create proposal transaction',
+            data: null,
         };
     }
 
