@@ -8,7 +8,6 @@ import {
 } from 'class-validator';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
-import { JoinPartyRequest } from 'src/modules/parties/requests/member/join-party.request';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import BN from 'bn.js';
 import { ValidationEnum } from 'src/common/enums/validation.enum';
@@ -52,16 +51,17 @@ export class TransferRequest {
     static mapFromJoinPartyRequest(
         party: PartyModel,
         user: UserModel,
-        request: JoinPartyRequest,
+        deposit: BN,
+        signature: string,
     ): TransferRequest {
         return {
             addressFrom: user.address,
             addressTo: party.address,
-            amount: request.initialDeposit,
+            amount: deposit,
             type: TransactionTypeEnum.Deposit,
             description: 'Initial Deposit',
             currencyId: 1, // TODO: still hardcoded to default USDC token
-            transferSignature: request.joinSignature,
+            transferSignature: signature,
         };
     }
 

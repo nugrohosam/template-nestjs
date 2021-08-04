@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     Inject,
     Param,
@@ -9,6 +10,7 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { DeleteIncompleteData } from '../requests/member/delete-incomplete-data.request';
 import { IndexPartyMemberRequest } from '../requests/member/index-party-member.request';
 import { JoinPartyRequest } from '../requests/member/join-party.request';
 import { LeavePartyRequest } from '../requests/member/leave-party.request';
@@ -34,7 +36,7 @@ export class PartyMemberController {
     ) {}
 
     @Post('join')
-    async join(
+    async prepareJoinParty(
         @Param('partyId') partyId: string,
         @Body() request: JoinPartyRequest,
     ): Promise<IApiResponse<JoinPartyResponse>> {
@@ -51,14 +53,26 @@ export class PartyMemberController {
         };
     }
 
-    @Put('join/:partyMemberId')
-    async update(
+    @Put('join/:partyMemberId/transaction-hash')
+    async updateIncompleteJoinParty(
         @Param('partyMemberId') partyMemberId: string,
         @Body() request: UpdatePartyMemberRequest,
     ): Promise<IApiResponse<null>> {
         await this.updatePartyMemberService.update(partyMemberId, request);
         return {
             message: 'Success update join party data',
+            data: null,
+        };
+    }
+
+    @Delete('join/:partyMemberId/transaction-hash')
+    async deleteIncompleteJoinParty(
+        @Param('partyMemberId') partyMemberId: string,
+        @Body() request: DeleteIncompleteData,
+    ): Promise<IApiResponse<null>> {
+        await this.updatePartyMemberService.delete(partyMemberId, request);
+        return {
+            message: 'Success delete incomplete join party data',
             data: null,
         };
     }
