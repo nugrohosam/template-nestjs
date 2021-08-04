@@ -8,7 +8,7 @@ import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { UpdatePartyMemberRequest } from '../../requests/member/update-party-member.request';
 import { GetPartyMemberService } from './get-party-member.service';
-import { joinPartyEvent } from 'src/contracts/JoinPartyEvent.json';
+import { JoinPartyEvent } from 'src/contracts/JoinPartyEvent.json';
 import { AbiItem } from 'web3-utils';
 import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { TransferService } from 'src/modules/transactions/services/transfer.service';
@@ -48,7 +48,7 @@ export class UpdatePartyMemberService {
         await this.web3Service.validateTransaction(
             request.transactionHash,
             member.address,
-            joinPartyEvent as AbiItem,
+            JoinPartyEvent as AbiItem,
             2,
             partyMemberId,
         );
