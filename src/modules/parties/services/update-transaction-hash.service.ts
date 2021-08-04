@@ -6,7 +6,7 @@ import {
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
-import { createPartyEvent } from 'src/contracts/CreatePartyEvent.json';
+import { CreatePartyEvent } from 'src/contracts/CreatePartyEvent.json';
 import { AbiItem } from 'web3-utils';
 
 export class UpdateTransactionHashService {
@@ -34,7 +34,7 @@ export class UpdateTransactionHashService {
         await this.web3Service.validateTransaction(
             request.transactionHash,
             creator.address,
-            createPartyEvent as AbiItem,
+            CreatePartyEvent as AbiItem,
             { 2: party.id },
         );
 
