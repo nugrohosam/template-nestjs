@@ -10,7 +10,7 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { DeleteIncompleteData } from '../requests/member/delete-incomplete-data.request';
+import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
 import { IndexPartyMemberRequest } from '../requests/member/index-party-member.request';
 import { JoinPartyRequest } from '../requests/member/join-party.request';
 import { LeavePartyRequest } from '../requests/member/leave-party.request';
@@ -68,7 +68,7 @@ export class PartyMemberController {
     @Delete('join/:partyMemberId/transaction-hash')
     async deleteIncompleteJoinParty(
         @Param('partyMemberId') partyMemberId: string,
-        @Body() request: DeleteIncompleteData,
+        @Body() request: DeleteIncompleteDataRequest,
     ): Promise<IApiResponse<null>> {
         await this.updatePartyMemberService.delete(partyMemberId, request);
         return {
