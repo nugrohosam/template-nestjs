@@ -14,6 +14,7 @@ import { CreatePartyEvent } from 'src/contracts/CreatePartyEvent.json';
 import { AbiItem } from 'web3-utils';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { GetPartyService } from './get-party.service';
+import { RevertCreatePartyRequest } from '../requests/revert-create-party.request';
 
 /**
  * Here is a create party flow :
@@ -142,9 +143,9 @@ export class CreatePartyService {
      * while dealing with SC. So we will don't have any incomplete data
      */
     async revertTransaction({
-        memberSignature,
+        signature,
         transactionHash,
-    }: UpdateDeployedPartyDataRequest): Promise<void> {
+    }: RevertCreatePartyRequest): Promise<void> {
         const party = await PartyModel.findOne({
             where: { transactionHash },
         });
@@ -153,7 +154,7 @@ export class CreatePartyService {
                 'Party with given transaction hash not found.',
             );
 
-        if (memberSignature !== party.signature)
+        if (signature !== party.signature)
             throw new UnauthorizedException('Invalid Signature');
 
         const transactionReceipt = await this.web3Service.getTransactionReceipt(

@@ -2,7 +2,10 @@ import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
 import { CreateProposalRequest } from '../requests/proposal/create-proposal.request';
-import { UpdateProposalStatusRequest } from '../requests/proposal/update-proposal-status.request';
+import {
+    RevertApproveProposalRequest,
+    UpdateProposalStatusRequest,
+} from '../requests/proposal/update-proposal-status.request';
 import { UpdateProposalTransactionRequest } from '../requests/proposal/update-proposal-transaction.request';
 import { DetailProposalResponse } from '../responses/proposal/detail-proposal.response';
 import { IndexProposalResponse } from '../responses/proposal/index-proposal.response';
@@ -110,7 +113,7 @@ export class PartyProposalController {
     @Put(':proposalId/approve/revert')
     async revertApprove(
         @Param('proposalId') proposalId: string,
-        @Body() request: UpdateProposalStatusRequest,
+        @Body() request: RevertApproveProposalRequest,
     ): Promise<IApiResponse<null>> {
         await this.approveProposalService.revert(proposalId, request);
         return {

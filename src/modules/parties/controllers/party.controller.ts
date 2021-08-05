@@ -16,6 +16,7 @@ import { TransactionResponse } from 'src/modules/transactions/responses/transact
 import { IndexTransactionService } from 'src/modules/transactions/services/index-transaction.service';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
+import { RevertCreatePartyRequest } from '../requests/revert-create-party.request';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
@@ -71,7 +72,7 @@ export class PartyController {
 
     @Put('/:partyId/transaction-hash/revert')
     async revertCreateParty(
-        @Body() request: UpdateDeployedPartyDataRequest,
+        @Body() request: RevertCreatePartyRequest,
     ): Promise<IApiResponse<null>> {
         await this.createPartyService.revertTransaction(request);
         return {
