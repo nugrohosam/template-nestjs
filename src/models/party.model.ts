@@ -184,9 +184,11 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     get isActive(): boolean {
         if (!this.address || !this.transactionHash) return false;
 
-        const partyMembers = this.partyMembers.filter(
-            (partyMember) => partyMember.memberId === this.ownerId,
-        );
+        const partyMembers = this.partyMembers
+            ? this.partyMembers.filter(
+                  (partyMember) => partyMember.memberId === this.ownerId,
+              )
+            : [];
         if (partyMembers.length <= 0) return false;
 
         return true;
