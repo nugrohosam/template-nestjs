@@ -104,7 +104,7 @@ export class PartyMemberController {
         };
     }
 
-    @Put('leave/transaction-hash/revert')
+    @Put('leave/revert')
     async revertLeave(
         @Param('partyId') partyId: string,
         @Body() request: LeavePartyRequest,
