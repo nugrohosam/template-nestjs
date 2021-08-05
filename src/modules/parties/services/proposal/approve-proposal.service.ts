@@ -15,7 +15,10 @@ import { PartyModel } from 'src/models/party.model';
 import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { Proposal } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
-import { UpdateProposalStatusRequest } from '../../requests/proposal/update-proposal-status.request';
+import {
+    RevertApproveProposalRequest,
+    UpdateProposalStatusRequest,
+} from '../../requests/proposal/update-proposal-status.request';
 import { GetProposalService } from './get-proposal.service';
 import { ApproveProposalEvent } from 'src/contracts/ApproveProposalEvent.json';
 import { AbiItem } from 'web3-utils';
@@ -160,7 +163,7 @@ export class ApproveProposalService {
 
     async revert(
         proposalId: string,
-        { signature }: UpdateProposalStatusRequest,
+        { signature }: RevertApproveProposalRequest,
     ): Promise<void> {
         const proposal = await this.getProposalService.getById(proposalId);
 

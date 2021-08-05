@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class RevertCreatePartyRequest {
     @IsNotEmpty()
@@ -7,8 +7,8 @@ export class RevertCreatePartyRequest {
     @Expose({ name: 'member_signature' })
     signature: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Expose({ name: 'transaction_hash' })
-    transactionHash: string;
+    transactionHash?: string;
 }

@@ -11,3 +11,9 @@ export class UpdateProposalStatusRequest {
     @Expose({ name: 'transaction_hash' })
     transactionHash: string;
 }
+
+export class RevertApproveProposalRequest {
+    @IsNotEmpty()
+    @IsString()
+    signature: string;
+}
