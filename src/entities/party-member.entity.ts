@@ -11,6 +11,8 @@ export interface IPartyMember {
     signature: string;
     transactionHash?: string;
     depositTransactionId?: string;
+    leavedAt?: Date;
+    leaveTransactionHash?: string;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;

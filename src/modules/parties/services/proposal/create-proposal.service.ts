@@ -1,6 +1,7 @@
 import {
     Inject,
     Injectable,
+    UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
 import { Transaction } from 'sequelize/types';
@@ -9,8 +10,12 @@ import { PartyModel } from 'src/models/party.model';
 import { Proposal } from 'src/models/proposal.model';
 import { UserModel } from 'src/models/user.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
+import { AbiItem } from 'web3-utils';
 import { CreateProposalRequest } from '../../requests/proposal/create-proposal.request';
+import { UpdateProposalTransactionRequest } from '../../requests/proposal/update-proposal-transaction.request';
 import { GetPartyService } from '../get-party.service';
+import { GetProposalService } from './get-proposal.service';
+import { CreateProposalEvents } from 'src/contracts/CreateProposalEvent.json';
 
 @Injectable()
 export class CreateProposalService {
@@ -21,6 +26,8 @@ export class CreateProposalService {
         private readonly getUserService: GetUserService,
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
+        @Inject(GetProposalService)
+        private readonly getProposalService: GetProposalService,
     ) {}
 
     private generateSignatureMessage(
@@ -103,5 +110,39 @@ export class CreateProposalService {
 
         console.log('message[create-proposal]: ' + message);
         return this.web3Service.sign(message);
+    }
+
+    async updateTransactionHash(
+        proposalId: string,
+        request: UpdateProposalTransactionRequest,
+    ): Promise<Proposal> {
+        const proposal = await this.getProposalService.getById(proposalId);
+
+        if (request.signature !== proposal.signature)
+            throw new UnauthorizedException('Invalid Signature');
+
+        const signer = await proposal.$get('creator');
+        await this.web3Service.validateTransaction(
+            request.transactionHash,
+            signer.address,
+            CreateProposalEvents as AbiItem,
+            { 0: proposal.id },
+        );
+
+        proposal.transactionHash = request.transactionHash;
+        return await proposal.save();
+    }
+
+    async revert(
+        proposalId: string,
+        request: UpdateProposalTransactionRequest,
+    ): Promise<void> {
+        const proposal = await this.getProposalService.getById(proposalId);
+
+        if (request.signature !== proposal.signature)
+            throw new UnauthorizedException('Invalid Signature');
+
+        proposal.transactionHash = null;
+        await proposal.save();
     }
 }

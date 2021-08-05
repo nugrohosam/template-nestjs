@@ -1,7 +1,6 @@
 import {
     Body,
     Controller,
-    Delete,
     Get,
     Inject,
     Param,
@@ -65,7 +64,7 @@ export class PartyMemberController {
         };
     }
 
-    @Delete('join/:partyMemberId/transaction-hash')
+    @Put('join/:partyMemberId/transaction-hash/revert')
     async deleteIncompleteJoinParty(
         @Param('partyMemberId') partyMemberId: string,
         @Body() request: DeleteIncompleteDataRequest,
@@ -102,6 +101,18 @@ export class PartyMemberController {
                 id: member.id,
                 deletedAt: member.deletedAt,
             },
+        };
+    }
+
+    @Put('leave/revert')
+    async revertLeave(
+        @Param('partyId') partyId: string,
+        @Body() request: LeavePartyRequest,
+    ): Promise<IApiResponse<null>> {
+        await this.leavePartyService.revert(partyId, request);
+        return {
+            message: 'Success revert leave party action',
+            data: null,
         };
     }
 }

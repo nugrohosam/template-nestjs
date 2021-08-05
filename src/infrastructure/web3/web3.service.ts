@@ -1,6 +1,5 @@
 import {
     Injectable,
-    InternalServerErrorException,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -98,8 +97,7 @@ export class Web3Service {
         transactionHash: string,
         from: string,
         abiItem: AbiItem,
-        inputIndex: number | number[],
-        validator: string | string[],
+        validations: { [key: number]: string },
     ): Promise<boolean> {
         const receipt = await this.getTransactionReceipt(transactionHash);
 
@@ -134,27 +132,12 @@ export class Web3Service {
         if (!decodedLog)
             throw new UnprocessableEntityException('Fail decode log event');
 
-        if (Array.isArray(inputIndex) && Array.isArray(validator)) {
-            for (const index in inputIndex) {
-                const identifier = decodedLog[inputIndex[index].toString()];
-                if (identifier !== validator[index])
-                    throw new UnprocessableEntityException(
-                        'Transaction not belongs to validator',
-                    );
-            }
-        } else if (
-            typeof inputIndex === 'number' &&
-            typeof validator === 'string'
-        ) {
+        for (const inputIndex in validations) {
             const identifier = decodedLog[inputIndex.toString()];
-            if (identifier !== validator)
+            if (identifier !== validations[inputIndex])
                 throw new UnprocessableEntityException(
                     'Transaction not belongs to validator',
                 );
-        } else {
-            throw new InternalServerErrorException(
-                'inputIndex and validator type invalid.',
-            );
         }
 
         return receipt.status;

@@ -1,6 +1,7 @@
 import {
     Inject,
     Injectable,
+    UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
 import { BN } from 'bn.js';
@@ -16,6 +17,8 @@ import { Proposal } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { UpdateProposalStatusRequest } from '../../requests/proposal/update-proposal-status.request';
 import { GetProposalService } from './get-proposal.service';
+import { ApproveProposalEvent } from 'src/contracts/ApproveProposalEvent.json';
+import { AbiItem } from 'web3-utils';
 
 @Injectable()
 export class ApproveProposalService {
@@ -95,7 +98,7 @@ export class ApproveProposalService {
 
     async approve(
         proposalId: string,
-        { signature }: UpdateProposalStatusRequest,
+        { signature, transactionHash }: UpdateProposalStatusRequest,
     ): Promise<Proposal> {
         const proposal = await this.getProposalService.getById(proposalId);
         const party = await proposal.$get('party');
@@ -117,6 +120,14 @@ export class ApproveProposalService {
             message,
         );
 
+        // validate transaction hash
+        const transactionStatus = await this.web3Service.validateTransaction(
+            transactionHash,
+            owner.address,
+            ApproveProposalEvent as AbiItem,
+            { 0: proposal.id },
+        );
+
         // validate party balance with proposal amount
         if (party.totalFund.lt(proposal.amount))
             throw new UnprocessableEntityException(
@@ -124,18 +135,20 @@ export class ApproveProposalService {
             );
 
         const dbTransaction = await localDatabase.transaction();
-
         try {
             proposal.approvedAt = new Date();
             proposal.approveSignature = signature;
+            proposal.approveTransactionHash = transactionHash;
             await proposal.save({ transaction: dbTransaction });
 
-            await this.processCalculation(
-                party,
-                proposal,
-                { signature },
-                dbTransaction,
-            );
+            if (transactionStatus) {
+                await this.processCalculation(
+                    party,
+                    proposal,
+                    { signature, transactionHash },
+                    dbTransaction,
+                );
+            }
 
             await dbTransaction.commit();
             return proposal;
@@ -143,5 +156,20 @@ export class ApproveProposalService {
             await dbTransaction.rollback();
             throw err;
         }
+    }
+
+    async revert(
+        proposalId: string,
+        { signature }: UpdateProposalStatusRequest,
+    ): Promise<void> {
+        const proposal = await this.getProposalService.getById(proposalId);
+
+        if (signature !== proposal.approveSignature)
+            throw new UnauthorizedException('Invalid Signature');
+
+        proposal.approvedAt = null;
+        proposal.approveSignature = null;
+        proposal.approveTransactionHash = null;
+        await proposal.save();
     }
 }

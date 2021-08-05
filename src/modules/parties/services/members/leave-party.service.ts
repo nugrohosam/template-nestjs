@@ -10,6 +10,8 @@ import { LeavePartyRequest } from '../../requests/member/leave-party.request';
 import { GetPartyService } from '../get-party.service';
 import { PartyCalculationService } from '../party-calculation.service';
 import { GetPartyMemberService } from './get-party-member.service';
+import { LeavePartyEvent } from 'src/contracts/LeavePartyEvent.json';
+import { AbiItem } from 'web3-utils';
 
 @Injectable()
 export class LeavePartyService {
@@ -52,35 +54,48 @@ export class LeavePartyService {
             message,
         );
 
-        // TODO: validate transaction hash
-        // this.web3Service.validateTransaction(transactionHash, user.address, leavePartyEvent as AbiItem, 0, member.id)
+        const transactionStatus = await this.web3Service.validateTransaction(
+            transactionHash,
+            user.address,
+            LeavePartyEvent as AbiItem,
+            {
+                0: user.address,
+                1: member.totalFund.toString(),
+                2: party.address,
+            },
+        );
 
         const dbTransaction = await localDatabase.transaction();
-
         try {
-            const withdraw = await this.transferService.storeTransaction(
-                TransferRequest.mapFromLeavePartyRequest(
-                    party,
-                    user,
-                    member,
-                    signature,
-                    transactionHash,
-                ),
-                true, // TODO: need to clear this!
-                dbTransaction,
-            );
+            member.leavedAt = new Date();
+            member.leaveTransactionHash = transactionHash;
+            await member.save({ transaction: dbTransaction });
 
-            await this.partyCalculationService.withdraw(
-                party.address,
-                user.address,
-                withdraw.amount,
-                dbTransaction,
-            );
+            if (transactionStatus) {
+                const withdraw = await this.transferService.storeTransaction(
+                    TransferRequest.mapFromLeavePartyRequest(
+                        party,
+                        user,
+                        member,
+                        signature,
+                        transactionHash,
+                    ),
+                    transactionStatus,
+                    dbTransaction,
+                );
 
-            await member.destroy({ force: true, transaction: dbTransaction });
+                await this.partyCalculationService.withdraw(
+                    party.address,
+                    user.address,
+                    withdraw.amount,
+                    dbTransaction,
+                );
 
-            party.totalMember -= 1;
-            await party.save();
+                await member.destroy({ transaction: dbTransaction });
+
+                party.totalMember -= 1;
+                await party.save({ transaction: dbTransaction });
+            }
 
             await dbTransaction.commit();
             return member;
@@ -88,5 +103,21 @@ export class LeavePartyService {
             await dbTransaction.rollback();
             throw err;
         }
+    }
+
+    async revert(
+        partyId: string,
+        { userAddress }: LeavePartyRequest,
+    ): Promise<void> {
+        const party = await this.getPartyService.getById(partyId);
+        const user = await this.getUserService.getUserByAddress(userAddress);
+        const member = await this.getPartyMemberService.getByMemberParty(
+            user.id,
+            party.id,
+        );
+
+        member.leaveTransactionHash = null;
+        member.leavedAt = null;
+        await member.save();
     }
 }

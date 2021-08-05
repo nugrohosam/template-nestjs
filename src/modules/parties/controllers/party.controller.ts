@@ -1,7 +1,6 @@
 import {
     Body,
     Controller,
-    Delete,
     Get,
     Headers,
     Inject,
@@ -16,17 +15,14 @@ import { GetSignerService } from 'src/modules/commons/providers/get-signer.servi
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
 import { IndexTransactionService } from 'src/modules/transactions/services/index-transaction.service';
 import { CreatePartyRequest } from '../requests/create-party.request';
-import { DeletePartyRequest } from '../requests/delete-party.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
 import { IndexPartyResponse } from '../responses/index-party.response';
 import { CreatePartyService } from '../services/create-party.service';
-import { DeletePartyService } from '../services/delete-party.service';
 import { GetPartyService } from '../services/get-party.service';
 import { IndexPartyService } from '../services/index-party.service';
-import { UpdateTransactionHashService } from '../services/update-transaction-hash.service';
 
 @Controller('parties')
 export class PartyController {
@@ -34,8 +30,6 @@ export class PartyController {
         private readonly indexPartyService: IndexPartyService,
         private readonly getPartyService: GetPartyService,
         private readonly createPartyService: CreatePartyService,
-        private readonly updateTransactionHashService: UpdateTransactionHashService,
-        private readonly deletePartyService: DeletePartyService,
         @Inject(GetSignerService)
         private readonly getSignerService: GetSignerService,
         @Inject(IndexTransactionService)
@@ -68,19 +62,18 @@ export class PartyController {
         @Param('partyId') partyId: string,
         @Body() request: UpdateDeployedPartyDataRequest,
     ): Promise<IApiResponse<null>> {
-        await this.updateTransactionHashService.updateParty(partyId, request);
+        await this.createPartyService.updateTransacionHash(partyId, request);
         return {
             message: 'Success update party transaction hash.',
             data: null,
         };
     }
 
-    @Delete('/:partyId')
-    async delete(
-        @Param('partyId') partyId: string,
-        @Body() request: DeletePartyRequest,
+    @Put('/:partyId/transaction-hash/revert')
+    async revertCreateParty(
+        @Body() request: UpdateDeployedPartyDataRequest,
     ): Promise<IApiResponse<null>> {
-        await this.deletePartyService.delete(partyId, request);
+        await this.createPartyService.revertTransaction(request);
         return {
             message: 'Success delete party',
             data: null,

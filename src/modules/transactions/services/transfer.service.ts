@@ -150,8 +150,7 @@ export class TransferService {
             request.transactionHash,
             user.address,
             depositEvent as AbiItem,
-            [0, 1, 2],
-            [user.address, party.address, request.amount.toString()],
+            { 0: user.address, 1: party.address, 2: request.amount.toString() },
         );
 
         const dbTransaction = await localDatabase.transaction();

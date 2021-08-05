@@ -11,19 +11,15 @@ import { CreateProposalService } from '../services/proposal/create-proposal.serv
 import { GetProposalService } from '../services/proposal/get-proposal.service';
 import { IndexProposalService } from '../services/proposal/index-proposal.service';
 import { RejectProposalService } from '../services/proposal/reject-proposal.service';
-import { UpdateApprovedProposalService } from '../services/proposal/update-approved-proposal.service';
-import { UpdateProposalTransactionService } from '../services/proposal/update-proposal-transaction.service';
 
 @Controller('parties/:partyId/proposals')
 export class PartyProposalController {
     constructor(
         private readonly createProposalService: CreateProposalService,
         private readonly indexProposalService: IndexProposalService,
-        private readonly updateProposalTransactionService: UpdateProposalTransactionService,
         private readonly getProposalService: GetProposalService,
         private readonly approveProposalService: ApproveProposalService,
         private readonly rejectProposalService: RejectProposalService,
-        private readonly updateApprovedProposalService: UpdateApprovedProposalService,
     ) {}
 
     @Post()
@@ -50,13 +46,25 @@ export class PartyProposalController {
         @Param('proposalId') proposalId: string,
         @Body() request: UpdateProposalTransactionRequest,
     ): Promise<IApiResponse<{ id: string }>> {
-        const { id } = await this.updateProposalTransactionService.update(
+        const { id } = await this.createProposalService.updateTransactionHash(
             proposalId,
             request,
         );
         return {
             message: 'Success update proposal transaction hash',
             data: { id },
+        };
+    }
+
+    @Put(':proposalId/transaction-hash/revert')
+    async revertCreate(
+        @Param('proposalId') proposalId: string,
+        @Body() request: UpdateProposalTransactionRequest,
+    ): Promise<IApiResponse<null>> {
+        await this.createProposalService.revert(proposalId, request);
+        return {
+            message: 'Success revert create proposal transaction',
+            data: null,
         };
     }
 
@@ -99,14 +107,14 @@ export class PartyProposalController {
         };
     }
 
-    @Put(':proposalId/approve')
-    async updateApprovedProposal(
+    @Put(':proposalId/approve/revert')
+    async revertApprove(
         @Param('proposalId') proposalId: string,
-        @Body() request: UpdateProposalTransactionRequest,
+        @Body() request: UpdateProposalStatusRequest,
     ): Promise<IApiResponse<null>> {
-        await this.updateApprovedProposalService.update(proposalId, request);
+        await this.approveProposalService.revert(proposalId, request);
         return {
-            message: 'Success update approved proposal transaction hash',
+            message: 'Success revert approve proposal transaction',
             data: null,
         };
     }
