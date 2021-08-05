@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
 import { Proposal } from 'src/models/proposal.model';
-import { UpdateProposalStatusRequest } from '../../requests/proposal/update-proposal-status.request';
+import { RejectProposalRequest } from '../../requests/proposal/update-proposal-status.request';
 import { GetProposalService } from './get-proposal.service';
 
 export class RejectProposalService {
@@ -19,7 +19,7 @@ export class RejectProposalService {
 
     async reject(
         proposalId: string,
-        { signature }: UpdateProposalStatusRequest,
+        { signature }: RejectProposalRequest,
     ): Promise<Proposal> {
         const proposal = await this.getProposalService.getById(proposalId);
         const party = await proposal.$get('party');

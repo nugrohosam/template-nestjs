@@ -4,7 +4,8 @@ import { IndexRequest } from 'src/common/request/index.request';
 import { CreateProposalRequest } from '../requests/proposal/create-proposal.request';
 import {
     RevertApproveProposalRequest,
-    UpdateProposalStatusRequest,
+    ApproveProposalRequest,
+    RejectProposalRequest,
 } from '../requests/proposal/update-proposal-status.request';
 import { UpdateProposalTransactionRequest } from '../requests/proposal/update-proposal-transaction.request';
 import { DetailProposalResponse } from '../responses/proposal/detail-proposal.response';
@@ -101,7 +102,7 @@ export class PartyProposalController {
     @Post(':proposalId/approve')
     async approve(
         @Param('proposalId') proposalId: string,
-        @Body() request: UpdateProposalStatusRequest,
+        @Body() request: ApproveProposalRequest,
     ): Promise<IApiResponse<null>> {
         await this.approveProposalService.approve(proposalId, request);
         return {
@@ -125,7 +126,7 @@ export class PartyProposalController {
     @Post(':proposalId/reject')
     async reject(
         @Param('proposalId') proposalId: string,
-        @Body() request: UpdateProposalStatusRequest,
+        @Body() request: RejectProposalRequest,
     ): Promise<IApiResponse<null>> {
         await this.rejectProposalService.reject(proposalId, request);
         return { message: 'Success reject proposal', data: null };

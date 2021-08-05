@@ -1,15 +1,21 @@
 import { Expose } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class UpdateProposalStatusRequest {
+export class ApproveProposalRequest {
     @IsNotEmpty()
     @IsString()
     signature: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Expose({ name: 'transaction_hash' })
-    transactionHash: string;
+    transactionHash?: string;
+}
+
+export class RejectProposalRequest {
+    @IsNotEmpty()
+    @IsString()
+    signature: string;
 }
 
 export class RevertApproveProposalRequest {
