@@ -37,13 +37,13 @@ export class CreateProposalRequest
 
     @IsNotEmpty()
     @IsDate()
-    @MinDate(new Date())
+    @MinDate(new Date(new Date().setHours(0, 0, 0, 0)))
     @Expose({ name: 'vote_start' })
     voteStart: Date;
 
     @IsNotEmpty()
     @IsDate()
-    @MinDate(new Date())
+    @MinDate(new Date(new Date().setHours(23, 59, 59, 999)))
     @Expose({ name: 'vote_end' })
     voteEnd: Date;
 
