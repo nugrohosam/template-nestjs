@@ -1,13 +1,4 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Put,
-    Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
 import { CreateProposalRequest } from '../requests/proposal/create-proposal.request';
@@ -65,7 +56,7 @@ export class PartyProposalController {
         };
     }
 
-    @Delete(':proposalId/transaction-hash')
+    @Put(':proposalId/transaction-hash/revert')
     async revertCreate(
         @Param('proposalId') proposalId: string,
         @Body() request: UpdateProposalTransactionRequest,
@@ -116,7 +107,7 @@ export class PartyProposalController {
         };
     }
 
-    @Delete(':proposalId/approve')
+    @Put(':proposalId/approve/revert')
     async revertApprove(
         @Param('proposalId') proposalId: string,
         @Body() request: UpdateProposalStatusRequest,

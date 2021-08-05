@@ -1,12 +1,4 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
 import { IndexTransactionRequest } from '../requests/index-transaction.request';
@@ -38,7 +30,7 @@ export class TransactionController {
         };
     }
 
-    @Delete(':transactionId/transaction-hash')
+    @Put(':transactionId/transaction-hash/revert')
     async deleteIncompleteTransfer(
         @Param('transactionId') transactionId: string,
         @Body() { signature }: DeleteIncompleteDataRequest,

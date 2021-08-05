@@ -1,7 +1,6 @@
 import {
     Body,
     Controller,
-    Delete,
     Get,
     Inject,
     Param,
@@ -65,7 +64,7 @@ export class PartyMemberController {
         };
     }
 
-    @Delete('join/:partyMemberId/transaction-hash')
+    @Put('join/:partyMemberId/transaction-hash/revert')
     async deleteIncompleteJoinParty(
         @Param('partyMemberId') partyMemberId: string,
         @Body() request: DeleteIncompleteDataRequest,
@@ -105,7 +104,7 @@ export class PartyMemberController {
         };
     }
 
-    @Delete('leave')
+    @Put('leave/transaction-hash/revert')
     async revertLeave(
         @Param('partyId') partyId: string,
         @Body() request: LeavePartyRequest,
