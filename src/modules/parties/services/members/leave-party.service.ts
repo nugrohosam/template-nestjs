@@ -58,11 +58,7 @@ export class LeavePartyService {
             transactionHash,
             user.address,
             LeavePartyEvent as AbiItem,
-            {
-                0: user.address,
-                1: member.totalFund.toString(),
-                2: party.address,
-            },
+            { 0: user.address },
         );
 
         const dbTransaction = await localDatabase.transaction();
