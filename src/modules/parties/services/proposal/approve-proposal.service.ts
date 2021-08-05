@@ -17,7 +17,7 @@ import { Proposal } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import {
     RevertApproveProposalRequest,
-    UpdateProposalStatusRequest,
+    ApproveProposalRequest,
 } from '../../requests/proposal/update-proposal-status.request';
 import { GetProposalService } from './get-proposal.service';
 import { ApproveProposalEvent } from 'src/contracts/ApproveProposalEvent.json';
@@ -45,7 +45,7 @@ export class ApproveProposalService {
     private async processCalculation(
         party: PartyModel,
         proposal: Proposal,
-        { signature }: UpdateProposalStatusRequest,
+        { signature }: ApproveProposalRequest,
         t: Transaction,
     ): Promise<void> {
         const members = await party.$get('partyMembers');
@@ -101,7 +101,7 @@ export class ApproveProposalService {
 
     async approve(
         proposalId: string,
-        { signature, transactionHash }: UpdateProposalStatusRequest,
+        { signature, transactionHash }: ApproveProposalRequest,
     ): Promise<Proposal> {
         const proposal = await this.getProposalService.getById(proposalId);
         const party = await proposal.$get('party');
