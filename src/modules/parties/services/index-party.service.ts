@@ -28,6 +28,11 @@ export class IndexPartyService {
                     [Op.like]: `%${query.search}%`,
                 };
             }
+
+            console.log(query.isFeatured);
+            if (query.isFeatured) {
+                where.isFeatured = query.isFeatured;
+            }
         }
 
         return {
