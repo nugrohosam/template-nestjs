@@ -10,8 +10,8 @@ import {
     Index,
 } from 'sequelize-typescript';
 import { IUser } from 'src/entities/user.entity';
+import { JoinRequestModel } from './join-request.model';
 import { PartyModel } from './party.model';
-import { WhitelistedAddressModel } from './whitelisted-address.model';
 
 @Table({ tableName: 'users', paranoid: true })
 export class UserModel extends Model<IUser, IUser> implements IUser {
@@ -66,25 +66,16 @@ export class UserModel extends Model<IUser, IUser> implements IUser {
     @HasMany(() => PartyModel, 'creatorId')
     ownedParties?: PartyModel[];
 
-    static associate(): void {
-        UserModel.hasMany(PartyModel, {
-            as: 'ownedParties',
-            foreignKey: 'ownerId',
-            sourceKey: 'id',
-            onDelete: 'set null',
+    async joinRequestStatus(partyId: string): Promise<string | undefined> {
+        const joinRequest = await JoinRequestModel.findOne({
+            where: {
+                partyId,
+                userId: this.id,
+            },
         });
 
-        UserModel.hasMany(PartyModel, {
-            as: 'createdParties',
-            foreignKey: 'creatorId',
-            sourceKey: 'id',
-            onDelete: 'set null',
-        });
+        if (!joinRequest) return undefined;
 
-        UserModel.hasOne(WhitelistedAddressModel, {
-            as: 'whitelistedAddress',
-            foreignKey: 'user_id',
-            sourceKey: 'id',
-        });
+        return joinRequest.status;
     }
 }

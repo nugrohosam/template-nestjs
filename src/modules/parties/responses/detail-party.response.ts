@@ -29,6 +29,7 @@ export class DetailPartyResponse
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;
+    joinRequestStatus?: string;
 
     static async mapFromPartyModel(
         party: PartyModel,
@@ -68,6 +69,9 @@ export class DetailPartyResponse
             createdAt: party.createdAt,
             updatedAt: party.updatedAt,
             deletedAt: party.deletedAt,
+            joinRequestStatus: user
+                ? await user.joinRequestStatus(party.id)
+                : undefined,
         };
     }
 }
