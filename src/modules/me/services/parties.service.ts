@@ -66,9 +66,9 @@ export class MePartiesService {
         const offset = query.page ? (query.page - 1) * limit : 0;
 
         let sql = `select * from parties `;
-        if (query.onlyOwner) {
+        if (query.onlyOwner && !query.onlyMember) {
             sql += `where owner_id = '${user.id}' `;
-        } else if (query.onlyMember) {
+        } else if (query.onlyMember && !query.onlyOwner) {
             sql += `where exists (
                 select member_id from party_members
                 where party_members.party_id = parties.id
@@ -82,7 +82,9 @@ export class MePartiesService {
             ) `;
         }
 
-        const count = (await localDatabase.query(sql + ';')).length;
+        const count = (
+            await localDatabase.query(sql + ';', { type: QueryTypes.SELECT })
+        ).length;
 
         sql += `order by ${query.sort ?? 'created_at'} ${
             query.order ?? 'desc'
