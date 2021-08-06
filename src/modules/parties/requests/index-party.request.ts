@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import {
+    IsBoolean,
     IsEnum,
     IsNumber,
     IsOptional,
@@ -38,4 +39,9 @@ export class IndexPartyRequest
     @IsString()
     @IsOptional()
     search?: string;
+
+    @IsOptional()
+    @IsBoolean()
+    @Expose({ name: 'is_featured' })
+    isFeatured?: boolean;
 }

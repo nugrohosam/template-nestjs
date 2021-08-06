@@ -5,6 +5,7 @@ import {
     Column,
     CreatedAt,
     DataType,
+    Default,
     DefaultScope,
     DeletedAt,
     ForeignKey,
@@ -97,6 +98,10 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
         allowNull: false,
     })
     isPublic: boolean;
+
+    @Default(false)
+    @Column({ field: 'is_featured', type: DataType.BOOLEAN })
+    isFeatured?: boolean;
 
     @Column(useBigIntColumn(PartyModel, 'totalFund', 'total_fund'))
     totalFund?: BN;
