@@ -28,10 +28,11 @@ export class IndexJoinRequestService {
                 whereOptions.acceptedAt = { [Op.eq]: null };
                 whereOptions.rejectedAt = { [Op.ne]: null };
                 break;
-
-            default:
+            case JoinRequestStatusEnum.Pending:
                 whereOptions.acceptedAt = { [Op.eq]: null };
                 whereOptions.rejectedAt = { [Op.eq]: null };
+
+            default:
                 break;
         }
 
