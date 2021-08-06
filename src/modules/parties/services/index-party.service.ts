@@ -67,7 +67,6 @@ export class IndexPartyService {
             ...this.getFindOptions(query),
             limit,
             offset,
-            subQuery: false,
         });
         const count = await PartyModel.count({
             ...this.getFindOptions(query),
