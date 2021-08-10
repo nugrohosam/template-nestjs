@@ -6,6 +6,7 @@ export class MemberDetailRespose {
     user: ProfileResponse;
     status: string;
     initialFund: string;
+    totalDeposit: string;
     totalFund: string;
     createdAt: Date;
     updatedAt: Date;
@@ -22,6 +23,7 @@ export class MemberDetailRespose {
             user: ProfileResponse.mapFromUserModel(user),
             status: partyMember.status,
             initialFund: partyMember.initialFund.toString(),
+            totalDeposit: partyMember.totalDeposit.toString(),
             totalFund: partyMember.totalFund.toString(),
             createdAt: partyMember.createdAt,
             updatedAt: partyMember.updatedAt,

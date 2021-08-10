@@ -16,6 +16,7 @@ import { LeavePartyRequest } from '../requests/member/leave-party.request';
 import { UpdatePartyMemberRequest } from '../requests/member/update-party-member.request';
 import { JoinPartyResponse } from '../responses/member/join-party.response';
 import { MemberDetailRespose } from '../responses/member/member-detail.response';
+import { GetPartyMemberService } from '../services/members/get-party-member.service';
 import { IndexPartyMemberService } from '../services/members/index-party-member.service';
 import { JoinPartyService } from '../services/members/join-party.service';
 import { LeavePartyService } from '../services/members/leave-party.service';
@@ -30,6 +31,8 @@ export class PartyMemberController {
         private readonly updatePartyMemberService: UpdatePartyMemberService,
         @Inject(IndexPartyMemberService)
         private readonly indexPartyMemberService: IndexPartyMemberService,
+        @Inject(GetPartyMemberService)
+        private readonly getPartyMemberService: GetPartyMemberService,
         @Inject(LeavePartyService)
         private readonly leavePartyService: LeavePartyService,
     ) {}
@@ -86,6 +89,19 @@ export class PartyMemberController {
         return {
             message: 'Success get user members',
             ...result,
+        };
+    }
+
+    @Get('members/:memberId')
+    async detail(
+        @Param('memberId') memberId: string,
+    ): Promise<IApiResponse<MemberDetailRespose>> {
+        const partyMember = await this.getPartyMemberService.getById(memberId);
+        return {
+            message: 'Success get user member detail',
+            data: await MemberDetailRespose.mapFromPartyMemberModel(
+                partyMember,
+            ),
         };
     }
 

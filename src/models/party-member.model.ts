@@ -13,6 +13,7 @@ import {
     Table,
     UpdatedAt,
 } from 'sequelize-typescript';
+import { MemberStatusEnum } from 'src/common/enums/party.enum';
 import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IPartyMember } from 'src/entities/party-member.entity';
 import { PartyModel } from './party.model';
@@ -54,10 +55,6 @@ export class PartyMemberModel
 
     @AllowNull(false)
     @Column(DataType.STRING)
-    status: string; // TODO: use party member status enum instead
-
-    @AllowNull(false)
-    @Column(DataType.STRING)
     signature: string;
 
     @Column({ type: DataType.STRING, field: 'transaction_hash' })
@@ -93,4 +90,10 @@ export class PartyMemberModel
 
     @BelongsTo(() => TransactionModel, 'depositTransactionId')
     readonly depositTransaction?: TransactionModel;
+
+    get status(): MemberStatusEnum {
+        if (this.deletedAt) return MemberStatusEnum.InActive;
+
+        return MemberStatusEnum.Active;
+    }
 }
