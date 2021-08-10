@@ -29,7 +29,6 @@ export class IndexPartyService {
                 };
             }
 
-            console.log(query.isFeatured);
             if (query.isFeatured) {
                 where.isFeatured = query.isFeatured;
             }
