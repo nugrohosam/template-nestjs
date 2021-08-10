@@ -22,3 +22,8 @@ export enum ProposalStatusEnum {
     Approved = 'approved',
     Rejected = 'rejected',
 }
+
+export enum MemberStatusEnum {
+    Active = 'active',
+    InActive = 'in_active',
+}
