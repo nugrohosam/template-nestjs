@@ -5,9 +5,9 @@ import {
     PaginationResponse,
     SequelizePaginator,
 } from 'sequelize-typescript-paginator';
-import { IndexRequest } from 'src/common/request/index.request';
 import { PartyModel } from 'src/models/party.model';
 import { TransactionModel } from 'src/models/transaction.model';
+import { IndexPartyTransactionRequest } from 'src/modules/parties/requests/transaction/index-party-transaction.request';
 import { IndexTransactionRequest } from '../requests/index-transaction.request';
 import { TransactionResponse } from '../responses/transaction.response';
 
@@ -50,7 +50,7 @@ export class IndexTransactionService {
 
     async fetchByParty(
         party: PartyModel,
-        query: IndexRequest,
+        query: IndexPartyTransactionRequest,
     ): Promise<PaginationResponse<TransactionResponse>> {
         const options: FindOptions<TransactionModel> = {
             where: {
@@ -61,10 +61,22 @@ export class IndexTransactionService {
             },
             order: [['created_at', 'desc']],
         };
+
+        if (query.memberAddress) {
+            options.where = {
+                ...options.where,
+                [Op.or]: {
+                    addressFrom: query.memberAddress,
+                    addressTo: query.memberAddress,
+                },
+            };
+        }
+
         const { data, meta } = await SequelizePaginator.paginate(
             TransactionModel,
             { perPage: query.perPage ?? 10, page: query.page ?? 1, options },
         );
+
         const response = this.mapTransactionResponse(data);
         return { data: response, meta };
     }

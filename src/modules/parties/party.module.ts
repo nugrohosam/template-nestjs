@@ -30,6 +30,7 @@ import { GetProposalService } from './services/proposal/get-proposal.service';
 import { ApproveProposalService } from './services/proposal/approve-proposal.service';
 import { RejectProposalService } from './services/proposal/reject-proposal.service';
 import { LeavePartyService } from './services/members/leave-party.service';
+import { PartyTransactionController } from './controllers/party-transaction.controller';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
@@ -40,6 +41,7 @@ import { LeavePartyService } from './services/members/leave-party.service';
         PartyMemberController,
         JoinRequestController,
         PartyProposalController,
+        PartyTransactionController,
     ],
     providers: [
         // Party Porviders
