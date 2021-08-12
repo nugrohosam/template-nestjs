@@ -40,6 +40,7 @@ export class PartyCalculationService {
         t?: Transaction,
     ): Promise<PartyModel> {
         party.totalFund = party.totalFund.add(amount);
+        party.totalDeposit = party.totalDeposit.add(amount);
         return await party.save({ transaction: t });
     }
 
@@ -49,6 +50,7 @@ export class PartyCalculationService {
         t?: Transaction,
     ): Promise<PartyMemberModel> {
         partyMember.totalFund = partyMember.totalFund.add(amount);
+        partyMember.totalDeposit = partyMember.totalDeposit.add(amount);
         return await partyMember.save({ transaction: t });
     }
 

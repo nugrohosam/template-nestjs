@@ -8,6 +8,7 @@ export class MemberDetailRespose {
     initialFund: string;
     totalDeposit: string;
     totalFund: string;
+    weight: number;
     createdAt: Date;
     updatedAt: Date;
 
@@ -18,6 +19,13 @@ export class MemberDetailRespose {
             ? partyMember.member
             : await partyMember.$get('member');
 
+        const party = partyMember.party
+            ? partyMember.party
+            : await partyMember.$get('party');
+
+        const currentWeight =
+            partyMember.totalDeposit.toNumber() / party.totalDeposit.toNumber();
+
         return {
             id: partyMember.id,
             user: ProfileResponse.mapFromUserModel(user),
@@ -25,6 +33,7 @@ export class MemberDetailRespose {
             initialFund: partyMember.initialFund.toString(),
             totalDeposit: partyMember.totalDeposit.toString(),
             totalFund: partyMember.totalFund.toString(),
+            weight: currentWeight,
             createdAt: partyMember.createdAt,
             updatedAt: partyMember.updatedAt,
         };

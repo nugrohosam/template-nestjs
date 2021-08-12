@@ -54,9 +54,6 @@ export class UpdatePartyMemberService {
 
         const dbTransaction = await localDatabase.transaction();
         try {
-            partyMember.transactionHash = request.transactionHash;
-            await partyMember.save({ transaction: dbTransaction });
-
             const depositTransaction =
                 await this.transferService.storeTransaction(
                     TransferRequest.mapFromJoinPartyRequest(
@@ -70,10 +67,14 @@ export class UpdatePartyMemberService {
                     dbTransaction,
                 );
 
+            partyMember.transactionHash = request.transactionHash;
             partyMember.depositTransactionId = depositTransaction.id;
             await partyMember.save({ transaction: dbTransaction });
 
             party.totalFund = party.totalFund.add(partyMember.initialFund);
+            party.totalDeposit = party.totalDeposit.add(
+                partyMember.initialFund,
+            );
             party.totalMember += 1; // TODO: use raw query to increment value
             await party.save({ transaction: dbTransaction });
 

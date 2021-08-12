@@ -71,6 +71,6 @@ import { PartyTransactionController } from './controllers/party-transaction.cont
         ApproveProposalService,
         RejectProposalService,
     ],
-    exports: [GetPartyService, PartyCalculationService],
+    exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
 })
 export class PartyModule {}
