@@ -21,6 +21,7 @@ export class DetailPartyResponse
     totalFund: string;
     minDeposit: string;
     maxDeposit: string;
+    totalDeposit: string;
     totalMember: number;
     distribution: DistributionTypeEnum;
     creator: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;
@@ -48,6 +49,7 @@ export class DetailPartyResponse
             totalFund: party.totalFund.toString(),
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
+            totalDeposit: party.totalDeposit.toString(),
             totalMember:
                 party.totalMember === 0
                     ? party.partyMembers.length ?? 1

@@ -112,6 +112,9 @@ export class PartyModel extends Model<IParty, IParty> implements IParty {
     @Column(useBigIntColumn(PartyModel, 'maxDeposit', 'max_deposit'))
     maxDeposit?: BN;
 
+    @Column(useBigIntColumn(PartyModel, 'totalDeposit', 'total_deposit'))
+    totalDeposit?: BN;
+
     @Column({
         field: 'total_member',
         type: DataType.INTEGER,

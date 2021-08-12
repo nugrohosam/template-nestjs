@@ -1,18 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Op } from 'sequelize';
 import { FindOptions, WhereOptions } from 'sequelize';
 import {
     PaginationResponse,
     SequelizePaginator,
 } from 'sequelize-typescript-paginator';
+import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { TransactionModel } from 'src/models/transaction.model';
+import { UserModel } from 'src/models/user.model';
 import { IndexPartyTransactionRequest } from 'src/modules/parties/requests/transaction/index-party-transaction.request';
+import { GetPartyMemberService } from 'src/modules/parties/services/members/get-party-member.service';
 import { IndexTransactionRequest } from '../requests/index-transaction.request';
 import { TransactionResponse } from '../responses/transaction.response';
 
 @Injectable()
 export class IndexTransactionService {
+    constructor(
+        @Inject(GetPartyMemberService)
+        private readonly getPartyMemberService: GetPartyMemberService,
+    ) {}
+
     private getFindOptions(
         query: IndexTransactionRequest,
     ): FindOptions<TransactionModel> {
@@ -62,12 +70,16 @@ export class IndexTransactionService {
             order: [['created_at', 'desc']],
         };
 
-        if (query.memberAddress) {
+        if (query.memberId) {
+            const member: PartyMemberModel =
+                await this.getPartyMemberService.getById(query.memberId);
+            const { address }: UserModel = await member.$get('member');
+
             options.where = {
                 ...options.where,
                 [Op.or]: {
-                    addressFrom: query.memberAddress,
-                    addressTo: query.memberAddress,
+                    addressFrom: address,
+                    addressTo: address,
                 },
             };
         }
