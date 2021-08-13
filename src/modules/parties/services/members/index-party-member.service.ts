@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { FindOptions } from 'sequelize';
+import { FindOptions, WhereOptions } from 'sequelize';
 import { IPartyMember } from 'src/entities/party-member.entity';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
@@ -11,6 +11,8 @@ import {
     SequelizePaginator,
 } from 'sequelize-typescript-paginator';
 import { MemberDetailRespose } from '../../responses/member/member-detail.response';
+import { MemberStatusEnum } from 'src/common/enums/party.enum';
+import { Op } from 'sequelize';
 
 export class IndexPartyMemberService {
     constructor(
@@ -22,8 +24,22 @@ export class IndexPartyMemberService {
         party: PartyModel,
         query: IndexPartyMemberRequest,
     ): FindOptions<IPartyMember> {
+        let whereOptions: WhereOptions<PartyMemberModel> = {};
+
+        if (query.status) {
+            if (query.status === MemberStatusEnum.InActive) {
+                whereOptions = {
+                    deletedAt: { [Op.ne]: null },
+                };
+            } else {
+                whereOptions = {
+                    deletedAt: null,
+                };
+            }
+        }
+
         return {
-            where: { partyId: party.id },
+            where: { partyId: party.id, ...whereOptions },
             include: {
                 model: UserModel,
                 as: 'member',
