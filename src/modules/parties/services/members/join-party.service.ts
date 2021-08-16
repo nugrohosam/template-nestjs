@@ -1,6 +1,7 @@
 import { Inject, UnprocessableEntityException } from '@nestjs/common';
 import BN from 'bn.js';
 import { Transaction } from 'sequelize/types';
+import { MemberStatusEnum } from 'src/common/enums/party.enum';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -118,7 +119,7 @@ export class JoinPartyService {
                 initialFund: request.initialDeposit,
                 totalFund: request.initialDeposit,
                 totalDeposit: request.initialDeposit,
-                status: 'active', // TODO: need based on member status enum
+                status: MemberStatusEnum.Active,
                 signature: request.joinSignature,
             },
             { transaction: t },
