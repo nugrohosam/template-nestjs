@@ -105,6 +105,23 @@ export class PartyMemberController {
         };
     }
 
+    @Get('users/:userId')
+    async detailByUser(
+        @Param('partyId') partyId: string,
+        @Param('userId') userId: string,
+    ): Promise<IApiResponse<MemberDetailRespose>> {
+        const partyMember = await this.getPartyMemberService.getByMemberParty(
+            userId,
+            partyId,
+        );
+        return {
+            message: 'Success get user member detail',
+            data: await MemberDetailRespose.mapFromPartyMemberModel(
+                partyMember,
+            ),
+        };
+    }
+
     @Put('leave')
     async leave(
         @Param('partyId') partyId: string,
