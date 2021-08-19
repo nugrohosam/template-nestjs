@@ -13,6 +13,7 @@ import { GetPartyService } from 'src/modules/parties/services/get-party.service'
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { TransferRequest } from '../requests/transfer.request';
 import { depositEvent } from 'src/contracts/DepositEvent.json';
+import { withdrawEvent } from 'src/contracts/WithdrawEvent.json';
 import { AbiItem } from 'web3-utils';
 import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
@@ -67,6 +68,24 @@ export class TransferService {
         }
 
         return { user, party };
+    }
+
+    private getAbiItem({ type }: TransferRequest): AbiItem {
+        let abiItem: Record<string, any>;
+
+        switch (type) {
+            case TransactionTypeEnum.Deposit:
+                abiItem = depositEvent;
+                break;
+            case TransactionTypeEnum.Withdraw:
+                abiItem = withdrawEvent;
+                break;
+            default:
+                abiItem = depositEvent;
+                break;
+        }
+
+        return abiItem as AbiItem;
     }
 
     async storeTransaction(
@@ -146,10 +165,12 @@ export class TransferService {
             message,
         );
 
+        const abiItem = this.getAbiItem(request);
+
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
             user.address,
-            depositEvent as AbiItem,
+            abiItem as AbiItem,
             { 0: user.address, 1: party.address, 2: request.amount.toString() },
         );
 
