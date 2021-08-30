@@ -1,64 +1,47 @@
-import {
-    AllowNull,
-    BelongsTo,
-    Column,
-    CreatedAt,
-    DataType,
-    Default,
-    DeletedAt,
-    ForeignKey,
-    Model,
-    PrimaryKey,
-    Table,
-    UpdatedAt,
-} from 'sequelize-typescript';
 import { JoinRequestStatusEnum } from 'src/common/enums/party.enum';
 import { IJoinRequest } from 'src/entities/join-request.entity';
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { PartyModel } from './party.model';
 import { UserModel } from './user.model';
 
-@Table({ tableName: 'join_requests', paranoid: true })
-export class JoinRequestModel
-    extends Model<IJoinRequest, IJoinRequest>
-    implements IJoinRequest
-{
-    @PrimaryKey
-    @AllowNull(false)
-    @Default(DataType.UUIDV4)
-    @Column(DataType.UUID)
+@Entity({ name: 'join_requests' })
+export class JoinRequestModel implements IJoinRequest {
+    @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @ForeignKey(() => UserModel)
-    @Column({ type: DataType.UUID, field: 'user_id' })
+    @Column('uuid')
     userId: string;
 
-    @ForeignKey(() => PartyModel)
-    @AllowNull(false)
-    @Column({ type: DataType.UUID, field: 'party_id' })
+    @Column('uuid')
     partyId: string;
 
-    @Column({ type: DataType.STRING, field: 'processed_by' })
+    @Column('uuid')
     processedBy: string;
 
-    @Column({ type: DataType.DATE, field: 'accepted_at' })
+    @Column('timestamp', { nullable: true })
     acceptedAt?: Date;
 
-    @Column({ type: DataType.DATE, field: 'rejected_at' })
+    @Column('timestamp', { name: 'rejected_at' })
     rejectedAt?: Date;
 
-    @CreatedAt
-    @Column({ type: DataType.DATE, field: 'created_at' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @UpdatedAt
-    @Column({ type: DataType.DATE, field: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @DeletedAt
-    @Column({ type: DataType.DATE, field: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @Column({ type: DataType.VIRTUAL })
     get status(): JoinRequestStatusEnum {
         if (this.acceptedAt) {
             return JoinRequestStatusEnum.Accepted;
@@ -69,9 +52,11 @@ export class JoinRequestModel
         }
     }
 
-    @BelongsTo(() => PartyModel, 'partyId')
+    @ManyToOne(() => PartyModel, (party) => party.joinRequests)
+    @JoinColumn({ name: 'party_id' })
     readonly party?: PartyModel;
 
-    @BelongsTo(() => UserModel, 'userId')
+    @ManyToOne(() => UserModel, (user) => user.joinRequests)
+    @JoinColumn({ name: 'user_id' })
     readonly user?: UserModel;
 }

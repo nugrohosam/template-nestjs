@@ -1,82 +1,61 @@
 import BN from 'bn.js';
-import {
-    AllowNull,
-    Column,
-    CreatedAt,
-    DataType,
-    Default,
-    DeletedAt,
-    HasOne,
-    Model,
-    PrimaryKey,
-    Table,
-    UpdatedAt,
-} from 'sequelize-typescript';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
-import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { ITransaction } from 'src/entities/transaction.entity';
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    OneToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { PartyMemberModel } from './party-member.model';
 
-@Table({ tableName: 'transactions', paranoid: true })
-export class TransactionModel
-    extends Model<ITransaction, ITransaction>
-    implements ITransaction
-{
-    @PrimaryKey
-    @Default(DataType.UUIDV4)
-    @AllowNull(false)
-    @Column(DataType.UUID)
+@Entity({ name: 'transactions' })
+export class TransactionModel implements ITransaction {
+    @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @AllowNull(false)
-    @Column({ type: DataType.STRING, field: 'address_from' })
+    @Column('varchar', { name: 'address_from' })
     addressFrom: string;
 
-    @AllowNull(false)
-    @Column({ type: DataType.STRING, field: 'address_to' })
+    @Column('varchar', { name: 'address_to' })
     addressTo: string;
 
-    @Column(useBigIntColumn(TransactionModel, 'amount'))
+    @Column('bigint')
     amount: BN;
 
-    @AllowNull(false)
-    @Column({ type: DataType.INTEGER, field: 'currency_id' })
+    @Column('int', { name: 'currency_id' })
     currencyId: number;
 
-    @AllowNull(false)
-    @Column(
-        DataType.ENUM(
-            TransactionTypeEnum.Deposit,
-            TransactionTypeEnum.Withdraw,
-            TransactionTypeEnum.Distribution,
-        ),
-    )
+    @Column('enum', { enum: TransactionTypeEnum })
     type: TransactionTypeEnum;
 
-    @Column(DataType.TEXT)
+    @Column('text')
     description?: string;
 
-    @Column(DataType.STRING)
+    @Column('varchar')
     signature: string;
 
-    @Column({ type: DataType.STRING, field: 'transaction_hash' })
+    @Column('varchar', { name: 'transaction_hash' })
     transactionHash: string;
 
-    @Column({ type: DataType.BOOLEAN, field: 'transaction_hash_status' })
+    @Column('boolean', { name: 'transaction_hash_status' })
     transactionHashStatus: boolean;
 
-    @CreatedAt
-    @Column({ type: DataType.DATE, field: 'created_at' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @UpdatedAt
-    @Column({ type: DataType.DATE, field: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @DeletedAt
-    @Column({ type: DataType.DATE, field: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @HasOne(() => PartyMemberModel, 'depositTransactionId')
+    @OneToOne(
+        () => PartyMemberModel,
+        (partyMember) => partyMember.depositTransaction,
+    )
     depositedPartyMember?: PartyMemberModel;
 }

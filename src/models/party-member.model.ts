@@ -1,95 +1,88 @@
 import BN from 'bn.js';
-import {
-    AllowNull,
-    BelongsTo,
-    Column,
-    CreatedAt,
-    DataType,
-    Default,
-    DeletedAt,
-    ForeignKey,
-    Model,
-    PrimaryKey,
-    Table,
-    UpdatedAt,
-} from 'sequelize-typescript';
 import { MemberStatusEnum } from 'src/common/enums/party.enum';
-import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IPartyMember } from 'src/entities/party-member.entity';
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { PartyModel } from './party.model';
+import { ProposalDistributionModel } from './proposal-distribution.model';
+import { ProposalVoteModel } from './proposal-vote.model';
 import { TransactionModel } from './transaction.model';
 import { UserModel } from './user.model';
 
-@Table({ tableName: 'party_members', paranoid: true })
-export class PartyMemberModel
-    extends Model<IPartyMember, IPartyMember>
-    implements IPartyMember
-{
-    @PrimaryKey
-    @AllowNull(false)
-    @Default(DataType.UUIDV4)
-    @Column(DataType.UUID)
+@Entity({ name: 'party_members' })
+export class PartyMemberModel implements IPartyMember {
+    @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @ForeignKey(() => PartyModel)
-    @AllowNull(false)
-    @Column({ type: DataType.UUID, field: 'party_id' })
+    @Column('uuid', { name: 'party_id' })
     partyId: string;
 
-    @ForeignKey(() => UserModel)
-    @AllowNull(false)
-    @Column({ type: DataType.UUID, field: 'member_id' })
+    @Column('uuid', { name: 'member_id' })
     memberId: string;
 
-    @AllowNull(false)
-    @Column(useBigIntColumn(PartyMemberModel, 'initialFund', 'initial_fund'))
+    @Column('bigint', { name: 'initial_fund' })
     initialFund: BN;
 
-    @AllowNull(false)
-    @Column(useBigIntColumn(PartyMemberModel, 'totalFund', 'total_fund'))
+    @Column('bigint', { name: 'total_fund' })
     totalFund: BN;
 
-    @AllowNull(false)
-    @Column(useBigIntColumn(PartyMemberModel, 'totalDeposit', 'total_deposit'))
+    @Column('bigint', { name: 'total_deposit' })
     totalDeposit: BN;
 
-    @AllowNull(false)
-    @Column(DataType.STRING)
+    @Column('varchar')
     signature: string;
 
-    @Column({ type: DataType.STRING, field: 'transaction_hash' })
+    @Column('varchar', { name: 'transaction_hash' })
     transactionHash?: string;
 
-    @ForeignKey(() => TransactionModel)
-    @Column({ type: DataType.UUID, field: 'transaction_id' })
+    @Column('uuid', { name: 'deposit_transaction_id' })
     depositTransactionId?: string;
 
-    @Column({ type: DataType.DATE, field: 'leaved_at' })
-    leavedAt?: Date;
-
-    @Column({ type: DataType.STRING, field: 'leave_transaction_hash' })
+    @Column('varchar', { name: 'leave_transaction_hash', nullable: true })
     leaveTransactionHash?: string;
 
-    @CreatedAt
-    @Column({ type: DataType.DATE, field: 'created_at' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @UpdatedAt
-    @Column({ type: DataType.DATE, field: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @DeletedAt
-    @Column({ type: DataType.DATE, field: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @BelongsTo(() => PartyModel, 'partyId')
-    readonly party?: PartyModel;
+    @ManyToOne(() => PartyModel, (party) => party.partyMembers)
+    @JoinColumn({ name: 'party_id' })
+    party?: PartyModel;
 
-    @BelongsTo(() => UserModel, 'memberId')
-    readonly member?: UserModel;
+    @ManyToOne(() => UserModel, (user) => user.joinedPartyMembers)
+    @JoinColumn({ name: 'party_id' })
+    member?: UserModel;
 
-    @BelongsTo(() => TransactionModel, 'depositTransactionId')
-    readonly depositTransaction?: TransactionModel;
+    @OneToOne(
+        () => TransactionModel,
+        (transaction) => transaction.depositedPartyMember,
+    )
+    @JoinColumn({ name: 'deposit_transaction_id' })
+    depositTransaction?: TransactionModel;
+
+    @OneToMany(() => ProposalVoteModel, (vote) => vote.member)
+    votes?: ProposalVoteModel[];
+
+    @OneToMany(
+        () => ProposalDistributionModel,
+        (proposalDistribution) => proposalDistribution.member,
+    )
+    distributions?: ProposalDistributionModel[];
 
     get status(): MemberStatusEnum {
         if (this.deletedAt) return MemberStatusEnum.InActive;
