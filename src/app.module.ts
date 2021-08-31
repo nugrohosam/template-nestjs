@@ -5,46 +5,22 @@ import { RavenInterceptor, RavenModule } from 'nest-raven';
 import { HttpExceptionFilter } from './common/filters/http-exeception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { ValidationPipe } from './common/pipes/validation.pipe';
-import { config } from './config';
-import { CurrencyModel } from './models/currency.model';
-import { JoinRequestModel } from './models/join-request.model';
-import { PartyMemberModel } from './models/party-member.model';
-import { PartyModel } from './models/party.model';
-import { ProposalDistributionModel } from './models/proposal-distribution.model';
-import { ProposalVoteModel } from './models/proposal-vote.model';
-import { Proposal } from './models/proposal.model';
-import { TransactionModel } from './models/transaction.model';
-import { UserModel } from './models/user.model';
+import { connectionOption } from './infrastructure/databases';
+import { CommonModule } from './modules/commons/common.module';
+import { MeModule } from './modules/me/me.module';
+import { PartyModule } from './modules/parties/party.module';
+import { TransactionModule } from './modules/transactions/transaction.module';
 import { UserModule } from './modules/users/user.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forRoot({
-            type: 'mysql',
-            host: config.database.host,
-            port: +config.database.port,
-            username: config.database.username,
-            password: config.database.password,
-            database: config.database.database,
-            entities: [
-                UserModel,
-                PartyModel,
-                PartyMemberModel,
-                JoinRequestModel,
-                TransactionModel,
-                CurrencyModel,
-                Proposal,
-                ProposalVoteModel,
-                ProposalDistributionModel,
-            ],
-            synchronize: false,
-        }),
+        TypeOrmModule.forRoot(connectionOption),
         RavenModule,
         UserModule,
-        // PartyModule,
-        // TransactionModule,
-        // CommonModule,
-        // MeModule,
+        PartyModule,
+        TransactionModule,
+        CommonModule,
+        MeModule,
     ],
     providers: [
         {

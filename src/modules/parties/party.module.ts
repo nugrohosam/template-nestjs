@@ -6,11 +6,10 @@ import { PartyMemberController } from './controllers/party-member.controller';
 import { PartyInvitationController } from './controllers/party-invitation.controller';
 import { PartyController } from './controllers/party.controller';
 import { AcceptInvitationService } from './services/invitation/accept-invitation.service';
-import { CreatePartyService } from './services/create-party.service';
+import { PartyService } from './services/party.service';
 import { GetPartyService } from './services/get-party.service';
 import { IndexPartyInvitationService } from './services/invitation/index-party-invitation.service';
 import { IndexPartyMemberService } from './services/members/index-party-member.service';
-import { IndexPartyService } from './services/index-party.service';
 import { JoinPartyService } from './services/members/join-party.service';
 import { UpdatePartyMemberService } from './services/members/update-party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
@@ -31,6 +30,8 @@ import { ApproveProposalService } from './services/proposal/approve-proposal.ser
 import { RejectProposalService } from './services/proposal/reject-proposal.service';
 import { LeavePartyService } from './services/members/leave-party.service';
 import { PartyTransactionController } from './controllers/party-transaction.controller';
+import { CreatePartyApplication } from './applications/create-party.application';
+import { IndexPartyApplication } from './applications/index-party.application';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
@@ -45,25 +46,31 @@ import { PartyTransactionController } from './controllers/party-transaction.cont
     ],
     providers: [
         // Party Porviders
-        IndexPartyService,
+        CreatePartyApplication,
+        IndexPartyApplication,
+
+        PartyService,
         GetPartyService,
-        CreatePartyService,
         PartyCalculationService,
+
         // Join Request Providers
         RequestJoinService,
         IndexJoinRequestService,
         GetJoinRequestService,
         UpdateStatusJoinRequestService,
+
         // Party Invitation Providers
         InvitePartyService,
         IndexPartyInvitationService,
         AcceptInvitationService,
+
         // Party Member / Join Party Providers
         JoinPartyService,
         UpdatePartyMemberService,
         GetPartyMemberService,
         IndexPartyMemberService,
         LeavePartyService,
+
         // Proposal
         CreateProposalService,
         IndexProposalService,
