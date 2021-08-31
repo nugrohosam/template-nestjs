@@ -15,10 +15,6 @@ import { ProposalVoteModel } from './models/proposal-vote.model';
 import { Proposal } from './models/proposal.model';
 import { TransactionModel } from './models/transaction.model';
 import { UserModel } from './models/user.model';
-import { CommonModule } from './modules/commons/common.module';
-import { MeModule } from './modules/me/me.module';
-import { PartyModule } from './modules/parties/party.module';
-import { TransactionModule } from './modules/transactions/transaction.module';
 import { UserModule } from './modules/users/user.module';
 
 @Module({

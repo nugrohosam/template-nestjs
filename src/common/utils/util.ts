@@ -45,4 +45,17 @@ export class Utils {
             }, milisecond);
         });
     }
+
+    /**
+     * count pagination offset
+     * @param {number} page
+     * @param {number} perPage
+     * @returns {number}
+     */
+    static countOffset(page?: number, perPage?: number): number {
+        page = page ?? 1;
+        perPage = perPage ?? 10;
+
+        return (page - 1) * perPage;
+    }
 }

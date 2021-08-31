@@ -2,16 +2,16 @@ import { Controller, Get, Headers, Inject, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
+import { MyPartiesApplication } from '../applications/my-parties.application';
 import { IndexMePartyRequest } from '../requests/index-party.request';
-import { MePartiesService } from '../services/parties.service';
 
 @Controller('me/parties')
 export class MePartiesController {
     constructor(
         @Inject(GetSignerService)
         private readonly getSignerService: GetSignerService,
-        @Inject(MePartiesService)
-        private readonly mePartyService: MePartiesService,
+        @Inject(MyPartiesApplication)
+        private readonly myPartyApplication: MyPartiesApplication,
     ) {}
 
     @Get()
@@ -19,12 +19,20 @@ export class MePartiesController {
         @Headers('Signature') signature: string,
         @Query() query: IndexMePartyRequest,
     ): Promise<IApiResponse<IndexPartyResponse[]>> {
-        const signer = await this.getSignerService.get(signature, true);
-        const { data, meta } = await this.mePartyService.fetch(signer, query);
+        const { data, meta } = await this.myPartyApplication.call(
+            query,
+            signature,
+        );
+
+        const response = await Promise.all(
+            data.map(async (datum) => {
+                return await IndexPartyResponse.mapFromPartyModel(datum);
+            }),
+        );
 
         return {
             message: 'Success fetch user parties',
-            data,
+            data: response,
             meta,
         };
     }
