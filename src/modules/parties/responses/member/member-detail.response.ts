@@ -15,13 +15,8 @@ export class MemberDetailRespose {
     static async mapFromPartyMemberModel(
         partyMember: PartyMemberModel,
     ): Promise<MemberDetailRespose> {
-        const user = partyMember.member
-            ? partyMember.member
-            : await partyMember.$get('member');
-
-        const party = partyMember.party
-            ? partyMember.party
-            : await partyMember.$get('party');
+        const user = await partyMember.member;
+        const party = await partyMember.party;
 
         const currentWeight =
             partyMember.totalDeposit.toNumber() / party.totalDeposit.toNumber();

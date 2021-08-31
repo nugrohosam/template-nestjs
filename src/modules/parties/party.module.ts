@@ -10,7 +10,7 @@ import { PartyService } from './services/party.service';
 import { GetPartyService } from './services/get-party.service';
 import { IndexPartyInvitationService } from './services/invitation/index-party-invitation.service';
 import { IndexPartyMemberService } from './services/members/index-party-member.service';
-import { JoinPartyService } from './services/members/join-party.service';
+import { PartyMemberService } from './services/members/party-member.service';
 import { UpdatePartyMemberService } from './services/members/update-party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
 import { InvitePartyService } from './services/invitation/invite-party.service';
@@ -65,7 +65,7 @@ import { IndexPartyApplication } from './applications/index-party.application';
         AcceptInvitationService,
 
         // Party Member / Join Party Providers
-        JoinPartyService,
+        PartyMemberService,
         UpdatePartyMemberService,
         GetPartyMemberService,
         IndexPartyMemberService,

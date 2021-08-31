@@ -7,7 +7,6 @@ export interface IPartyMember {
     initialFund: BN;
     totalFund: BN;
     totalDeposit: BN;
-    status: string;
     signature: string;
     transactionHash?: string;
     depositTransactionId?: string;

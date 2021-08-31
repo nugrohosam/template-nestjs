@@ -62,11 +62,11 @@ export class PartyMemberModel implements IPartyMember {
 
     @ManyToOne(() => PartyModel, (party) => party.partyMembers)
     @JoinColumn({ name: 'party_id' })
-    party?: PartyModel;
+    party?: Promise<PartyModel>;
 
     @ManyToOne(() => UserModel, (user) => user.joinedPartyMembers)
     @JoinColumn({ name: 'party_id' })
-    member?: UserModel;
+    member?: Promise<UserModel>;
 
     @OneToOne(
         () => TransactionModel,
