@@ -1,11 +1,16 @@
 import { Inject, UnprocessableEntityException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { UserModel } from 'src/models/user.model';
+import { Repository } from 'typeorm';
 import { RegisterRequest } from '../requests/register.request';
 
 export class RegisterService {
     constructor(
-        @Inject(Web3Service) private readonly web3Service: Web3Service,
+        @InjectRepository(UserModel)
+        private readonly userRepository: Repository<UserModel>,
+        @Inject(Web3Service)
+        private readonly web3Service: Web3Service,
     ) {}
 
     private generateRegisterSignatureMessage(userAddress: string): string {
@@ -25,9 +30,7 @@ export class RegisterService {
     }
 
     private async validateAddressMustUnique(address: string): Promise<void> {
-        const user = await UserModel.findOne({
-            where: { address },
-        });
+        const user = await this.userRepository.findOne({ where: { address } });
 
         if (user)
             throw new UnprocessableEntityException(
@@ -36,7 +39,7 @@ export class RegisterService {
     }
 
     async storeUserAddress(address: string): Promise<UserModel> {
-        return UserModel.create({
+        return this.userRepository.create({
             address,
             username: address,
         });

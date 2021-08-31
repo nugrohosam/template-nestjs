@@ -1,8 +1,8 @@
-import { PaginationMeta } from 'sequelize-typescript-paginator';
+import { IPaginationMeta } from './index.interface';
 
 export interface IApiResponse<T> {
     message: string;
-    meta?: PaginationMeta;
+    meta?: IPaginationMeta;
     data: T;
 }
 

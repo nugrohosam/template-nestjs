@@ -1,10 +1,10 @@
 // Index Request
 
-import { OrderDirectionEnum } from '../enums/index.enum';
+import { OrderDirectionType } from '../enums/index.enum';
 
 export interface ISortRequest {
     sort?: string;
-    order?: OrderDirectionEnum;
+    order?: OrderDirectionType;
 }
 
 export interface IPaginateRequest {
@@ -15,9 +15,10 @@ export interface IPaginateRequest {
 // Index Response
 
 export interface IPaginationMeta {
-    limit: number;
-    offset: number;
+    page: number;
+    perPage: number;
     total: number;
+    totalPage: number;
 }
 
 export interface IPaginateResponse<T> {

@@ -45,10 +45,10 @@ import { UserModule } from './modules/users/user.module';
         }),
         RavenModule,
         UserModule,
-        PartyModule,
-        TransactionModule,
-        CommonModule,
-        MeModule,
+        // PartyModule,
+        // TransactionModule,
+        // CommonModule,
+        // MeModule,
     ],
     providers: [
         {
