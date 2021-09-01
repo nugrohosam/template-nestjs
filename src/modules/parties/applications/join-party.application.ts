@@ -17,8 +17,12 @@ import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { PartyMemberValidationService } from '../services/members/party-member-validation.service';
 import { PartyService } from '../services/party.service';
 import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
+import {
+    OnchainSeriesApplication,
+    PrepareOnchainReturn,
+} from 'src/infrastructure/applications/onchain.application';
 
-export class JoinPartyApplication {
+export class JoinPartyApplication extends OnchainSeriesApplication {
     constructor(
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
@@ -30,13 +34,15 @@ export class JoinPartyApplication {
         private readonly transactionService: TransactionService,
         @Inject(PartyService)
         private readonly partyService: PartyService,
-    ) {}
+    ) {
+        super();
+    }
 
     async prepare(
         party: PartyModel,
         user: UserModel,
         request: JoinPartyRequest,
-    ): Promise<{ data: PartyMemberModel; platformSignature: string }> {
+    ): Promise<PrepareOnchainReturn<PartyMemberModel>> {
         await this.partyMemberValidation.validateUser(user, party);
         this.partyMemberValidation.validateUserInitialDeposit(
             party,

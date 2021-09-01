@@ -9,8 +9,9 @@ import { TransactionService } from 'src/modules/transactions/services/transactio
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { PartyCalculationService } from '../services/party-calculation.service';
 import { PartyService } from '../services/party.service';
+import { OnchainParalelApplication } from 'src/infrastructure/applications/onchain.application';
 
-export class LeavePartyApplication {
+export class LeavePartyApplication extends OnchainParalelApplication {
     constructor(
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
@@ -22,9 +23,11 @@ export class LeavePartyApplication {
         private readonly partyCalculationService: PartyCalculationService,
         @Inject(PartyService)
         private readonly partyService: PartyService,
-    ) {}
+    ) {
+        super();
+    }
 
-    async call(
+    async commit(
         partyMember: PartyMemberModel,
         request: LeavePartyRequest,
     ): Promise<void> {

@@ -24,8 +24,12 @@ import { GetPartyService } from '../services/get-party.service';
 import { CreatePartyEvent } from 'src/contracts/CreatePartyEvent.json';
 import { AbiItem } from 'web3-utils';
 import { RevertCreatePartyRequest } from '../requests/revert-create-party.request';
+import {
+    OnchainSeriesApplication,
+    PrepareOnchainReturn,
+} from 'src/infrastructure/applications/onchain.application';
 
-export class CreatePartyApplication {
+export class CreatePartyApplication extends OnchainSeriesApplication {
     constructor(
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
@@ -33,11 +37,13 @@ export class CreatePartyApplication {
         private readonly partyService: PartyService,
         @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
-    ) {}
+    ) {
+        super();
+    }
 
     async prepare(
         request: CreatePartyRequest,
-    ): Promise<{ data: PartyModel; platformSignature: string }> {
+    ): Promise<PrepareOnchainReturn<PartyModel>> {
         await this.web3Service.validateSignature(
             request.memberSignature,
             request.memberAddress,
