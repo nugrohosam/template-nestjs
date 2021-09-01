@@ -1,4 +1,4 @@
-import { UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -6,6 +6,7 @@ import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { Repository } from 'typeorm';
 
+@Injectable()
 export class JoinRequestValidation {
     constructor(
         @InjectRepository(PartyMemberModel)

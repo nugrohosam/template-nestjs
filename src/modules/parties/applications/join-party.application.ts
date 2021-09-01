@@ -14,7 +14,7 @@ import { JoinPartyEvent } from 'src/contracts/JoinPartyEvent.json';
 import { AbiItem } from 'web3-utils';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
-import { PartyMemberValidationService } from '../services/members/party-member-validation.service';
+import { PartyMemberValidation } from '../services/members/party-member.validation';
 import { PartyService } from '../services/party.service';
 import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
 import {
@@ -26,8 +26,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
     constructor(
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
-        @Inject(PartyMemberValidationService)
-        private readonly partyMemberValidation: PartyMemberValidationService,
+        @Inject(PartyMemberValidation)
+        private readonly partyMemberValidation: PartyMemberValidation,
         @Inject(PartyMemberService)
         private readonly partyMemberService: PartyMemberService,
         @Inject(TransactionService)

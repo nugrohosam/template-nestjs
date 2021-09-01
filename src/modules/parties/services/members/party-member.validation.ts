@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { PartyMemberService } from './party-member.service';
 
 @Injectable()
-export class PartyMemberValidationService {
+export class PartyMemberValidation {
     constructor(
         @InjectRepository(PartyMemberService)
         private readonly partyMemberRepository: Repository<PartyMemberModel>,

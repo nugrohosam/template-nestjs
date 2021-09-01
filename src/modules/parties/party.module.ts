@@ -10,8 +10,6 @@ import { PartyMemberService } from './services/members/party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
 import { PartyJoinRequestController } from './controllers/party-join-request.controller';
 import { JoinRequestService } from './services/join-request/join-request.service';
-import { IndexJoinRequestService } from './services/join-request/index-join-request.service';
-import { UpdateStatusJoinRequestService } from './services/join-request/update-status-join-request.service';
 import { GetJoinRequestService } from './services/join-request/get-join-request.service';
 import { CommonModule } from '../commons/common.module';
 import { JoinRequestController } from './controllers/join-request.controller';
@@ -28,6 +26,11 @@ import { IndexPartyApplication } from './applications/index-party.application';
 import { JoinPartyApplication } from './applications/join-party.application';
 import { IndexPartyMemberApplication } from './applications/index-party-member.application';
 import { LeavePartyApplication } from './applications/leave-party.application';
+import { RequestJoinPartyApplication } from './applications/request-join-party.application';
+import { IndexPartyJoinRequestApplication } from './applications/index-party-join-request.application';
+import { UpdateJoinRequestStatusApplication } from './applications/update-join-request-status.application';
+import { JoinRequestValidation } from './services/join-request/join-request.validation';
+import { PartyMemberValidation } from './services/members/party-member.validation';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
@@ -50,10 +53,14 @@ import { LeavePartyApplication } from './applications/leave-party.application';
         PartyCalculationService,
 
         // Join Request Providers
+        RequestJoinPartyApplication,
+        IndexPartyJoinRequestApplication,
+        UpdateJoinRequestStatusApplication,
+
         JoinRequestService,
-        IndexJoinRequestService,
         GetJoinRequestService,
-        UpdateStatusJoinRequestService,
+
+        JoinRequestValidation,
 
         // Party Member / Join Party Providers
         JoinPartyApplication,
@@ -62,6 +69,8 @@ import { LeavePartyApplication } from './applications/leave-party.application';
 
         PartyMemberService,
         GetPartyMemberService,
+
+        PartyMemberValidation,
 
         // Proposal
         CreateProposalService,
