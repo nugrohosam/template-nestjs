@@ -85,7 +85,7 @@ export class PartyModel implements IParty {
 
     @ManyToOne(() => UserModel, (user) => user.ownedParties)
     @JoinColumn({ name: 'owner_id' })
-    owner?: UserModel;
+    owner?: Promise<UserModel>;
 
     @ManyToOne(() => UserModel, (user) => user.createdParties)
     @JoinColumn({ name: 'creator_id' })

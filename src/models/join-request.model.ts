@@ -54,9 +54,9 @@ export class JoinRequestModel implements IJoinRequest {
 
     @ManyToOne(() => PartyModel, (party) => party.joinRequests)
     @JoinColumn({ name: 'party_id' })
-    readonly party?: PartyModel;
+    readonly party?: Promise<PartyModel>;
 
     @ManyToOne(() => UserModel, (user) => user.joinRequests)
     @JoinColumn({ name: 'user_id' })
-    readonly user?: UserModel;
+    readonly user?: Promise<UserModel>;
 }

@@ -9,7 +9,7 @@ import { GetPartyService } from './services/get-party.service';
 import { PartyMemberService } from './services/members/party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
 import { PartyJoinRequestController } from './controllers/party-join-request.controller';
-import { RequestJoinService } from './services/join-request/request-join.service';
+import { JoinRequestService } from './services/join-request/join-request.service';
 import { IndexJoinRequestService } from './services/join-request/index-join-request.service';
 import { UpdateStatusJoinRequestService } from './services/join-request/update-status-join-request.service';
 import { GetJoinRequestService } from './services/join-request/get-join-request.service';
@@ -50,7 +50,7 @@ import { LeavePartyApplication } from './applications/leave-party.application';
         PartyCalculationService,
 
         // Join Request Providers
-        RequestJoinService,
+        JoinRequestService,
         IndexJoinRequestService,
         GetJoinRequestService,
         UpdateStatusJoinRequestService,

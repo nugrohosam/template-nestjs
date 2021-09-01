@@ -1,19 +1,38 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Inject,
+    Param,
+    Post,
+    Put,
+    Query,
+} from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
+import { IndexPartyJoinRequestApplication } from '../applications/index-party-join-request.application';
+import { RequestJoinPartyApplication } from '../applications/request-join-party.application';
+import { UpdateJoinRequestStatusApplication } from '../applications/update-join-request-status.application';
 import { JoinRequestRequest } from '../requests/join-request/join-request.request';
 import { UpdateStatusJoinRequestRequest } from '../requests/join-request/update-status-join-request.request';
 import { JoinRequestResponse } from '../responses/join-request/join-request.response';
-import { IndexJoinRequestService } from '../services/join-request/index-join-request.service';
-import { RequestJoinService } from '../services/join-request/request-join.service';
-import { UpdateStatusJoinRequestService } from '../services/join-request/update-status-join-request.service';
+import { GetPartyService } from '../services/get-party.service';
+import { GetJoinRequestService } from '../services/join-request/get-join-request.service';
 
 @Controller('parties/:partyId/join-requests')
 export class PartyJoinRequestController {
     constructor(
-        private readonly requestJoinService: RequestJoinService,
-        private readonly indexJoinRequest: IndexJoinRequestService,
-        private readonly updateStatusJoinRequestService: UpdateStatusJoinRequestService,
+        private readonly requestJoinApplication: RequestJoinPartyApplication,
+        private readonly indexPartyJoinRequestApplication: IndexPartyJoinRequestApplication,
+        private readonly updateJoinRequestStatusApplication: UpdateJoinRequestStatusApplication,
+
+        @Inject(GetPartyService)
+        private readonly getPartyServie: GetPartyService,
+        @Inject(GetUserService)
+        private readonly getUserService: GetUserService,
+        @Inject(GetJoinRequestService)
+        private readonly getJoinRequestService: GetJoinRequestService,
     ) {}
 
     @Post()
@@ -21,8 +40,14 @@ export class PartyJoinRequestController {
         @Param('partyId') partyId: string,
         @Body() request: JoinRequestRequest,
     ): Promise<IApiResponse<JoinRequestResponse>> {
-        const joinRequest = await this.requestJoinService.call(
-            partyId,
+        const party = await this.getPartyServie.getById(partyId);
+        const user = await this.getUserService.getUserByAddress(
+            request.userAddress,
+        );
+
+        const joinRequest = await this.requestJoinApplication.call(
+            user,
+            party,
             request,
         );
 
@@ -39,15 +64,19 @@ export class PartyJoinRequestController {
         @Param('partyId') partyId: string,
         @Query() query: IndexRequest,
     ): Promise<IApiResponse<JoinRequestResponse[]>> {
-        const { data, meta } = await this.indexJoinRequest.fetchByPartyId(
-            partyId,
-            query,
+        const { data, meta } =
+            await this.indexPartyJoinRequestApplication.fetch(partyId, query);
+
+        const response = await Promise.all(
+            data.map(async (datum) => {
+                return await JoinRequestResponse.mapFromJoinRequestModel(datum);
+            }),
         );
 
         return {
             message: "Success get party's join requests",
+            data: response,
             meta,
-            data,
         };
     }
 
@@ -56,8 +85,11 @@ export class PartyJoinRequestController {
         @Param('joinRequestId') joinRequestId: string,
         @Body() request: UpdateStatusJoinRequestRequest,
     ): Promise<IApiResponse<JoinRequestResponse>> {
-        const joinRequest = await this.updateStatusJoinRequestService.call(
+        let joinRequest = await this.getJoinRequestService.getById(
             joinRequestId,
+        );
+        joinRequest = await this.updateJoinRequestStatusApplication.call(
+            joinRequest,
             request,
         );
         return {

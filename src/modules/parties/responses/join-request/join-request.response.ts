@@ -21,18 +21,17 @@ export class JoinRequestResponse
     static async mapFromJoinRequestModel(
         model: JoinRequestModel,
     ): Promise<JoinRequestResponse> {
+        const user = await model.user;
+        const party = await model.party;
+
         return {
             id: model.id,
-            user: model.user
-                ? {
-                      id: model.user.id,
-                      address: model.user.address,
-                      username: model.user.username,
-                  }
-                : undefined,
-            party: model.party
-                ? await IndexPartyResponse.mapFromPartyModel(model.party)
-                : undefined,
+            user: {
+                id: user.id,
+                address: user.address,
+                username: user.username,
+            },
+            party: await IndexPartyResponse.mapFromPartyModel(party),
             acceptedAt: model.acceptedAt,
             rejectedAt: model.rejectedAt,
             status: model.status,

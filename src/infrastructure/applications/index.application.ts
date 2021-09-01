@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 /**
  * Index Application
  * Used to fetch paginated data with any sort, filter and search
@@ -9,7 +11,6 @@ import {
     IPaginateResponse,
     IPaginationMeta,
 } from 'src/common/interface/index.interface';
-import { IndexRequest } from 'src/common/request/index.request';
 
 export abstract class IndexApplication {
     readonly DefaultPerPage: number = 10;
@@ -17,9 +18,7 @@ export abstract class IndexApplication {
     readonly DefaultSort: string = 'created_at';
     readonly DefaultOrder: OrderDirectionType = 'DESC';
 
-    abstract fetch(
-        params: IndexRequest,
-    ): Promise<IPaginateResponse<Record<string, any>>>;
+    abstract fetch(arg0: any, arg1: any): Promise<IPaginateResponse<any>>;
 
     countOffset({ page, perPage }: IPaginateRequest): number {
         page = page ?? this.DefaultPage;
