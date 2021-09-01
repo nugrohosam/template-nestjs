@@ -96,10 +96,10 @@ export class PartyMemberController {
         @Query() request: IndexPartyMemberRequest,
     ): Promise<IApiResponse<MemberDetailRespose[]>> {
         const party = await this.getPartyService.getById(partyId);
-        const { data, meta } = await this.indexPartyMemberApplication.fetch(
+        const { data, meta } = await this.indexPartyMemberApplication.fetch({
             party,
-            request,
-        );
+            ...request,
+        });
 
         const response = await Promise.all(
             data.map(async (datum) => {

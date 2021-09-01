@@ -2,24 +2,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MemberStatusEnum } from 'src/common/enums/party.enum';
 import { IPaginateResponse } from 'src/common/interface/index.interface';
 import { Utils } from 'src/common/utils/util';
+import { IndexApplication } from 'src/infrastructure/applications/index.application';
 import { PartyMemberModel } from 'src/models/party-member.model';
-import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
-import { IndexPartyMemberRequest } from '../requests/member/index-party-member.request';
+import { IndexPartyMemberRequestWithParty } from '../requests/member/index-party-member.request';
 
-export class IndexPartyMemberApplication {
+export class IndexPartyMemberApplication extends IndexApplication {
     constructor(
         @InjectRepository(PartyMemberModel)
         private readonly repository: Repository<PartyMemberModel>,
-    ) {}
+    ) {
+        super();
+    }
 
     async fetch(
-        party: PartyModel,
-        request: IndexPartyMemberRequest,
+        request: IndexPartyMemberRequestWithParty,
     ): Promise<IPaginateResponse<PartyMemberModel>> {
         const query = this.repository.createQueryBuilder();
         query.setParameters({
-            partyId: party.id,
+            partyId: request.party.id,
         });
         query.where('party_id = :partyId');
 

@@ -3,17 +3,11 @@ import { Web3Module } from 'src/infrastructure/web3/web3.module';
 import { TransactionModule } from '../transactions/transaction.module';
 import { UserModule } from '../users/user.module';
 import { PartyMemberController } from './controllers/party-member.controller';
-import { PartyInvitationController } from './controllers/party-invitation.controller';
 import { PartyController } from './controllers/party.controller';
-import { AcceptInvitationService } from './services/invitation/accept-invitation.service';
 import { PartyService } from './services/party.service';
 import { GetPartyService } from './services/get-party.service';
-import { IndexPartyInvitationService } from './services/invitation/index-party-invitation.service';
-import { IndexPartyMemberService } from './services/members/index-party-member.service';
 import { PartyMemberService } from './services/members/party-member.service';
-import { UpdatePartyMemberService } from './services/members/update-party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
-import { InvitePartyService } from './services/invitation/invite-party.service';
 import { PartyJoinRequestController } from './controllers/party-join-request.controller';
 import { RequestJoinService } from './services/join-request/request-join.service';
 import { IndexJoinRequestService } from './services/join-request/index-join-request.service';
@@ -28,21 +22,23 @@ import { IndexProposalService } from './services/proposal/index-proposal.service
 import { GetProposalService } from './services/proposal/get-proposal.service';
 import { ApproveProposalService } from './services/proposal/approve-proposal.service';
 import { RejectProposalService } from './services/proposal/reject-proposal.service';
-import { LeavePartyService } from './services/members/leave-party.service';
 import { PartyTransactionController } from './controllers/party-transaction.controller';
 import { CreatePartyApplication } from './applications/create-party.application';
 import { IndexPartyApplication } from './applications/index-party.application';
+import { JoinPartyApplication } from './applications/join-party.application';
+import { IndexPartyMemberApplication } from './applications/index-party-member.application';
+import { LeavePartyApplication } from './applications/leave-party.application';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
     controllers: [
         PartyController,
-        PartyJoinRequestController,
-        PartyInvitationController,
         PartyMemberController,
-        JoinRequestController,
+        PartyJoinRequestController,
         PartyProposalController,
         PartyTransactionController,
+
+        JoinRequestController,
     ],
     providers: [
         // Party Porviders
@@ -59,17 +55,13 @@ import { IndexPartyApplication } from './applications/index-party.application';
         GetJoinRequestService,
         UpdateStatusJoinRequestService,
 
-        // Party Invitation Providers
-        InvitePartyService,
-        IndexPartyInvitationService,
-        AcceptInvitationService,
-
         // Party Member / Join Party Providers
+        JoinPartyApplication,
+        IndexPartyMemberApplication,
+        LeavePartyApplication,
+
         PartyMemberService,
-        UpdatePartyMemberService,
         GetPartyMemberService,
-        IndexPartyMemberService,
-        LeavePartyService,
 
         // Proposal
         CreateProposalService,

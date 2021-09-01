@@ -1,15 +1,17 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginateResponse } from 'src/common/interface/index.interface';
-import { Utils } from 'src/common/utils/util';
+import { IndexApplication } from 'src/infrastructure/applications/index.application';
 import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
 import { IndexPartyRequest } from '../requests/index-party.request';
 
-export class IndexPartyApplication {
+export class IndexPartyApplication extends IndexApplication {
     constructor(
         @InjectRepository(PartyModel)
         private readonly repository: Repository<PartyModel>,
-    ) {}
+    ) {
+        super();
+    }
 
     async fetch(
         request: IndexPartyRequest,
@@ -33,17 +35,12 @@ export class IndexPartyApplication {
             request.order ?? 'DESC',
         );
         query.take(request.perPage ?? 10);
-        query.skip(Utils.countOffset(request.page, request.perPage));
+        query.skip(this.countOffset(request));
 
         const [data, count] = await query.getManyAndCount();
         return {
             data: data,
-            meta: {
-                page: request.page ?? 1,
-                perPage: request.perPage ?? 10,
-                total: count,
-                totalPage: count / request.perPage,
-            },
+            meta: this.mapMeta(count, request),
         };
     }
 }

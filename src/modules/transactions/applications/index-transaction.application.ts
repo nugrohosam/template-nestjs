@@ -1,16 +1,19 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginateResponse } from 'src/common/interface/index.interface';
+import { IndexApplication } from 'src/infrastructure/applications/index.application';
 import { TransactionModel } from 'src/models/transaction.model';
 import { Brackets, Repository } from 'typeorm';
 import { IndexTransactionRequest } from '../requests/index-transaction.request';
 
-export class IndexApplication {
+export class IndexTransactionApplication extends IndexApplication {
     constructor(
         @InjectRepository(TransactionModel)
         private readonly repository: Repository<TransactionModel>,
-    ) {}
+    ) {
+        super();
+    }
 
-    async call({
+    async fetch({
         from,
         to,
         order,
