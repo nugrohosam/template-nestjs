@@ -96,11 +96,11 @@ export class PartyController {
         @Headers('Signature') signature: string,
         @Param('partyId') partyId: string,
     ): Promise<IApiResponse<DetailPartyResponse>> {
-        const signer = await this.getSignerService.get(signature);
+        // const signer = await this.getSignerService.get(signature);
         const party = await this.getPartyService.getById(partyId);
         return {
             message: 'Success get party',
-            data: await DetailPartyResponse.mapFromPartyModel(party, signer),
+            data: await DetailPartyResponse.mapFromPartyModel(party),
         };
     }
 }

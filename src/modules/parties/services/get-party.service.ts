@@ -11,6 +11,25 @@ export class GetPartyService {
     ) {}
 
     async getById(partyId: string): Promise<PartyModel> {
+        const query = this.repository.createQueryBuilder('parties');
+        query.setParameters({ partyId });
+        query.select('parties.*');
+        query.addSelect((subQuery) => {
+            const subSubQuery = subQuery
+                .subQuery()
+                .select('p.id')
+                .from(PartyModel, 'p')
+                .leftJoin('parties.members', 'pm', 'pm.party_id = parties.id')
+                .where('p.id = parties.id')
+                .andWhere('pm.member_id = parties.owner_id')
+                .andWhere('parties.address is not null')
+                .andWhere('parties.transaction_hash is not null')
+                .getQuery();
+
+            return subQuery.select(subSubQuery + ' is not null as isActive');
+        });
+        query.where('id = :partyId');
+
         const party = await this.repository.findOne({
             where: { id: partyId },
             relations: ['owner', 'creator'],

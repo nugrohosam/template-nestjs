@@ -1,23 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { JoinRequestModel } from 'src/models/join-request.model';
-import { PartyModel } from 'src/models/party.model';
-import { UserModel } from 'src/models/user.model';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class GetJoinRequestService {
+    constructor(
+        @InjectRepository(JoinRequestModel)
+        private readonly repository: Repository<JoinRequestModel>,
+    ) {}
+
     async getById(id: string): Promise<JoinRequestModel> {
-        const joinRequest = await JoinRequestModel.findOne({
-            include: [
-                {
-                    model: PartyModel,
-                    as: 'party',
-                    required: true,
-                    include: [
-                        { model: UserModel, as: 'owner', required: true },
-                    ],
-                },
-                { model: UserModel, as: 'user', required: true },
-            ],
+        const joinRequest = await this.repository.findOne({
             where: { id },
         });
 

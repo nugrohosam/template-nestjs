@@ -1,6 +1,7 @@
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
+    JoinRequestStatusEnum,
 } from 'src/common/enums/party.enum';
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
@@ -34,12 +35,14 @@ export class DetailPartyResponse
 
     static async mapFromPartyModel(
         party: PartyModel,
-        user?: UserModel,
     ): Promise<DetailPartyResponse> {
+        const creator = await party.creator;
+        const owner = await party.owner;
+
         return {
             id: party.id,
             isActive: party.isActive,
-            isMember: user ? await party.isMember(user) : false,
+            isMember: party.isMember,
             address: party.address,
             name: party.name,
             type: party.type,
@@ -50,30 +53,25 @@ export class DetailPartyResponse
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
             totalDeposit: party.totalDeposit.toString(),
-            totalMember:
-                party.totalMember === 0
-                    ? party.partyMembers.length ?? 1
-                    : party.totalMember,
+            totalMember: party.totalMember,
             distribution: party.distribution,
             creator: {
-                id: party.creator.id,
-                firstname: party.creator.firstname,
-                lastname: party.creator.lastname,
-                imageUrl: party.creator.imageUrl,
+                id: creator.id,
+                firstname: creator.firstname,
+                lastname: creator.lastname,
+                imageUrl: creator.imageUrl,
             },
             owner: {
-                id: party.owner.id,
-                firstname: party.owner.firstname,
-                lastname: party.owner.lastname,
-                imageUrl: party.owner.imageUrl,
+                id: owner.id,
+                firstname: owner.firstname,
+                lastname: owner.lastname,
+                imageUrl: owner.imageUrl,
             },
             projects: [],
             createdAt: party.createdAt,
             updatedAt: party.updatedAt,
             deletedAt: party.deletedAt,
-            joinRequestStatus: user
-                ? await user.joinRequestStatus(party.id)
-                : undefined,
+            joinRequestStatus: JoinRequestStatusEnum.Pending, // TODO: need to be included in get party query
         };
     }
 }

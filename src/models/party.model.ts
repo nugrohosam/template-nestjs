@@ -89,35 +89,17 @@ export class PartyModel implements IParty {
 
     @ManyToOne(() => UserModel, (user) => user.createdParties)
     @JoinColumn({ name: 'creator_id' })
-    creator?: UserModel;
+    creator?: Promise<UserModel>;
 
     @OneToMany(() => JoinRequestModel, (joinRequest) => joinRequest.party)
-    joinRequests?: JoinRequestModel[];
+    joinRequests?: Promise<JoinRequestModel[]>;
 
     @OneToMany(() => PartyMemberModel, (partyMember) => partyMember.party)
-    partyMembers?: PartyMemberModel[];
+    partyMembers?: Promise<PartyMemberModel[]>;
 
     @OneToMany(() => Proposal, (proposal) => proposal.party)
-    proposals?: Proposal[];
+    proposals?: Promise<Proposal[]>;
 
-    get isActive(): boolean {
-        if (!this.address || !this.transactionHash) return false;
-
-        const partyMembers = this.partyMembers
-            ? this.partyMembers.filter(
-                  (partyMember) => partyMember.memberId === this.ownerId,
-              )
-            : [];
-        if (partyMembers.length <= 0) return false;
-
-        return true;
-    }
-
-    // async isMember(user: UserModel): Promise<boolean> {
-    //     const partyMembers = await PartyMemberModel.findOne({
-    //         where: { memberId: user.id, partyId: this.id },
-    //     });
-
-    //     return partyMembers !== null;
-    // }
+    isActive?: boolean;
+    isMember?: boolean;
 }

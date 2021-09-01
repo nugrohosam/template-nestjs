@@ -155,7 +155,7 @@ export class PartyMemberController {
             user.id,
             partyId,
         );
-        await this.leavePartyApplication.call(partyMember, request);
+        await this.leavePartyApplication.commit(partyMember, request);
         return {
             message: 'Success leaving party',
             data: null,
