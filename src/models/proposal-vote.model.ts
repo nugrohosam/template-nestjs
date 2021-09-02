@@ -11,7 +11,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { PartyMemberModel } from './party-member.model';
-import { Proposal } from './proposal.model';
+import { ProposalModel } from './proposal.model';
 
 @Entity({ name: 'proposal_votes' })
 export class ProposalVoteModel implements IProposalVote {
@@ -36,9 +36,9 @@ export class ProposalVoteModel implements IProposalVote {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @ManyToOne(() => Proposal, (proposal) => proposal.votes)
+    @ManyToOne(() => ProposalModel, (proposal) => proposal.votes)
     @JoinColumn({ name: 'proposal_id' })
-    proposal?: Proposal;
+    proposal?: ProposalModel;
 
     @ManyToOne(() => PartyMemberModel, (partyMember) => partyMember.votes)
     @JoinColumn({ name: 'member_id' })

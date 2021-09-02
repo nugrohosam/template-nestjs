@@ -6,7 +6,7 @@ import {
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { OnchainParalelApplication } from 'src/infrastructure/applications/onchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { ApproveProposalRequest } from '../requests/proposal/update-proposal-status.request';
 import { ProposalService } from '../services/proposal/proposal.service';
 import { ApproveProposalEvent } from 'src/contracts/ApproveProposalEvent.json';
@@ -23,7 +23,7 @@ export class ApproveProposalApplication extends OnchainParalelApplication {
     }
 
     async commit(
-        proposal: Proposal,
+        proposal: ProposalModel,
         request: ApproveProposalRequest,
     ): Promise<void> {
         const party = await proposal.party;
@@ -65,7 +65,7 @@ export class ApproveProposalApplication extends OnchainParalelApplication {
     }
 
     async revert(
-        proposal: Proposal,
+        proposal: ProposalModel,
         { signature }: ApproveProposalRequest,
     ): Promise<void> {
         if (signature !== proposal.approveSignature)

@@ -5,7 +5,7 @@ import {
 } from 'src/infrastructure/applications/onchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { UserModel } from 'src/models/user.model';
 import { CreateProposalRequest } from '../requests/proposal/create-proposal.request';
 import { UpdateProposalTransactionRequest } from '../requests/proposal/update-proposal-transaction.request';
@@ -50,7 +50,7 @@ export class CreateProposalApplication extends OnchainSeriesApplication {
     }
 
     async commit(
-        proposal: Proposal,
+        proposal: ProposalModel,
         request: UpdateProposalTransactionRequest,
     ): Promise<void> {
         if (request.signature !== proposal.signature)
@@ -70,7 +70,7 @@ export class CreateProposalApplication extends OnchainSeriesApplication {
     }
 
     async revert(
-        proposal: Proposal,
+        proposal: ProposalModel,
         request: UpdateProposalTransactionRequest,
     ): Promise<void> {
         if (request.signature !== proposal.signature)

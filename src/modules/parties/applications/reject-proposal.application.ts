@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { OffchainApplication } from 'src/infrastructure/applications/offchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { RejectProposalRequest } from '../requests/proposal/update-proposal-status.request';
 import { ProposalService } from '../services/proposal/proposal.service';
 
@@ -16,7 +16,7 @@ export class RejectProposalApplication extends OffchainApplication {
     }
 
     async call(
-        proposal: Proposal,
+        proposal: ProposalModel,
         { signature }: RejectProposalRequest,
     ): Promise<void> {
         const party = await proposal.party;

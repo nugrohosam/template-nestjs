@@ -3,13 +3,13 @@ import { IPaginateResponse } from 'src/common/interface/index.interface';
 import { IndexRequest } from 'src/common/request/index.request';
 import { IndexApplication } from 'src/infrastructure/applications/index.application';
 import { PartyModel } from 'src/models/party.model';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { Repository } from 'typeorm';
 
 export class IndexPartyProposalApplication extends IndexApplication {
     constructor(
-        @InjectRepository(Proposal)
-        private readonly repository: Repository<Proposal>,
+        @InjectRepository(ProposalModel)
+        private readonly repository: Repository<ProposalModel>,
     ) {
         super();
     }
@@ -17,7 +17,7 @@ export class IndexPartyProposalApplication extends IndexApplication {
     async fetch(
         party: PartyModel,
         request: IndexRequest,
-    ): Promise<IPaginateResponse<Proposal>> {
+    ): Promise<IPaginateResponse<ProposalModel>> {
         const query = this.repository.createQueryBuilder('proposals');
         query.where('party_id = :partyId', { partyId: party.id });
 

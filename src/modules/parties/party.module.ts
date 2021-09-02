@@ -32,9 +32,32 @@ import { CreateProposalApplication } from './applications/create-proposal.applic
 import { IndexPartyProposalApplication } from './applications/index-party-proposal.application';
 import { ApproveProposalApplication } from './applications/approve-proposal-application';
 import { RejectProposalApplication } from './applications/reject-proposal.application';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PartyModel } from 'src/models/party.model';
+import { PartyMemberModel } from 'src/models/party-member.model';
+import { JoinRequestModel } from 'src/models/join-request.model';
+import { ProposalValidation } from './services/proposal/proposal.validation';
+import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
+import { ProposalModel } from 'src/models/proposal.model';
+import { IndexPartyTransactionApplication } from './applications/index-party-transaction.application';
+import { TransactionModel } from 'src/models/transaction.model';
+import { IndexJoinRequestApplication } from './applications/index-join-request.application';
 
 @Module({
-    imports: [Web3Module, UserModule, TransactionModule, CommonModule],
+    imports: [
+        Web3Module,
+        UserModule,
+        TransactionModule,
+        CommonModule,
+        TypeOrmModule.forFeature([
+            PartyModel,
+            PartyMemberModel,
+            JoinRequestModel,
+            ProposalModel,
+            ProposalDistributionModel,
+            TransactionModel,
+        ]),
+    ],
     controllers: [
         PartyController,
         PartyMemberController,
@@ -55,8 +78,9 @@ import { RejectProposalApplication } from './applications/reject-proposal.applic
 
         // Join Request Providers
         RequestJoinPartyApplication,
-        IndexPartyJoinRequestApplication,
         UpdateJoinRequestStatusApplication,
+        IndexPartyJoinRequestApplication,
+        IndexJoinRequestApplication,
 
         JoinRequestService,
         GetJoinRequestService,
@@ -81,6 +105,11 @@ import { RejectProposalApplication } from './applications/reject-proposal.applic
 
         ProposalService,
         GetProposalService,
+
+        ProposalValidation,
+
+        // Transaction
+        IndexPartyTransactionApplication,
     ],
     exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
 })

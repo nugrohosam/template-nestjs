@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { CreateProposalRequest } from '../../requests/proposal/create-proposal.request';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -20,8 +20,8 @@ export class ProposalService {
     private readonly WeiPercentage = 10 ** 4;
 
     constructor(
-        @InjectRepository(Proposal)
-        private readonly proposalRepository: Repository<Proposal>,
+        @InjectRepository(ProposalModel)
+        private readonly proposalRepository: Repository<ProposalModel>,
         @InjectRepository(ProposalDistributionModel)
         private readonly proposalDistributionRepository: Repository<ProposalDistributionModel>,
         @InjectRepository(PartyMemberModel)
@@ -46,7 +46,7 @@ export class ProposalService {
         return message;
     }
 
-    async generatePlatformSignature(proposal: Proposal): Promise<string> {
+    async generatePlatformSignature(proposal: ProposalModel): Promise<string> {
         const party = await proposal.party;
         const message = this.web3Service.soliditySha3([
             { t: 'string', v: party.id },
@@ -58,34 +58,40 @@ export class ProposalService {
         return this.web3Service.sign(message);
     }
 
-    generateApproveSignature(party: PartyModel, proposal: Proposal): string {
+    generateApproveSignature(
+        party: PartyModel,
+        proposal: ProposalModel,
+    ): string {
         const message = `I want to approve a proposal in ${party.name} with title ${proposal.title}`;
         console.log('message[approve-proposal]: ' + message);
         return message;
     }
 
-    genereteRejectSignature(party: PartyModel, proposal: Proposal): string {
+    genereteRejectSignature(
+        party: PartyModel,
+        proposal: ProposalModel,
+    ): string {
         const message = `I want to reject a proposal in ${party.name} with title ${proposal.title}`;
         console.log('message[reject-proposal]: ' + message);
         return message;
     }
 
-    async store(data: IProposal): Promise<Proposal> {
+    async store(data: IProposal): Promise<ProposalModel> {
         const proposal = this.proposalRepository.create(data);
         return await this.proposalRepository.save(proposal);
     }
 
     async update(
-        proposal: Proposal,
+        proposal: ProposalModel,
         data: Partial<IProposal>,
-    ): Promise<Proposal> {
+    ): Promise<ProposalModel> {
         proposal = Object.assign(proposal, data);
         return this.proposalRepository.save(proposal);
     }
 
     async processCalculation(
         party: PartyModel,
-        proposal: Proposal,
+        proposal: ProposalModel,
         { signature, transactionHash }: ApproveProposalRequest,
     ): Promise<void> {
         const members = await party.partyMembers;

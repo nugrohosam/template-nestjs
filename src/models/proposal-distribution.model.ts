@@ -11,7 +11,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { PartyMemberModel } from './party-member.model';
-import { Proposal } from './proposal.model';
+import { ProposalModel } from './proposal.model';
 
 @Entity({ name: 'proposal_distributions' })
 export class ProposalDistributionModel implements IProposalDistribution {
@@ -42,9 +42,9 @@ export class ProposalDistributionModel implements IProposalDistribution {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @ManyToOne(() => Proposal, (proposal) => proposal.distributions)
+    @ManyToOne(() => ProposalModel, (proposal) => proposal.distributions)
     @JoinColumn({ name: 'proposal_id' })
-    proposal?: Proposal;
+    proposal?: ProposalModel;
 
     @ManyToOne(
         () => PartyMemberModel,

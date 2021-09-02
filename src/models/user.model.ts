@@ -11,7 +11,7 @@ import {
 import { JoinRequestModel } from './join-request.model';
 import { PartyMemberModel } from './party-member.model';
 import { PartyModel } from './party.model';
-import { Proposal } from './proposal.model';
+import { ProposalModel } from './proposal.model';
 
 @Entity({ name: 'users' })
 export class UserModel implements IUser {
@@ -66,19 +66,6 @@ export class UserModel implements IUser {
     @OneToMany(() => PartyMemberModel, (partyMember) => partyMember.member)
     joinedPartyMembers?: PartyMemberModel[];
 
-    @OneToMany(() => Proposal, (proposal) => proposal.creator)
-    proposals?: Proposal[];
-
-    // async joinRequestStatus(partyId: string): Promise<string | undefined> {
-    //     const joinRequest = await JoinRequestModel.findOne({
-    //         where: {
-    //             partyId,
-    //             userId: this.id,
-    //         },
-    //     });
-
-    //     if (!joinRequest) return undefined;
-
-    //     return joinRequest.status;
-    // }
+    @OneToMany(() => ProposalModel, (proposal) => proposal.creator)
+    proposals?: ProposalModel[];
 }

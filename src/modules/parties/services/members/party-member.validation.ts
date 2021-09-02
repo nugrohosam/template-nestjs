@@ -6,12 +6,11 @@ import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { Repository } from 'typeorm';
-import { PartyMemberService } from './party-member.service';
 
 @Injectable()
 export class PartyMemberValidation {
     constructor(
-        @InjectRepository(PartyMemberService)
+        @InjectRepository(PartyMemberModel)
         private readonly partyMemberRepository: Repository<PartyMemberModel>,
         @InjectRepository(JoinRequestModel)
         private readonly joinRequestRepository: Repository<JoinRequestModel>,

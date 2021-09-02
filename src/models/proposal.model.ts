@@ -18,7 +18,7 @@ import { ProposalVoteModel } from './proposal-vote.model';
 import { UserModel } from './user.model';
 
 @Entity({ name: 'proposals' })
-export class Proposal implements IProposal {
+export class ProposalModel implements IProposal {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
 

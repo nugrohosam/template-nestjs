@@ -15,7 +15,7 @@ import {
 } from 'typeorm';
 import { JoinRequestModel } from './join-request.model';
 import { PartyMemberModel } from './party-member.model';
-import { Proposal } from './proposal.model';
+import { ProposalModel } from './proposal.model';
 import { UserModel } from './user.model';
 
 @Entity({ name: 'parties' })
@@ -97,8 +97,8 @@ export class PartyModel implements IParty {
     @OneToMany(() => PartyMemberModel, (partyMember) => partyMember.party)
     partyMembers?: Promise<PartyMemberModel[]>;
 
-    @OneToMany(() => Proposal, (proposal) => proposal.party)
-    proposals?: Promise<Proposal[]>;
+    @OneToMany(() => ProposalModel, (proposal) => proposal.party)
+    proposals?: Promise<ProposalModel[]>;
 
     isActive?: boolean;
     isMember?: boolean;

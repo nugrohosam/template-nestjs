@@ -5,7 +5,7 @@ import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { ProposalVoteModel } from 'src/models/proposal-vote.model';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { UserModel } from 'src/models/user.model';
 import { ConnectionOptions, createConnection } from 'typeorm';
@@ -24,7 +24,7 @@ export const connectionOption: ConnectionOptions = {
         JoinRequestModel,
         TransactionModel,
         CurrencyModel,
-        Proposal,
+        ProposalModel,
         ProposalVoteModel,
         ProposalDistributionModel,
     ],

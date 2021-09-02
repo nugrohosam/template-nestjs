@@ -1,5 +1,5 @@
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { MemberResponse } from 'src/modules/users/responses/member.response';
 import { IndexPartyResponse } from '../index-party.response';
 
@@ -16,7 +16,7 @@ export class IndexProposalResponse {
     creator: MemberResponse;
 
     static async mapFromProposalModel(
-        proposal: Proposal,
+        proposal: ProposalModel,
     ): Promise<IndexProposalResponse> {
         return {
             id: proposal.id,

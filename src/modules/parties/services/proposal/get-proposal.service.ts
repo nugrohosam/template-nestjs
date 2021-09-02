@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class GetProposalService {
     constructor(
-        @InjectRepository(Proposal)
-        private readonly repository: Repository<Proposal>,
+        @InjectRepository(ProposalModel)
+        private readonly repository: Repository<ProposalModel>,
     ) {}
 
-    async getById(proposalId: string): Promise<Proposal> {
+    async getById(proposalId: string): Promise<ProposalModel> {
         const query = this.repository.createQueryBuilder('proposals');
         query.where('id = :id', { id: proposalId });
 
