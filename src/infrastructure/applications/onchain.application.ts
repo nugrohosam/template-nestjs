@@ -16,7 +16,7 @@ export type PrepareOnchainReturn<T = any> = {
  */
 export abstract class OnchainParalelApplication {
     abstract commit(arg0: any, arg1: any): Promise<any>;
-    abstract revert(arg0: any): Promise<void>;
+    abstract revert(arg0: any, arg1: any): Promise<void>;
 }
 
 /**

@@ -14,12 +14,9 @@ import { GetJoinRequestService } from './services/join-request/get-join-request.
 import { CommonModule } from '../commons/common.module';
 import { JoinRequestController } from './controllers/join-request.controller';
 import { PartyCalculationService } from './services/party-calculation.service';
-import { CreateProposalService } from './services/proposal/create-proposal.service';
+import { ProposalService } from './services/proposal/proposal.service';
 import { PartyProposalController } from './controllers/party-proposal.controller';
-import { IndexProposalService } from './services/proposal/index-proposal.service';
 import { GetProposalService } from './services/proposal/get-proposal.service';
-import { ApproveProposalService } from './services/proposal/approve-proposal.service';
-import { RejectProposalService } from './services/proposal/reject-proposal.service';
 import { PartyTransactionController } from './controllers/party-transaction.controller';
 import { CreatePartyApplication } from './applications/create-party.application';
 import { IndexPartyApplication } from './applications/index-party.application';
@@ -31,6 +28,10 @@ import { IndexPartyJoinRequestApplication } from './applications/index-party-joi
 import { UpdateJoinRequestStatusApplication } from './applications/update-join-request-status.application';
 import { JoinRequestValidation } from './services/join-request/join-request.validation';
 import { PartyMemberValidation } from './services/members/party-member.validation';
+import { CreateProposalApplication } from './applications/create-proposal.application';
+import { IndexPartyProposalApplication } from './applications/index-party-proposal.application';
+import { ApproveProposalApplication } from './applications/approve-proposal-application';
+import { RejectProposalApplication } from './applications/reject-proposal.application';
 
 @Module({
     imports: [Web3Module, UserModule, TransactionModule, CommonModule],
@@ -73,11 +74,13 @@ import { PartyMemberValidation } from './services/members/party-member.validatio
         PartyMemberValidation,
 
         // Proposal
-        CreateProposalService,
-        IndexProposalService,
+        CreateProposalApplication,
+        IndexPartyProposalApplication,
+        ApproveProposalApplication,
+        RejectProposalApplication,
+
+        ProposalService,
         GetProposalService,
-        ApproveProposalService,
-        RejectProposalService,
     ],
     exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
 })

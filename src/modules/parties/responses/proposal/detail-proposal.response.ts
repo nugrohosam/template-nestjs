@@ -46,11 +46,9 @@ export class DetailProposalResponse
             approvedAt: proposal.approvedAt,
             rejectedAt: proposal.rejectedAt,
             party: await IndexPartyResponse.mapFromPartyModel(
-                await proposal.$get('party'),
+                await proposal.party,
             ),
-            creator: MemberResponse.mapFromUserModel(
-                await proposal.$get('creator'),
-            ),
+            creator: MemberResponse.mapFromUserModel(await proposal.creator),
         };
     }
 }

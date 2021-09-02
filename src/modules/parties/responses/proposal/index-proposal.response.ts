@@ -28,11 +28,9 @@ export class IndexProposalResponse {
             attachmentUrl: proposal.attachmentUrl,
             createdAt: proposal.createdAt,
             party: await IndexPartyResponse.mapFromPartyModel(
-                await proposal.$get('party'),
+                await proposal.party,
             ),
-            creator: MemberResponse.mapFromUserModel(
-                await proposal.$get('creator'),
-            ),
+            creator: MemberResponse.mapFromUserModel(await proposal.creator),
         };
     }
 }

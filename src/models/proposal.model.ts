@@ -87,20 +87,20 @@ export class Proposal implements IProposal {
 
     @ManyToOne(() => PartyModel, (party) => party.proposals)
     @JoinColumn({ name: 'party_id' })
-    party?: PartyModel;
+    party?: Promise<PartyModel>;
 
     @ManyToOne(() => UserModel, (user) => user.proposals)
     @JoinColumn({ name: 'creator_id' })
-    creator?: UserModel;
+    creator?: Promise<UserModel>;
 
     @OneToMany(() => ProposalVoteModel, (vote) => vote.proposal)
-    votes?: ProposalVoteModel[];
+    votes?: Promise<ProposalVoteModel[]>;
 
     @OneToMany(
         () => ProposalDistributionModel,
         (distribution) => distribution.proposal,
     )
-    distributions?: ProposalDistributionModel[];
+    distributions?: Promise<ProposalDistributionModel[]>;
 
     get status(): ProposalStatusEnum {
         if (this.approvedAt) {

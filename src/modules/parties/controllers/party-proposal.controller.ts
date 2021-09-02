@@ -1,6 +1,18 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Inject,
+    Param,
+    Post,
+    Put,
+    Query,
+} from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
+import { CreateProposalApplication } from '../applications/create-proposal.application';
+import { IndexPartyProposalApplication } from '../applications/index-party-proposal.application';
 import { CreateProposalRequest } from '../requests/proposal/create-proposal.request';
 import {
     RevertApproveProposalRequest,
@@ -10,20 +22,25 @@ import {
 import { UpdateProposalTransactionRequest } from '../requests/proposal/update-proposal-transaction.request';
 import { DetailProposalResponse } from '../responses/proposal/detail-proposal.response';
 import { IndexProposalResponse } from '../responses/proposal/index-proposal.response';
-import { ApproveProposalService } from '../services/proposal/approve-proposal.service';
-import { CreateProposalService } from '../services/proposal/create-proposal.service';
+import { GetPartyService } from '../services/get-party.service';
 import { GetProposalService } from '../services/proposal/get-proposal.service';
-import { IndexProposalService } from '../services/proposal/index-proposal.service';
-import { RejectProposalService } from '../services/proposal/reject-proposal.service';
+import { ApproveProposalApplication } from '../applications/approve-proposal-application';
+import { RejectProposalApplication } from '../applications/reject-proposal.application';
 
 @Controller('parties/:partyId/proposals')
 export class PartyProposalController {
     constructor(
-        private readonly createProposalService: CreateProposalService,
-        private readonly indexProposalService: IndexProposalService,
+        private readonly indexPartyProposalApplication: IndexPartyProposalApplication,
+        private readonly createProposalApplication: CreateProposalApplication,
+        private readonly approveProposalApplication: ApproveProposalApplication,
+        private readonly rejectProposalApplication: RejectProposalApplication,
+
+        @Inject(GetPartyService)
+        private readonly getPartyService: GetPartyService,
+        @Inject(GetUserService)
+        private readonly getUserService: GetUserService,
+        @Inject(GetProposalService)
         private readonly getProposalService: GetProposalService,
-        private readonly approveProposalService: ApproveProposalService,
-        private readonly rejectProposalService: RejectProposalService,
     ) {}
 
     @Post()
@@ -31,41 +48,39 @@ export class PartyProposalController {
         @Param('partyId') partyId: string,
         @Body() request: CreateProposalRequest,
     ): Promise<IApiResponse<{ id: string; platformSignature: string }>> {
-        const proposal = await this.createProposalService.call(
-            partyId,
-            request,
+        const party = await this.getPartyService.getById(partyId);
+        const user = await this.getUserService.getUserByAddress(
+            request.signerAddress,
         );
-        const platformSignature =
-            await this.createProposalService.generatePlatformSignature(
-                proposal,
-            );
+        const { data, platformSignature } =
+            await this.createProposalApplication.prepare(user, party, request);
         return {
             message: 'Success create proposal',
-            data: { id: proposal.id, platformSignature },
+            data: { id: data.id, platformSignature },
         };
     }
 
     @Put(':proposalId/transaction-hash')
-    async updateTransactionHash(
+    async commit(
         @Param('proposalId') proposalId: string,
         @Body() request: UpdateProposalTransactionRequest,
     ): Promise<IApiResponse<{ id: string }>> {
-        const { id } = await this.createProposalService.updateTransactionHash(
-            proposalId,
-            request,
-        );
+        const proposal = await this.getProposalService.getById(proposalId);
+
+        await this.createProposalApplication.commit(proposal, request);
         return {
             message: 'Success update proposal transaction hash',
-            data: { id },
+            data: { id: proposal.id },
         };
     }
 
     @Put(':proposalId/transaction-hash/revert')
-    async revertCreate(
+    async revert(
         @Param('proposalId') proposalId: string,
         @Body() request: UpdateProposalTransactionRequest,
     ): Promise<IApiResponse<null>> {
-        await this.createProposalService.revert(proposalId, request);
+        const proposal = await this.getProposalService.getById(proposalId);
+        await this.createProposalApplication.revert(proposal, request);
         return {
             message: 'Success revert create proposal transaction',
             data: null,
@@ -77,14 +92,22 @@ export class PartyProposalController {
         @Param('partyId') partyId: string,
         @Query() query: IndexRequest,
     ): Promise<IApiResponse<IndexProposalResponse[]>> {
-        const { data, meta } = await this.indexProposalService.fetch(
-            partyId,
+        const party = await this.getPartyService.getById(partyId);
+        const { data, meta } = await this.indexPartyProposalApplication.fetch(
+            party,
             query,
         );
+
+        const response = await Promise.all(
+            data.map(async (datum) => {
+                return await IndexProposalResponse.mapFromProposalModel(datum);
+            }),
+        );
+
         return {
             message: 'Success fetch proposal',
+            data: response,
             meta,
-            data,
         };
     }
 
@@ -104,7 +127,8 @@ export class PartyProposalController {
         @Param('proposalId') proposalId: string,
         @Body() request: ApproveProposalRequest,
     ): Promise<IApiResponse<null>> {
-        await this.approveProposalService.approve(proposalId, request);
+        const proposal = await this.getProposalService.getById(proposalId);
+        await this.approveProposalApplication.commit(proposal, request);
         return {
             message: 'Success approve proposal',
             data: null,
@@ -116,7 +140,8 @@ export class PartyProposalController {
         @Param('proposalId') proposalId: string,
         @Body() request: RevertApproveProposalRequest,
     ): Promise<IApiResponse<null>> {
-        await this.approveProposalService.revert(proposalId, request);
+        const proposal = await this.getProposalService.getById(proposalId);
+        await this.approveProposalApplication.revert(proposal, request);
         return {
             message: 'Success revert approve proposal transaction',
             data: null,
@@ -128,7 +153,8 @@ export class PartyProposalController {
         @Param('proposalId') proposalId: string,
         @Body() request: RejectProposalRequest,
     ): Promise<IApiResponse<null>> {
-        await this.rejectProposalService.reject(proposalId, request);
+        const proposal = await this.getProposalService.getById(proposalId);
+        await this.rejectProposalApplication.call(proposal, request);
         return { message: 'Success reject proposal', data: null };
     }
 }
