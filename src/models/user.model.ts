@@ -13,7 +13,7 @@ import { PartyMemberModel } from './party-member.model';
 import { PartyModel } from './party.model';
 import { ProposalModel } from './proposal.model';
 
-@Entity({ name: 'users' })
+@Entity('users')
 export class UserModel implements IUser {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
@@ -30,7 +30,7 @@ export class UserModel implements IUser {
     @Column('varchar', { nullable: true })
     lastname?: string;
 
-    @Column('text', { nullable: true })
+    @Column('varchar', { nullable: true, name: 'image_url' })
     imageUrl?: string;
 
     @Column('varchar', { nullable: true })

@@ -60,6 +60,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
             creatorId: creator.id,
             ownerId: creator.id,
             totalFund: new BN(0),
+            totalDeposit: new BN(0),
             totalMember: 0,
         });
 

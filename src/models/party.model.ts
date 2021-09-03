@@ -17,13 +17,14 @@ import { JoinRequestModel } from './join-request.model';
 import { PartyMemberModel } from './party-member.model';
 import { ProposalModel } from './proposal.model';
 import { UserModel } from './user.model';
+import { TransformBN } from 'src/common/utils/typeorm.util';
 
 @Entity({ name: 'parties' })
 export class PartyModel implements IParty {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @Column('varchar')
+    @Column('varchar', { unique: true })
     address?: string;
 
     @Column('varchar')
@@ -38,10 +39,10 @@ export class PartyModel implements IParty {
     @Column('varchar', { name: 'image_url', nullable: true })
     imageUrl?: string;
 
-    @Column('uuid', { name: 'creator_id' })
+    @Column('uuid', { name: 'creator_id', nullable: true })
     creatorId: string;
 
-    @Column('uuid', { name: 'owner_id' })
+    @Column('uuid', { name: 'owner_id', nullable: true })
     ownerId: string;
 
     @Column('boolean', { name: 'is_public' })
@@ -50,16 +51,32 @@ export class PartyModel implements IParty {
     @Column('boolean', { name: 'is_featured', nullable: true })
     isFeatured?: boolean;
 
-    @Column('bigint', { name: 'total_fund', nullable: true })
+    @Column('bigint', {
+        name: 'total_fund',
+        nullable: true,
+        transformer: TransformBN,
+    })
     totalFund?: BN;
 
-    @Column('bigint', { name: 'min_deposit', nullable: true })
+    @Column('bigint', {
+        name: 'min_deposit',
+        nullable: true,
+        transformer: TransformBN,
+    })
     minDeposit?: BN;
 
-    @Column('bigint', { name: 'max_deposit', nullable: true })
+    @Column('bigint', {
+        name: 'max_deposit',
+        nullable: true,
+        transformer: TransformBN,
+    })
     maxDeposit?: BN;
 
-    @Column('bigint', { name: 'total_deposit', nullable: true })
+    @Column('bigint', {
+        name: 'total_deposit',
+        nullable: true,
+        transformer: TransformBN,
+    })
     totalDeposit?: BN;
 
     @Column('int', { name: 'total_member', nullable: true })
@@ -100,6 +117,23 @@ export class PartyModel implements IParty {
     @OneToMany(() => ProposalModel, (proposal) => proposal.party)
     proposals?: Promise<ProposalModel[]>;
 
+    // Computed Columns
+
+    @Column('boolean', {
+        select: false,
+        transformer: {
+            to: (value) => value,
+            from: (value: number) => value === 1,
+        },
+    })
     isActive?: boolean;
+
+    @Column('boolean', {
+        select: false,
+        transformer: {
+            to: (value) => value,
+            from: (value: number) => value === 1,
+        },
+    })
     isMember?: boolean;
 }

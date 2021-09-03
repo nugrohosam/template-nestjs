@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import { MemberStatusEnum } from 'src/common/enums/party.enum';
+import { TransformBN } from 'src/common/utils/typeorm.util';
 import { IPartyMember } from 'src/entities/party-member.entity';
 import {
     Column,
@@ -30,14 +31,17 @@ export class PartyMemberModel implements IPartyMember {
     @Column('uuid', { name: 'member_id' })
     memberId: string;
 
-    @Column('bigint', { name: 'initial_fund' })
+    @Column('bigint', { name: 'initial_fund', transformer: TransformBN })
     initialFund: BN;
 
-    @Column('bigint', { name: 'total_fund' })
+    @Column('bigint', { name: 'total_fund', transformer: TransformBN })
     totalFund: BN;
 
-    @Column('bigint', { name: 'total_deposit' })
+    @Column('bigint', { name: 'total_deposit', transformer: TransformBN })
     totalDeposit: BN;
+
+    @Column('int')
+    weight: number;
 
     @Column('varchar')
     signature: string;

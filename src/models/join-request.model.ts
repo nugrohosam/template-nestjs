@@ -18,16 +18,16 @@ export class JoinRequestModel implements IJoinRequest {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @Column('uuid')
+    @Column('uuid', { name: 'user_id' })
     userId: string;
 
-    @Column('uuid')
+    @Column('uuid', { name: 'party_id' })
     partyId: string;
 
-    @Column('uuid')
+    @Column('uuid', { name: 'processed_by' })
     processedBy: string;
 
-    @Column('timestamp', { nullable: true })
+    @Column('timestamp', { nullable: true, name: 'accepted_at' })
     acceptedAt?: Date;
 
     @Column('timestamp', { name: 'rejected_at' })

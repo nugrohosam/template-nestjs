@@ -19,7 +19,7 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "cross-env NODE_PATH=. jest --config ./test/jest-e2e.json --testTimeout 30000 --detectOpenHandles",
-        "database": "npx sequelize-cli --options-path database/.sequelizerc $npm_config_script"
+        "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config databases/config.js"
     },
     "dependencies": {
         "@nestjs/common": "^7.6.15",
@@ -35,6 +35,7 @@
         "@types/bn.js": "^5.1.0",
         "@types/lodash": "^4.14.170",
         "@types/passport-http": "^0.3.8",
+        "@types/pluralize": "^0.0.29",
         "bn.js": "^5.2.0",
         "class-transformer": "^0.4.0",
         "class-validator": "^0.13.1",
@@ -45,6 +46,7 @@
         "passport": "^0.4.1",
         "passport-http": "^0.3.0",
         "passport-jwt": "^4.0.0",
+        "pluralize": "^8.0.0",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
         "rxjs": "^6.6.6",

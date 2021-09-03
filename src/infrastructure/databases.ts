@@ -29,6 +29,7 @@ export const connectionOption: ConnectionOptions = {
         ProposalDistributionModel,
     ],
     synchronize: false,
+    logging: false,
 };
 
 export const databaseConnection = createConnection(connectionOption);

@@ -14,7 +14,9 @@ export class GetSignerService {
     ) {}
 
     private generateGlobalSignature(): string {
-        return `I want to access private information of PolkaParty`;
+        const message = `I want to access private information of PolkaParty`;
+        console.log('[global-signature]: ' + message);
+        return message;
     }
 
     async get(signature: string, required = false): Promise<UserModel | null> {

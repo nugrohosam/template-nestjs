@@ -17,7 +17,7 @@ export class PartyMemberService {
 
     async store(data: IPartyMember): Promise<PartyMemberModel> {
         const partyMember = this.partyMemberRepository.create(data);
-        return this.partyMemberRepository.save(partyMember);
+        return await this.partyMemberRepository.save(partyMember);
     }
 
     async update(

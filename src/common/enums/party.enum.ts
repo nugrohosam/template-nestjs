@@ -7,6 +7,7 @@ export enum PartyTypeEnum {
 
 export enum DistributionTypeEnum {
     Daily = 'daily',
+    Weekly = 'weekly',
     Monthly = 'monthly',
     Yearly = 'yearly',
 }
