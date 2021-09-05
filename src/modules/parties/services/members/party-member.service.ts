@@ -52,6 +52,7 @@ export class PartyMemberService {
     async generatePlatformSignature(
         partyMember: PartyMemberModel,
     ): Promise<string> {
+        console.log(await partyMember.member);
         const party = await partyMember.party;
         const member = await partyMember.member;
 

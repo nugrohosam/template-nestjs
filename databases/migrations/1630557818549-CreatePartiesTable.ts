@@ -101,11 +101,14 @@ export class CreatePartiesTable1630557818549 implements MigrationInterface {
                     {
                         name: 'created_at',
                         type: 'timestamp',
+                        default: 'current_timestamp()',
                         isNullable: true,
                     },
                     {
                         name: 'updated_at',
                         type: 'timestamp',
+                        default: 'current_timestamp()',
+                        onUpdate: 'current_timestamp()',
                         isNullable: true,
                     },
                     {

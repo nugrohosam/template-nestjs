@@ -46,8 +46,19 @@ export class CreateTransactionsTable1630570654030
                         type: 'boolean',
                         default: false,
                     },
-                    { name: 'created_at', type: 'timestamp', isNullable: true },
-                    { name: 'updated_at', type: 'timestamp', isNullable: true },
+                    {
+                        name: 'created_at',
+                        type: 'timestamp',
+                        isNullable: true,
+                        default: 'current_timestamp()',
+                    },
+                    {
+                        name: 'updated_at',
+                        type: 'timestamp',
+                        isNullable: true,
+                        default: 'current_timestamp()',
+                        onUpdate: 'current_timestamp()',
+                    },
                     { name: 'deleted_at', type: 'timestamp', isNullable: true },
                 ],
                 foreignKeys: [

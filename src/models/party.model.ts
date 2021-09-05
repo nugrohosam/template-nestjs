@@ -119,8 +119,11 @@ export class PartyModel implements IParty {
 
     // Computed Columns
 
-    @Column('boolean', {
+    @Column({
+        type: 'boolean',
         select: false,
+        update: true,
+        insert: false,
         transformer: {
             to: (value) => value,
             from: (value: number) => value === 1,
@@ -128,8 +131,11 @@ export class PartyModel implements IParty {
     })
     isActive?: boolean;
 
-    @Column('boolean', {
+    @Column({
+        type: 'boolean',
         select: false,
+        update: false,
+        insert: false,
         transformer: {
             to: (value) => value,
             from: (value: number) => value === 1,

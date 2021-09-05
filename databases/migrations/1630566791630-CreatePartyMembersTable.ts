@@ -41,11 +41,14 @@ export class CreatePartyMembersTable1630566791630
                         name: 'created_at',
                         type: 'timestamp',
                         isNullable: true,
+                        default: 'current_timestamp()',
                     },
                     {
                         name: 'updated_at',
                         type: 'timestamp',
                         isNullable: true,
+                        default: 'current_timestamp()',
+                        onUpdate: 'current_timestamp()',
                     },
                     {
                         name: 'deleted_at',

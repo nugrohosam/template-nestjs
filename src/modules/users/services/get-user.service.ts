@@ -10,16 +10,22 @@ export class GetUserService {
     ) {}
 
     async getUserByAddress(address: string): Promise<UserModel> {
-        const user = await this.userRepository.findOne({ where: { address } });
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .where('address = :address', { address })
+            .getOne();
 
-        if (user === null) throw new NotFoundException('User not found.');
+        if (!user) throw new NotFoundException('User not found.');
         return user;
     }
 
     async getUserById(id: string): Promise<UserModel> {
-        const user = await this.userRepository.findOne({ where: { id } });
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .where('id = :id', { id })
+            .getOne();
 
-        if (user === null) throw new NotFoundException('User not found.');
+        if (!user) throw new NotFoundException('User not found.');
         return user;
     }
 }

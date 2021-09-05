@@ -12,31 +12,31 @@ export class GetPartyService {
     ) {}
 
     async getById(partyId: string, userId?: string): Promise<PartyModel> {
-        const query = this.repository.createQueryBuilder('parties');
+        const query = this.repository.createQueryBuilder('party');
         query.setParameters({ partyId, userId });
 
         const isActiveQuery = query
             .subQuery()
             .select('p.id')
             .from(PartyModel, 'p')
-            .leftJoin(PartyMemberModel, 'pm', 'pm.party_id = parties.id')
-            .where('p.id = parties.id')
-            .andWhere('pm.member_id = parties.owner_id')
-            .andWhere('parties.address is not null')
-            .andWhere('parties.transaction_hash is not null')
+            .leftJoin(PartyMemberModel, 'pm', 'pm.party_id = p.id')
+            .where('p.id = party.id')
+            .andWhere('pm.member_id = party.owner_id')
+            .andWhere('party.address is not null')
+            .andWhere('party.transaction_hash is not null')
             .take(1)
             .getQuery();
-        query.addSelect(`(${isActiveQuery}) is not null`, 'parties_isActive');
+        query.addSelect(`(${isActiveQuery}) is not null`, 'party_isActive');
 
         const isMemberQuery = query
             .subQuery()
             .select('pm.id')
             .from(PartyMemberModel, 'pm')
-            .where('pm.party_id = parties.id')
+            .where('pm.party_id = party.id')
             .where('pm.member_id = :userId')
             .take(1)
             .getQuery();
-        query.addSelect(`(${isMemberQuery}) is not null`, 'parties_isMember');
+        query.addSelect(`(${isMemberQuery}) is not null`, 'party_isMember');
 
         query.where('id = :partyId');
 
