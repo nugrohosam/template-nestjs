@@ -2,6 +2,7 @@ import {
     PartyTypeEnum,
     DistributionTypeEnum,
 } from 'src/common/enums/party.enum';
+import { Utils } from 'src/common/utils/util';
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 
@@ -18,9 +19,11 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     totalFund: string;
     totalDeposit: string;
     distribution: DistributionTypeEnum;
+    distributionDay: number;
     ownerId: string;
     createdAt: Date;
     isActive: boolean;
+    nextDistribution: Date;
 
     static async mapFromPartyModel(
         party: PartyModel,
@@ -38,6 +41,11 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             totalMember: party.totalMember,
             totalFund: party.totalFund.toString(),
             distribution: party.distribution,
+            distributionDay: party.distributionDate?.getDay() ?? 1,
+            nextDistribution: Utils.dateOfNearestDay(
+                new Date(),
+                party.distributionDate?.getDay() ?? 1,
+            ),
             ownerId: party.ownerId,
             createdAt: party.createdAt,
             isActive: party.isActive,

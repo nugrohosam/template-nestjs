@@ -3,6 +3,7 @@ import {
     DistributionTypeEnum,
     JoinRequestStatusEnum,
 } from 'src/common/enums/party.enum';
+import { Utils } from 'src/common/utils/util';
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -25,6 +26,8 @@ export class DetailPartyResponse
     totalDeposit: string;
     totalMember: number;
     distribution: DistributionTypeEnum;
+    distributionDay: number;
+    nextDistribution: Date;
     creator: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;
     owner: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;
     projects: Record<string, any> | [];
@@ -55,6 +58,11 @@ export class DetailPartyResponse
             totalDeposit: party.totalDeposit.toString(),
             totalMember: party.totalMember,
             distribution: party.distribution,
+            distributionDay: party.distributionDate?.getDay() ?? 1,
+            nextDistribution: Utils.dateOfNearestDay(
+                new Date(),
+                party.distributionDate?.getDay() ?? 1,
+            ),
             creator: {
                 id: creator.id,
                 firstname: creator.firstname,
