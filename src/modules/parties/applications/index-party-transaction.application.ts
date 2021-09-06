@@ -22,17 +22,14 @@ export class IndexPartyTransactionApplication extends IndexApplication {
     ): Promise<IPaginateResponse<TransactionModel>> {
         const query = this.repository.createQueryBuilder('transactions');
 
-        query
-            .setParameters({
-                partyAddress: party.address,
-            })
-            .where(
-                new Brackets((qb) => {
-                    qb.where('address_from = :partyAddress').orWhere(
-                        'address_to = :partyAddress',
-                    );
-                }),
-            );
+        query.where(
+            new Brackets((qb) => {
+                qb.where('address_from = :partyAddress').orWhere(
+                    'address_to = :partyAddress',
+                    { partyAddress: party.address },
+                );
+            }),
+        );
 
         query.orderBy(
             request.sort ?? 'transactions.created_at',

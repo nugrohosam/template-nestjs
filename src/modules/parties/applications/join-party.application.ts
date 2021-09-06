@@ -116,7 +116,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             depositTransactionId: transaction.id,
         });
 
-        party = await this.partyService.updateParty(party, {
+        party = await this.partyService.update(party, {
             totalFund: party.totalFund.add(transaction.amount),
             totalDeposit: party.totalDeposit.add(transaction.amount),
             totalMember: party.totalMember + 1,

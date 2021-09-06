@@ -37,11 +37,10 @@ export class UpdateJoinRequestStatusApplication extends OffchainApplication {
         );
 
         if (request.accept) {
-            joinRequest.acceptedAt = new Date();
+            await this.joinRequestService.acceptJoinRequest(joinRequest, owner);
         } else {
-            joinRequest.rejectedAt = new Date();
+            await this.joinRequestService.rejectJoinRequest(joinRequest, owner);
         }
-        joinRequest.processedBy = owner.id;
 
         return await this.repository.save(joinRequest);
     }

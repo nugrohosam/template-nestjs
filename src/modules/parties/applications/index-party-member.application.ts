@@ -1,7 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { MemberStatusEnum } from 'src/common/enums/party.enum';
 import { IPaginateResponse } from 'src/common/interface/index.interface';
-import { Utils } from 'src/common/utils/util';
 import { IndexApplication } from 'src/infrastructure/applications/index.application';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { Repository } from 'typeorm';
@@ -19,10 +18,7 @@ export class IndexPartyMemberApplication extends IndexApplication {
         request: IndexPartyMemberRequestWithParty,
     ): Promise<IPaginateResponse<PartyMemberModel>> {
         const query = this.repository.createQueryBuilder();
-        query.setParameters({
-            partyId: request.party.id,
-        });
-        query.where('party_id = :partyId');
+        query.where('party_id = :partyId', { partyId: request.party.id });
 
         if (request.status) {
             if (request.status === MemberStatusEnum.InActive) {
@@ -32,19 +28,17 @@ export class IndexPartyMemberApplication extends IndexApplication {
             }
         }
 
-        query.orderBy(request.sort ?? 'created_at', request.order ?? 'DESC');
-        query.take(request.perPage ?? 10);
-        query.skip(Utils.countOffset(request.page, request.perPage));
+        query.orderBy(
+            request.sort ?? this.DefaultSort,
+            request.order ?? this.DefaultOrder,
+        );
+        query.take(request.perPage ?? this.DefaultPerPage);
+        query.skip(this.countOffset(request));
 
         const [data, count] = await query.getManyAndCount();
         return {
             data: data,
-            meta: {
-                page: request.page ?? 1,
-                perPage: request.perPage ?? 10,
-                total: count,
-                totalPage: count / (request.perPage ?? 10),
-            },
+            meta: this.mapMeta(count, request),
         };
     }
 }

@@ -31,7 +31,7 @@ export class PartyService {
         return await this.getUserService.getUserByAddress(address);
     }
 
-    async storeParty(data: IParty): Promise<PartyModel> {
+    async store(data: IParty): Promise<PartyModel> {
         const party = this.repository.create(data);
         return await this.repository.save(party);
     }
@@ -53,7 +53,7 @@ export class PartyService {
         return await this.web3Service.sign(message);
     }
 
-    async updateParty(
+    async update(
         party: PartyModel,
         data: Partial<IParty>,
     ): Promise<PartyModel> {
@@ -62,7 +62,13 @@ export class PartyService {
         return party;
     }
 
-    async deleteParty(party: PartyModel): Promise<void> {
+    async decreaseTotalMember({ id }: PartyModel, by = 1): Promise<void> {
+        await this.repository.update(id, {
+            totalMember: () => `total_member - ${by}`,
+        });
+    }
+
+    async delete(party: PartyModel): Promise<void> {
         await this.repository.delete(party);
     }
 }

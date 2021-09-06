@@ -13,6 +13,10 @@ export type PrepareOnchainReturn<T = any> = {
 /**
  * Used to handle Onchain Paralel Transaction with flow
  * FE -> SC -> FE -> BE
+ *
+ * The "commit" method will called twice by FE:
+ * - Transaction hash initiated or transaction created on network
+ * - Transaction has mined with status eather true or false
  */
 export abstract class OnchainParalelApplication {
     abstract commit(arg0: any, arg1: any): Promise<any>;
@@ -22,6 +26,10 @@ export abstract class OnchainParalelApplication {
 /**
  * Used to handle Onchain Series Transaction with flow
  * FE -> BE -> FE -> SC -> FE -> BE
+ *
+ * The "commit" method will called twice by FE:
+ * - Transaction hash initiated or transaction created on network
+ * - Transaction has mined with status eather true or false
  */
 export abstract class OnchainSeriesApplication {
     abstract prepare(

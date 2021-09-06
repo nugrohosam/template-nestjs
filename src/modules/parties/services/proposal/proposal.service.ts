@@ -136,7 +136,7 @@ export class ProposalService {
                 transactionHashStatus: true,
             });
 
-            await this.partyService.updateParty(party, {
+            await this.partyService.update(party, {
                 totalFund: party.totalFund.add(transaction.amount),
             });
         }

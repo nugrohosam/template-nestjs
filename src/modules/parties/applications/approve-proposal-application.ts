@@ -71,10 +71,7 @@ export class ApproveProposalApplication extends OnchainParalelApplication {
         if (signature !== proposal.approveSignature)
             throw new UnauthorizedException('Invalid Signature');
 
-        proposal.approvedAt = null;
-        proposal.approveSignature = null;
-        proposal.approveTransactionHash = null;
-        this.proposalService.update(proposal, {
+        await this.proposalService.update(proposal, {
             approvedAt: null,
             approveSignature: null,
             approveTransactionHash: null,

@@ -24,7 +24,7 @@ export class IndexPartyJoinRequestApplication extends IndexApplication {
             request.sort ?? 'joinRequests.created_at',
             request.order ?? 'DESC',
         );
-        query.take(request.perPage ?? this.DefaultPage);
+        query.take(request.perPage ?? this.DefaultPerPage);
         query.skip(this.countOffset(request));
 
         const [data, count] = await query.getManyAndCount();

@@ -13,43 +13,35 @@ export class IndexTransactionApplication extends IndexApplication {
         super();
     }
 
-    async fetch({
-        from,
-        to,
-        order,
-        sort,
-        perPage,
-        page,
-    }: IndexTransactionRequest): Promise<IPaginateResponse<TransactionModel>> {
-        const query = this.repository
-            .createQueryBuilder('transactions')
-            .setParameters({
-                from,
-                to,
-            });
+    async fetch(
+        request: IndexTransactionRequest,
+    ): Promise<IPaginateResponse<TransactionModel>> {
+        const query = this.repository.createQueryBuilder('transactions');
 
-        if (from || to) {
+        if (request.from || request.to) {
             query.where(
                 new Brackets((qb) => {
-                    qb.where('transaction.address_from = :from');
-                    qb.orWhere('transaction.address_to = :to');
+                    qb.where('transaction.address_from = :from', {
+                        from: request.from,
+                    });
+                    qb.orWhere('transaction.address_to = :to', {
+                        to: request.to,
+                    });
                 }),
             );
         }
 
-        query.orderBy(sort ?? 'transactions.created_at', order ?? 'DESC');
-        query.take(perPage ?? 10);
-        query.skip(page ? (page - 1) * perPage : 0);
+        query.orderBy(
+            request.sort ?? this.DefaultSort,
+            request.order ?? this.DefaultOrder,
+        );
+        query.take(request.perPage ?? this.DefaultPerPage);
+        query.skip(this.countOffset(request));
         const [data, count] = await query.getManyAndCount();
 
         return {
             data: data,
-            meta: {
-                page: page ?? 1,
-                perPage: perPage ?? 10,
-                total: count,
-                totalPage: Math.ceil(count / perPage),
-            },
+            meta: this.mapMeta(count, request),
         };
     }
 }

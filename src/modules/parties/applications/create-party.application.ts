@@ -54,7 +54,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
             request.memberAddress,
         );
 
-        const party = await this.partyService.storeParty({
+        const party = await this.partyService.store({
             ...request,
             signature: request.memberSignature,
             creatorId: creator.id,
@@ -90,7 +90,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
             { 2: party.id },
         );
 
-        this.partyService.updateParty(party, {
+        await this.partyService.update(party, {
             address: request.partyAddress,
             transactionHash: request.transactionHash,
         });
@@ -113,6 +113,6 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
                 'This party has a success transaction hash.',
             );
 
-        this.partyService.deleteParty(party);
+        this.partyService.delete(party);
     }
 }

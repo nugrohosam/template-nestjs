@@ -33,14 +33,31 @@ export class JoinRequestService {
         return message;
     }
 
-    async storeJoinRequest(
-        user: UserModel,
-        party: PartyModel,
-    ): Promise<JoinRequestModel> {
+    async store(user: UserModel, party: PartyModel): Promise<JoinRequestModel> {
         const joinRequest = this.repository.create({
             userId: user.id,
             partyId: party.id,
         });
         return await this.repository.save(joinRequest);
+    }
+
+    async acceptJoinRequest(
+        joinRequest: JoinRequestModel,
+        processedBy: UserModel,
+    ): Promise<void> {
+        await this.repository.update(joinRequest, {
+            acceptedAt: new Date(),
+            processedBy: processedBy.id,
+        });
+    }
+
+    async rejectJoinRequest(
+        joinRequest: JoinRequestModel,
+        processedBy: UserModel,
+    ): Promise<void> {
+        await this.repository.update(joinRequest, {
+            rejectedAt: new Date(),
+            processedBy: processedBy.id,
+        });
     }
 }

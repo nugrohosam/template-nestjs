@@ -10,6 +10,7 @@ import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { PartyCalculationService } from '../services/party-calculation.service';
 import { PartyService } from '../services/party.service';
 import { OnchainParalelApplication } from 'src/infrastructure/applications/onchain.application';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 export class LeavePartyApplication extends OnchainParalelApplication {
     constructor(
@@ -27,6 +28,7 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         super();
     }
 
+    @Transactional()
     async commit(
         partyMember: PartyMemberModel,
         request: LeavePartyRequest,
@@ -53,6 +55,8 @@ export class LeavePartyApplication extends OnchainParalelApplication {
             leaveTransactionHash: request.transactionHash,
         });
 
+        // will only process leave party bussiness logic if transaction hash
+        // sended by FE is the success one (true)
         if (!transactionStatus) return;
 
         const transaction = await this.transactionService.store({
@@ -74,10 +78,7 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         );
 
         await this.partyMemberService.delete(partyMember, true);
-
-        await this.partyService.updateParty(party, {
-            totalMember: party.totalMember - 1,
-        });
+        await this.partyService.decreaseTotalMember(party);
     }
 
     async revert(partyMember: PartyMemberModel): Promise<void> {

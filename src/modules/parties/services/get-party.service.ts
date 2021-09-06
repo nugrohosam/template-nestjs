@@ -13,7 +13,6 @@ export class GetPartyService {
 
     async getById(partyId: string, userId?: string): Promise<PartyModel> {
         const query = this.repository.createQueryBuilder('party');
-        query.setParameters({ partyId, userId });
 
         const isActiveQuery = query
             .subQuery()
@@ -33,12 +32,12 @@ export class GetPartyService {
             .select('pm.id')
             .from(PartyMemberModel, 'pm')
             .where('pm.party_id = party.id')
-            .where('pm.member_id = :userId')
+            .where('pm.member_id = :userId', { userId })
             .take(1)
             .getQuery();
         query.addSelect(`${isMemberQuery} is not null`, 'party_isMember');
 
-        query.where('id = :partyId');
+        query.where('id = :partyId', { partyId });
 
         const party = await query.getOne();
         if (!party) throw new NotFoundException('Party not found.');

@@ -32,6 +32,6 @@ export class RequestJoinPartyApplication extends OffchainApplication {
             this.joinRequestService.generateJoinRequestSignature(party.id),
         );
 
-        return await this.joinRequestService.storeJoinRequest(user, party);
+        return await this.joinRequestService.store(user, party);
     }
 }

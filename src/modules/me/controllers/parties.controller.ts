@@ -19,7 +19,7 @@ export class MePartiesController {
         @Headers('Signature') signature: string,
         @Query() query: IndexMePartyRequest,
     ): Promise<IApiResponse<IndexPartyResponse[]>> {
-        const { data, meta } = await this.myPartyApplication.call(
+        const { data, meta } = await this.myPartyApplication.fetch(
             query,
             signature,
         );
