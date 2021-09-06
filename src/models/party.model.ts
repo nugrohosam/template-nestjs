@@ -120,25 +120,27 @@ export class PartyModel implements IParty {
     // Computed Columns
 
     @Column({
-        type: 'boolean',
+        type: 'varchar',
+        length: 1,
         select: false,
-        update: true,
+        update: false,
         insert: false,
         transformer: {
-            to: (value) => value,
-            from: (value: number) => value === 1,
+            to: (value) => value == 1 || value === 'true',
+            from: (value) => value == 1 || value === 'true',
         },
     })
     isActive?: boolean;
 
     @Column({
-        type: 'boolean',
+        type: 'varchar',
+        length: 1,
         select: false,
         update: false,
         insert: false,
         transformer: {
-            to: (value) => value,
-            from: (value: number) => value === 1,
+            to: (value) => value == 1 || value === 'true',
+            from: (value) => value == 1 || value === 'true',
         },
     })
     isMember?: boolean;

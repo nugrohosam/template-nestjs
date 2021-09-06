@@ -26,7 +26,7 @@ export class GetPartyService {
             .andWhere('party.transaction_hash is not null')
             .take(1)
             .getQuery();
-        query.addSelect(`(${isActiveQuery}) is not null`, 'party_isActive');
+        query.addSelect(`${isActiveQuery} is not null`, 'party_isActive');
 
         const isMemberQuery = query
             .subQuery()
@@ -36,7 +36,7 @@ export class GetPartyService {
             .where('pm.member_id = :userId')
             .take(1)
             .getQuery();
-        query.addSelect(`(${isMemberQuery}) is not null`, 'party_isMember');
+        query.addSelect(`${isMemberQuery} is not null`, 'party_isMember');
 
         query.where('id = :partyId');
 

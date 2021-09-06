@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { TransformBN } from 'src/common/utils/typeorm.util';
 import { ITransaction } from 'src/entities/transaction.entity';
 import {
     Column,
@@ -23,7 +24,7 @@ export class TransactionModel implements ITransaction {
     @Column('varchar', { name: 'address_to' })
     addressTo: string;
 
-    @Column('bigint')
+    @Column('bigint', { transformer: TransformBN })
     amount: BN;
 
     @Column('int', { name: 'currency_id' })

@@ -27,7 +27,7 @@ export class UpdateJoinRequestStatusApplication extends OffchainApplication {
         const party = await joinRequest.party;
         const owner = await party.owner;
 
-        this.web3Service.validateSignature(
+        await this.web3Service.validateSignature(
             request.signature,
             owner.address,
             this.joinRequestService.generateUpdateStatusSignature(
@@ -41,7 +41,7 @@ export class UpdateJoinRequestStatusApplication extends OffchainApplication {
         } else {
             joinRequest.rejectedAt = new Date();
         }
-        joinRequest.processedBy = owner.address;
+        joinRequest.processedBy = owner.id;
 
         return await this.repository.save(joinRequest);
     }

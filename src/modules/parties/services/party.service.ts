@@ -22,7 +22,9 @@ export class PartyService {
     ) {}
 
     generateCreatePartySignatureMessage(partyName: string): string {
-        return `I want to create party with name ${partyName}`;
+        const message = `I want to create party with name ${partyName}`;
+        console.log('[create-party]: ' + message);
+        return message;
     }
 
     async validateCreatorAddress(address: string): Promise<UserModel> {

@@ -40,8 +40,8 @@ export class PartyMemberModel implements IPartyMember {
     @Column('bigint', { name: 'total_deposit', transformer: TransformBN })
     totalDeposit: BN;
 
-    @Column('int')
-    weight: number;
+    @Column('int', { transformer: TransformBN })
+    weight: BN;
 
     @Column('varchar')
     signature: string;
@@ -69,7 +69,7 @@ export class PartyMemberModel implements IPartyMember {
     party?: Promise<PartyModel>;
 
     @ManyToOne(() => UserModel, (user) => user.joinedPartyMembers)
-    @JoinColumn({ name: 'party_id' })
+    @JoinColumn({ name: 'member_id' })
     member?: Promise<UserModel>;
 
     @OneToOne(

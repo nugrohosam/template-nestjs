@@ -8,7 +8,7 @@ export class MemberDetailRespose {
     initialFund: string;
     totalDeposit: string;
     totalFund: string;
-    weight: number;
+    weight: string;
     createdAt: Date;
     updatedAt: Date;
 
@@ -16,10 +16,6 @@ export class MemberDetailRespose {
         partyMember: PartyMemberModel,
     ): Promise<MemberDetailRespose> {
         const user = await partyMember.member;
-        const party = await partyMember.party;
-
-        const currentWeight =
-            partyMember.totalDeposit.toNumber() / party.totalDeposit.toNumber();
 
         return {
             id: partyMember.id,
@@ -28,7 +24,7 @@ export class MemberDetailRespose {
             initialFund: partyMember.initialFund.toString(),
             totalDeposit: partyMember.totalDeposit.toString(),
             totalFund: partyMember.totalFund.toString(),
-            weight: currentWeight,
+            weight: partyMember.weight.toString(),
             createdAt: partyMember.createdAt,
             updatedAt: partyMember.updatedAt,
         };

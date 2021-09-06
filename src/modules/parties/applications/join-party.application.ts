@@ -21,8 +21,11 @@ import {
     OnchainSeriesApplication,
     PrepareOnchainReturn,
 } from 'src/infrastructure/applications/onchain.application';
+import { BN } from 'bn.js';
 
 export class JoinPartyApplication extends OnchainSeriesApplication {
+    private readonly WeiPercentage = 10 ** 4;
+
     constructor(
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
@@ -83,7 +86,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         partyMember: PartyMemberModel,
         request: UpdatePartyMemberRequest,
     ): Promise<PartyMemberModel> {
-        const party = await partyMember.party;
+        let party = await partyMember.party;
         const member = await partyMember.member;
 
         if (request.joinPartySignature !== partyMember.signature)
@@ -113,10 +116,16 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             depositTransactionId: transaction.id,
         });
 
-        await this.partyService.updateParty(party, {
+        party = await this.partyService.updateParty(party, {
             totalFund: party.totalFund.add(transaction.amount),
             totalDeposit: party.totalDeposit.add(transaction.amount),
             totalMember: party.totalMember + 1,
+        });
+
+        partyMember = await this.partyMemberService.update(partyMember, {
+            weight: partyMember.totalDeposit
+                .mul(new BN(this.WeiPercentage))
+                .div(party.totalDeposit),
         });
 
         return partyMember;
