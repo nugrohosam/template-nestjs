@@ -36,11 +36,15 @@ export class ProposalVoteModel implements IProposalVote {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @ManyToOne(() => ProposalModel, (proposal) => proposal.votes)
+    @ManyToOne(() => ProposalModel, (proposal) => proposal.votes, {
+        eager: true,
+    })
     @JoinColumn({ name: 'proposal_id' })
     proposal?: ProposalModel;
 
-    @ManyToOne(() => PartyMemberModel, (partyMember) => partyMember.votes)
+    @ManyToOne(() => PartyMemberModel, (partyMember) => partyMember.votes, {
+        eager: true,
+    })
     @JoinColumn({ name: 'member_id' })
     member?: PartyMemberModel;
 }

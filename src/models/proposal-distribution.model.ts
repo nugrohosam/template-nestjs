@@ -42,13 +42,16 @@ export class ProposalDistributionModel implements IProposalDistribution {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @ManyToOne(() => ProposalModel, (proposal) => proposal.distributions)
+    @ManyToOne(() => ProposalModel, (proposal) => proposal.distributions, {
+        eager: true,
+    })
     @JoinColumn({ name: 'proposal_id' })
     proposal?: ProposalModel;
 
     @ManyToOne(
         () => PartyMemberModel,
         (partyMember) => partyMember.distributions,
+        { eager: true },
     )
     @JoinColumn({ name: 'member_id' })
     member?: PartyMemberModel;

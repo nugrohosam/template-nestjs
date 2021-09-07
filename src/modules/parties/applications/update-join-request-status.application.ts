@@ -3,8 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OffchainApplication } from 'src/infrastructure/applications/offchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { JoinRequestModel } from 'src/models/join-request.model';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Repository } from 'typeorm';
 import { UpdateStatusJoinRequestRequest } from '../requests/join-request/update-status-join-request.request';
+import { GetPartyService } from '../services/get-party.service';
 import { JoinRequestService } from '../services/join-request/join-request.service';
 
 export class UpdateJoinRequestStatusApplication extends OffchainApplication {
@@ -16,6 +18,10 @@ export class UpdateJoinRequestStatusApplication extends OffchainApplication {
         private readonly web3Service: Web3Service,
         @Inject(JoinRequestService)
         private readonly joinRequestService: JoinRequestService,
+        @Inject(GetPartyService)
+        private readonly getPartyService: GetPartyService,
+        @Inject(GetUserService)
+        private readonly getUserService: GetUserService,
     ) {
         super();
     }
@@ -24,8 +30,8 @@ export class UpdateJoinRequestStatusApplication extends OffchainApplication {
         joinRequest: JoinRequestModel,
         request: UpdateStatusJoinRequestRequest,
     ): Promise<JoinRequestModel> {
-        const party = await joinRequest.party;
-        const owner = await party.owner;
+        const party = await this.getPartyService.getById(joinRequest.partyId);
+        const owner = await this.getUserService.getUserById(party.ownerId);
 
         await this.web3Service.validateSignature(
             request.signature,

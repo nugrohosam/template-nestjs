@@ -6,6 +6,7 @@ import {
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
+import { MemberResponse } from 'src/modules/users/responses/member.response';
 
 export class DetailPartyResponse
     implements Omit<IParty, 'creatorId' | 'ownerId'>
@@ -36,9 +37,6 @@ export class DetailPartyResponse
     static async mapFromPartyModel(
         party: PartyModel,
     ): Promise<DetailPartyResponse> {
-        const creator = await party.creator;
-        const owner = await party.owner;
-
         return {
             id: party.id,
             isActive: party.isActive,
@@ -55,18 +53,12 @@ export class DetailPartyResponse
             totalDeposit: party.totalDeposit.toString(),
             totalMember: party.totalMember,
             distribution: party.distribution,
-            creator: {
-                id: creator.id,
-                firstname: creator.firstname,
-                lastname: creator.lastname,
-                imageUrl: creator.imageUrl,
-            },
-            owner: {
-                id: owner.id,
-                firstname: owner.firstname,
-                lastname: owner.lastname,
-                imageUrl: owner.imageUrl,
-            },
+            creator: party.creator
+                ? MemberResponse.mapFromUserModel(party.creator)
+                : null,
+            owner: party.owner
+                ? MemberResponse.mapFromUserModel(party.owner)
+                : null,
             projects: [],
             createdAt: party.createdAt,
             updatedAt: party.updatedAt,

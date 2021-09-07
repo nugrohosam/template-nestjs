@@ -85,22 +85,22 @@ export class ProposalModel implements IProposal {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt: Date;
 
-    @ManyToOne(() => PartyModel, (party) => party.proposals)
+    @ManyToOne(() => PartyModel, (party) => party.proposals, { eager: true })
     @JoinColumn({ name: 'party_id' })
-    party?: Promise<PartyModel>;
+    party?: PartyModel;
 
-    @ManyToOne(() => UserModel, (user) => user.proposals)
+    @ManyToOne(() => UserModel, (user) => user.proposals, { eager: true })
     @JoinColumn({ name: 'creator_id' })
-    creator?: Promise<UserModel>;
+    creator?: UserModel;
 
     @OneToMany(() => ProposalVoteModel, (vote) => vote.proposal)
-    votes?: Promise<ProposalVoteModel[]>;
+    votes?: ProposalVoteModel;
 
     @OneToMany(
         () => ProposalDistributionModel,
         (distribution) => distribution.proposal,
     )
-    distributions?: Promise<ProposalDistributionModel[]>;
+    distributions?: ProposalDistributionModel;
 
     get status(): ProposalStatusEnum {
         if (this.approvedAt) {

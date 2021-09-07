@@ -15,9 +15,9 @@ export class IndexProposalResponse {
     party: IndexPartyResponse;
     creator: MemberResponse;
 
-    static async mapFromProposalModel(
+    static mapFromProposalModel(
         proposal: ProposalModel,
-    ): Promise<IndexProposalResponse> {
+    ): IndexProposalResponse {
         return {
             id: proposal.id,
             title: proposal.title,
@@ -27,10 +27,12 @@ export class IndexProposalResponse {
             amount: proposal.amount.toString(),
             attachmentUrl: proposal.attachmentUrl,
             createdAt: proposal.createdAt,
-            party: await IndexPartyResponse.mapFromPartyModel(
-                await proposal.party,
-            ),
-            creator: MemberResponse.mapFromUserModel(await proposal.creator),
+            party: proposal.party
+                ? IndexPartyResponse.mapFromPartyModel(proposal.party)
+                : null,
+            creator: proposal.creator
+                ? MemberResponse.mapFromUserModel(proposal.creator)
+                : null,
         };
     }
 }

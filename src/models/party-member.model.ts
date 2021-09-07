@@ -64,13 +64,15 @@ export class PartyMemberModel implements IPartyMember {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @ManyToOne(() => PartyModel, (party) => party.partyMembers)
+    @ManyToOne(() => PartyModel, (party) => party.partyMembers, { eager: true })
     @JoinColumn({ name: 'party_id' })
-    party?: Promise<PartyModel>;
+    party?: PartyModel;
 
-    @ManyToOne(() => UserModel, (user) => user.joinedPartyMembers)
+    @ManyToOne(() => UserModel, (user) => user.joinedPartyMembers, {
+        eager: true,
+    })
     @JoinColumn({ name: 'member_id' })
-    member?: Promise<UserModel>;
+    member?: UserModel;
 
     @OneToOne(
         () => TransactionModel,

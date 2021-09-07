@@ -98,11 +98,9 @@ export class PartyProposalController {
             query,
         );
 
-        const response = await Promise.all(
-            data.map(async (datum) => {
-                return await IndexProposalResponse.mapFromProposalModel(datum);
-            }),
-        );
+        const response = data.map((datum) => {
+            return IndexProposalResponse.mapFromProposalModel(datum);
+        });
 
         return {
             message: 'Success fetch proposal',

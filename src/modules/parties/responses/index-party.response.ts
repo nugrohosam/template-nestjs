@@ -22,9 +22,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     createdAt: Date;
     isActive: boolean;
 
-    static async mapFromPartyModel(
-        party: PartyModel,
-    ): Promise<IndexPartyResponse> {
+    static mapFromPartyModel(party: PartyModel): IndexPartyResponse {
         return {
             id: party.id,
             name: party.name,

@@ -57,6 +57,7 @@ export class TransactionModel implements ITransaction {
     @OneToOne(
         () => PartyMemberModel,
         (partyMember) => partyMember.depositTransaction,
+        { eager: true },
     )
     depositedPartyMember?: PartyMemberModel;
 }

@@ -78,11 +78,9 @@ export class PartyController {
         @Query() query: IndexPartyRequest,
     ): Promise<IApiResponse<IndexPartyResponse[]>> {
         const { data, meta } = await this.indexPartyApplication.fetch(query);
-        const response = await Promise.all(
-            data.map(async (datum) => {
-                return await IndexPartyResponse.mapFromPartyModel(datum);
-            }),
-        );
+        const response = data.map((datum) => {
+            return IndexPartyResponse.mapFromPartyModel(datum);
+        });
 
         return {
             message: 'Success fetching parties data',

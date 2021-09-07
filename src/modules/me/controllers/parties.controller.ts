@@ -24,11 +24,9 @@ export class MePartiesController {
             signature,
         );
 
-        const response = await Promise.all(
-            data.map(async (datum) => {
-                return await IndexPartyResponse.mapFromPartyModel(datum);
-            }),
-        );
+        const response = data.map((datum) => {
+            return IndexPartyResponse.mapFromPartyModel(datum);
+        });
 
         return {
             message: 'Success fetch user parties',

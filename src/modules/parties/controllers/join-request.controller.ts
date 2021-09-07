@@ -24,11 +24,9 @@ export class JoinRequestController {
             request,
         );
 
-        const response = await Promise.all(
-            data.map(async (datum) => {
-                return await JoinRequestResponse.mapFromJoinRequestModel(datum);
-            }),
-        );
+        const response = data.map((datum) => {
+            return JoinRequestResponse.mapFromJoinRequestModel(datum);
+        });
 
         return {
             message: 'Success fetch join requests.',

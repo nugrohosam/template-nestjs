@@ -53,9 +53,7 @@ export class PartyJoinRequestController {
 
         return {
             message: 'Success request join a party.',
-            data: await JoinRequestResponse.mapFromJoinRequestModel(
-                joinRequest,
-            ),
+            data: JoinRequestResponse.mapFromJoinRequestModel(joinRequest),
         };
     }
 
@@ -67,11 +65,9 @@ export class PartyJoinRequestController {
         const { data, meta } =
             await this.indexPartyJoinRequestApplication.fetch(partyId, query);
 
-        const response = await Promise.all(
-            data.map(async (datum) => {
-                return await JoinRequestResponse.mapFromJoinRequestModel(datum);
-            }),
-        );
+        const response = data.map((datum) => {
+            return JoinRequestResponse.mapFromJoinRequestModel(datum);
+        });
 
         return {
             message: "Success get party's join requests",
@@ -94,9 +90,7 @@ export class PartyJoinRequestController {
         );
         return {
             message: 'Success update join party request status',
-            data: await JoinRequestResponse.mapFromJoinRequestModel(
-                joinRequest,
-            ),
+            data: JoinRequestResponse.mapFromJoinRequestModel(joinRequest),
         };
     }
 }

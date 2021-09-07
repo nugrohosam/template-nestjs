@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class GetPartyService {
@@ -11,8 +11,18 @@ export class GetPartyService {
         private readonly repository: Repository<PartyModel>,
     ) {}
 
-    async getById(partyId: string, userId?: string): Promise<PartyModel> {
+    getBaseQuery(userId?: string): SelectQueryBuilder<PartyModel> {
         const query = this.repository.createQueryBuilder('party');
+        query.leftJoinAndSelect(
+            'party.creator',
+            'creator',
+            'creator.id = party.creator_id',
+        );
+        query.leftJoinAndSelect(
+            'party.owner',
+            'owner',
+            'owner.id = party.owner_id',
+        );
 
         const isActiveQuery = query
             .subQuery()
@@ -37,7 +47,12 @@ export class GetPartyService {
             .getQuery();
         query.addSelect(`${isMemberQuery} is not null`, 'party_isMember');
 
-        query.where('id = :partyId', { partyId });
+        return query;
+    }
+
+    async getById(partyId: string, userId?: string): Promise<PartyModel> {
+        const query = this.getBaseQuery(userId);
+        query.where('party.id = :partyId', { partyId });
 
         const party = await query.getOne();
         if (!party) throw new NotFoundException('Party not found.');
@@ -46,18 +61,24 @@ export class GetPartyService {
     }
 
     async getByAddress(address: string): Promise<PartyModel> {
-        const party = await this.repository.findOne({
-            where: { address },
-        });
+        const query = this.getBaseQuery();
+        query.where('party.address = :address', { address });
+
+        const party = await query.getOne();
         if (!party) throw new NotFoundException('Party not found');
+
         return party;
     }
 
     async getByTransactionHash(transactionHash: string): Promise<PartyModel> {
-        const party = await this.repository.findOne({
-            where: { transactionHash },
+        const query = this.getBaseQuery();
+        query.where('party.transaction_hash = :transactionHash', {
+            transactionHash,
         });
+
+        const party = await query.getOne();
         if (!party) throw new NotFoundException('Party not found');
+
         return party;
     }
 }

@@ -12,14 +12,14 @@ export class MemberDetailRespose {
     createdAt: Date;
     updatedAt: Date;
 
-    static async mapFromPartyMemberModel(
+    static mapFromPartyMemberModel(
         partyMember: PartyMemberModel,
-    ): Promise<MemberDetailRespose> {
-        const user = await partyMember.member;
-
+    ): MemberDetailRespose {
         return {
             id: partyMember.id,
-            user: ProfileResponse.mapFromUserModel(user),
+            user: partyMember.member
+                ? ProfileResponse.mapFromUserModel(partyMember.member)
+                : null,
             status: partyMember.status,
             initialFund: partyMember.initialFund.toString(),
             totalDeposit: partyMember.totalDeposit.toString(),

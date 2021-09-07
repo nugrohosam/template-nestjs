@@ -101,11 +101,10 @@ export class PartyMemberController {
             ...request,
         });
 
-        const response = await Promise.all(
-            data.map(async (datum) => {
-                return await MemberDetailRespose.mapFromPartyMemberModel(datum);
-            }),
-        );
+        const response = data.map((datum) => {
+            return MemberDetailRespose.mapFromPartyMemberModel(datum);
+        });
+
         return {
             message: 'Success get user members',
             data: response,

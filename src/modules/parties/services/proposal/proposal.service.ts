@@ -47,7 +47,7 @@ export class ProposalService {
     }
 
     async generatePlatformSignature(proposal: ProposalModel): Promise<string> {
-        const party = await proposal.party;
+        const party = proposal.party;
         const message = this.web3Service.soliditySha3([
             { t: 'string', v: party.id },
             { t: 'address', v: party.address },
@@ -94,7 +94,9 @@ export class ProposalService {
         proposal: ProposalModel,
         { signature, transactionHash }: ApproveProposalRequest,
     ): Promise<void> {
-        const members = await party.partyMembers;
+        const members = await this.partyMemberRepository.find({
+            where: { partyId: party.id },
+        });
         const partyDeposit = party.totalDeposit;
 
         for (const member of members) {
@@ -123,7 +125,7 @@ export class ProposalService {
                 totalFund: member.totalFund.add(distribution.amount),
             });
 
-            const user = await member.member;
+            const user = member.member;
             const transaction = await this.transactionService.store({
                 addressFrom: user.address,
                 addressTo: proposal.contractAddress,

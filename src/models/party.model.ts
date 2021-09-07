@@ -100,22 +100,22 @@ export class PartyModel implements IParty {
     @CreateDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @ManyToOne(() => UserModel, (user) => user.ownedParties)
+    @ManyToOne(() => UserModel, (user) => user.ownedParties, { eager: true })
     @JoinColumn({ name: 'owner_id' })
-    owner?: Promise<UserModel>;
+    owner?: UserModel;
 
-    @ManyToOne(() => UserModel, (user) => user.createdParties)
+    @ManyToOne(() => UserModel, (user) => user.createdParties, { eager: true })
     @JoinColumn({ name: 'creator_id' })
-    creator?: Promise<UserModel>;
+    creator?: UserModel;
 
     @OneToMany(() => JoinRequestModel, (joinRequest) => joinRequest.party)
-    joinRequests?: Promise<JoinRequestModel[]>;
+    joinRequests?: JoinRequestModel;
 
     @OneToMany(() => PartyMemberModel, (partyMember) => partyMember.party)
-    partyMembers?: Promise<PartyMemberModel[]>;
+    partyMembers?: PartyMemberModel;
 
     @OneToMany(() => ProposalModel, (proposal) => proposal.party)
-    proposals?: Promise<ProposalModel[]>;
+    proposals?: ProposalModel;
 
     // Computed Columns
 

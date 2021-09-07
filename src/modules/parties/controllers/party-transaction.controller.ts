@@ -23,11 +23,10 @@ export class PartyTransactionController {
         const { data, meta } =
             await this.indexPartyTransactionApplication.fetch(party, query);
 
-        const response = await Promise.all(
-            data.map(async (datum) => {
-                return TransactionResponse.mapFromTransactionModel(datum);
-            }),
-        );
+        const response = data.map((datum) => {
+            return TransactionResponse.mapFromTransactionModel(datum);
+        });
+
         return {
             message: "Success fetch party's transactions",
             data: response,
