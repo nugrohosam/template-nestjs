@@ -84,6 +84,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         };
     }
 
+    @Transactional()
     async commit(
         partyMember: PartyMemberModel,
         request: UpdatePartyMemberRequest,

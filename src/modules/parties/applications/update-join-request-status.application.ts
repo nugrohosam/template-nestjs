@@ -5,6 +5,7 @@ import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { JoinRequestModel } from 'src/models/join-request.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Repository } from 'typeorm';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { UpdateStatusJoinRequestRequest } from '../requests/join-request/update-status-join-request.request';
 import { GetPartyService } from '../services/get-party.service';
 import { JoinRequestService } from '../services/join-request/join-request.service';
@@ -26,6 +27,7 @@ export class UpdateJoinRequestStatusApplication extends OffchainApplication {
         super();
     }
 
+    @Transactional()
     async call(
         joinRequest: JoinRequestModel,
         request: UpdateStatusJoinRequestRequest,

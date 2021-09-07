@@ -14,6 +14,7 @@ import { TransactionService } from 'src/modules/transactions/services/transactio
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { PartyService } from '../party.service';
 import { PartyMemberService } from '../members/party-member.service';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class ProposalService {
@@ -89,6 +90,7 @@ export class ProposalService {
         return this.proposalRepository.save(proposal);
     }
 
+    @Transactional()
     async processCalculation(
         party: PartyModel,
         proposal: ProposalModel,
