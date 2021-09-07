@@ -38,7 +38,7 @@ export class TransferService {
     ): Promise<string> {
         const partyAddress =
             request.type === TransactionTypeEnum.Withdraw
-                ? request.addressFrom,
+                ? request.addressFrom,,,,
                 : request.addressTo;
 
         const party = await this.getPartyService.getByAddress(partyAddress);
