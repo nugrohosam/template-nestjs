@@ -29,7 +29,7 @@ export const connectionOption: ConnectionOptions = {
         ProposalDistributionModel,
     ],
     synchronize: false,
-    logging: false,
+    logging: config.nodeEnv === 'local',
 };
 
 export const databaseConnection = createConnection(connectionOption);

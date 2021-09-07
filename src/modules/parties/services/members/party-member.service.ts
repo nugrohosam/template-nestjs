@@ -16,8 +16,8 @@ export class PartyMemberService {
     ) {}
 
     async store(data: IPartyMember): Promise<PartyMemberModel> {
-        const partyMember = this.partyMemberRepository.create(data);
-        return await this.partyMemberRepository.save(partyMember);
+        const { id } = await this.partyMemberRepository.save(data);
+        return this.partyMemberRepository.findOne(id);
     }
 
     async update(
@@ -25,7 +25,8 @@ export class PartyMemberService {
         data: Partial<IPartyMember>,
     ): Promise<PartyMemberModel> {
         partyMember = Object.assign(partyMember, data);
-        return await this.partyMemberRepository.save(partyMember);
+        await this.partyMemberRepository.save(partyMember);
+        return this.partyMemberRepository.findOne(partyMember.id);
     }
 
     async delete(
@@ -52,8 +53,8 @@ export class PartyMemberService {
     async generatePlatformSignature(
         partyMember: PartyMemberModel,
     ): Promise<string> {
-        const party = await partyMember.party;
-        const member = await partyMember.member;
+        const party = partyMember.party;
+        const member = partyMember.member;
 
         const message = this.web3Service.soliditySha3([
             { t: 'address', v: member.address },

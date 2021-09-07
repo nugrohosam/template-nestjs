@@ -22,6 +22,7 @@ import {
     PrepareOnchainReturn,
 } from 'src/infrastructure/applications/onchain.application';
 import { BN } from 'bn.js';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 export class JoinPartyApplication extends OnchainSeriesApplication {
     private readonly WeiPercentage = 10 ** 4;
@@ -41,6 +42,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         super();
     }
 
+    @Transactional()
     async prepare(
         party: PartyModel,
         user: UserModel,
@@ -86,8 +88,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         partyMember: PartyMemberModel,
         request: UpdatePartyMemberRequest,
     ): Promise<PartyMemberModel> {
-        let party = await partyMember.party;
-        const member = await partyMember.member;
+        let party = partyMember.party;
+        const member = partyMember.member;
 
         if (request.joinPartySignature !== partyMember.signature)
             throw new UnauthorizedException('Signature not valid');

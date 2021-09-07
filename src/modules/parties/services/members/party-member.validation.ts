@@ -36,12 +36,12 @@ export class PartyMemberValidation {
         user: UserModel,
         party: PartyModel,
     ): Promise<void> {
-        const member = await this.partyMemberRepository.findOne({
-            where: {
-                partyId: party.id,
-                memberId: user.id,
-            },
-        });
+        const member = await this.partyMemberRepository
+            .createQueryBuilder('partyMember')
+            .select('id')
+            .where('party_id = :partyId', { partyId: party.id })
+            .where('member_id = :userId', { userId: user.id })
+            .getOne();
 
         if (member)
             throw new UnprocessableEntityException(

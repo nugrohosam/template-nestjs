@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartyMemberModel } from 'src/models/party-member.model';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class GetPartyMemberService {
@@ -10,10 +10,17 @@ export class GetPartyMemberService {
         private readonly repository: Repository<PartyMemberModel>,
     ) {}
 
+    getBaseQuery(): SelectQueryBuilder<PartyMemberModel> {
+        return this.repository
+            .createQueryBuilder('partyMember')
+            .leftJoinAndSelect('partyMember.party', 'party')
+            .leftJoinAndSelect('partyMember.member', 'member');
+    }
+
     async getById(joinPartyId: string): Promise<PartyMemberModel> {
-        const partyMember = await this.repository.findOne({
-            where: { id: joinPartyId },
-        });
+        const partyMember = await this.getBaseQuery()
+            .where('partyMember.id = :joinPartyId', { joinPartyId })
+            .getOne();
 
         if (!partyMember)
             throw new NotFoundException('Party member not found.');
@@ -25,9 +32,10 @@ export class GetPartyMemberService {
         memberId: string,
         partyId: string,
     ): Promise<PartyMemberModel> {
-        const partyMember = await this.repository.findOne({
-            where: { partyId, memberId },
-        });
+        const partyMember = await this.getBaseQuery()
+            .where('party_id = :partyId', { partyId })
+            .where('member_id = :memberId', { memberId })
+            .getOne();
 
         if (!partyMember) throw new NotFoundException('Party Member not found');
 

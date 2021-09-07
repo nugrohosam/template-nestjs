@@ -99,6 +99,8 @@ export class Web3Service {
         abiItem: AbiItem,
         validations: { [key: number]: string },
     ): Promise<boolean> {
+        if (config.nodeEnv === 'local') return true;
+
         const receipt = await this.getTransactionReceipt(transactionHash);
 
         if (!receipt)

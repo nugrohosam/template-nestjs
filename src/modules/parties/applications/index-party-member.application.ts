@@ -17,23 +17,30 @@ export class IndexPartyMemberApplication extends IndexApplication {
     async fetch(
         request: IndexPartyMemberRequestWithParty,
     ): Promise<IPaginateResponse<PartyMemberModel>> {
-        const query = this.repository.createQueryBuilder();
-        query.where('party_id = :partyId', { partyId: request.party.id });
+        const query = this.repository
+            .createQueryBuilder('partyMember')
+            .innerJoinAndSelect('partyMember.member', 'member')
+            .innerJoinAndSelect('partyMember.party', 'party')
+            .where('partyMember.party_id = :partyId', {
+                partyId: request.party.id,
+            });
 
         if (request.status) {
             if (request.status === MemberStatusEnum.InActive) {
-                query.where('deleted_at is not null');
+                query.where('partyMember.deleted_at is not null');
             } else {
-                query.where('deleted_at is null');
+                query.where('partyMember.deleted_at is null');
             }
         }
 
         query.orderBy(
-            request.sort ?? this.DefaultSort,
+            request.sort
+                ? `partyMember.${request.sort}`
+                : 'partyMember.created_at',
             request.order ?? this.DefaultOrder,
         );
-        query.take(request.perPage ?? this.DefaultPerPage);
-        query.skip(this.countOffset(request));
+        query.limit(request.perPage ?? this.DefaultPerPage);
+        query.offset(this.countOffset(request));
 
         const [data, count] = await query.getManyAndCount();
         return {

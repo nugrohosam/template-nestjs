@@ -82,7 +82,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         if (request.memberSignature !== party.signature)
             throw new UnauthorizedException('Invalid Signature');
 
-        const creator = await party.creator;
+        const creator = party.creator;
         await this.web3Service.validateTransaction(
             request.transactionHash,
             creator.address,

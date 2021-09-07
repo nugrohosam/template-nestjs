@@ -13,16 +13,8 @@ export class GetPartyService {
 
     getBaseQuery(userId?: string): SelectQueryBuilder<PartyModel> {
         const query = this.repository.createQueryBuilder('party');
-        query.leftJoinAndSelect(
-            'party.creator',
-            'creator',
-            'creator.id = party.creator_id',
-        );
-        query.leftJoinAndSelect(
-            'party.owner',
-            'owner',
-            'owner.id = party.owner_id',
-        );
+        query.leftJoinAndSelect('party.creator', 'creator');
+        query.leftJoinAndSelect('party.owner', 'owner');
 
         const isActiveQuery = query
             .subQuery()
