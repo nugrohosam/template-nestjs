@@ -23,7 +23,5 @@ export class SwapController {
                 platformSignature,
             },
         };
-        // TODO fetch 0x to get quote
-        // generate platform signature from quote response
     }
 }

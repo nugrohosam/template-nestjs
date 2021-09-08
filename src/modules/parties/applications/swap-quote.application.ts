@@ -28,6 +28,7 @@ export class SwapQuoteApplication {
         const party = await this.getPartyService.getById(partyId);
         // TODO need to validate that request.address is has permission to buy
         // because user will initiate transaction using a party name
+        // for now at monarki governance, only to be validated as owner of the party
         await this.web3Service.validateSignature(
             request.signature,
             party.owner.address,
