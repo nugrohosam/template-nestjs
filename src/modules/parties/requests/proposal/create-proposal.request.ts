@@ -28,6 +28,7 @@ export class CreateProposalRequest
     @IsNotEmpty()
     @IsEthereumAddress()
     @Expose({ name: 'contract_address' })
+    @Transform(({ value }) => value.toLowerCase())
     contractAddress: string;
 
     @IsNotEmpty()
@@ -73,6 +74,7 @@ export class CreateProposalRequest
     @IsNotEmpty()
     @IsEthereumAddress()
     @Expose({ name: 'signer_address' })
+    @Transform(({ value }) => value.toLowerCase())
     signerAddress: string;
 
     @IsNotEmpty()

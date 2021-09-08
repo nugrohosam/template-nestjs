@@ -19,11 +19,13 @@ export class TransferRequest {
     @IsEthereumAddress()
     @IsNotEmpty()
     @Expose({ name: 'from_address' })
+    @Transform(({ value }) => value.toLowerCase())
     addressFrom: string;
 
     @IsEthereumAddress()
     @IsNotEmpty()
     @Expose({ name: 'to_address' })
+    @Transform(({ value }) => value.toLowerCase())
     addressTo: string;
 
     @IsNotEmpty()

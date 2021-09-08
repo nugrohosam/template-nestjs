@@ -48,6 +48,7 @@ export class CreatePartyRequest
     @IsNotEmpty()
     @IsEthereumAddress()
     @Expose({ name: 'member_address' })
+    @Transform(({ value }) => value.toLowerCase())
     memberAddress: string;
 
     @IsNotEmpty()

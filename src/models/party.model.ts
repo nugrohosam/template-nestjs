@@ -24,7 +24,13 @@ export class PartyModel implements IParty {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @Column('varchar', { unique: true })
+    @Column('varchar', {
+        unique: true,
+        transformer: {
+            to: (value: string) => value.toLowerCase(),
+            from: (value: string) => value.toLowerCase(),
+        },
+    })
     address?: string;
 
     @Column('varchar')
