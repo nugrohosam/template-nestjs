@@ -11,6 +11,9 @@ import { ApproveProposalRequest } from '../requests/proposal/update-proposal-sta
 import { ProposalService } from '../services/proposal/proposal.service';
 import { ApproveProposalEvent } from 'src/contracts/ApproveProposalEvent.json';
 import { AbiItem } from 'web3-utils';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { GetPartyService } from '../services/get-party.service';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 
 export class ApproveProposalApplication extends OnchainParalelApplication {
     constructor(
@@ -18,16 +21,21 @@ export class ApproveProposalApplication extends OnchainParalelApplication {
         private readonly web3Service: Web3Service,
         @Inject(ProposalService)
         private readonly proposalService: ProposalService,
+        @Inject(GetPartyService)
+        private readonly getPartyService: GetPartyService,
+        @Inject(GetUserService)
+        private readonly getUserService: GetUserService,
     ) {
         super();
     }
 
+    @Transactional()
     async commit(
         proposal: ProposalModel,
         request: ApproveProposalRequest,
     ): Promise<void> {
-        const party = await proposal.party;
-        const owner = await party.owner;
+        const party = await this.getPartyService.getById(proposal.partyId);
+        const owner = await this.getUserService.getUserById(party.ownerId);
 
         if (proposal.status !== ProposalStatusEnum.Pending)
             throw new UnprocessableEntityException(
