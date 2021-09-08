@@ -1,17 +1,30 @@
-import { Controller, Get, Headers, Inject, Query } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Headers,
+    Param,
+    Post,
+    Query,
+} from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { TransactionModel } from 'src/models/transaction.model';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
+import { GetPartyService } from 'src/modules/parties/services/get-party.service';
+import { TransferRequest } from 'src/modules/transactions/requests/transfer.request';
+import { DepositApplication } from '../applications/deposit.application';
 import { MyPartiesApplication } from '../applications/my-parties.application';
 import { IndexMePartyRequest } from '../requests/index-party.request';
 
 @Controller('me/parties')
 export class MePartiesController {
     constructor(
-        @Inject(GetSignerService)
-        private readonly getSignerService: GetSignerService,
-        @Inject(MyPartiesApplication)
         private readonly myPartyApplication: MyPartiesApplication,
+        private readonly depositApplication: DepositApplication,
+
+        private readonly getSignerService: GetSignerService,
+        private readonly getPartyService: GetPartyService,
     ) {}
 
     @Get()
@@ -32,6 +45,27 @@ export class MePartiesController {
             message: 'Success fetch user parties',
             data: response,
             meta,
+        };
+    }
+
+    @Post(':partyId/deposit')
+    async deposit(
+        @Headers('Signature') signature: string,
+        @Param('partyId') partyId: string,
+        @Body() request: TransferRequest,
+    ): Promise<IApiResponse<TransactionModel>> {
+        const user = await this.getSignerService.get(signature);
+        const party = await this.getPartyService.getById(partyId);
+
+        const depositTransaction = await this.depositApplication.call(
+            user,
+            party,
+            request,
+        );
+
+        return {
+            message: 'Success deposit to party',
+            data: depositTransaction,
         };
     }
 }
