@@ -44,7 +44,7 @@ export class Web3Service {
         if (config.disableSignatureValidation) return;
 
         const signer = await this.recover(signature, message);
-        if (signer !== address)
+        if (signer.toLowerCase() !== address.toLowerCase())
             throw new UnauthorizedException('Signature invalid!');
     }
 

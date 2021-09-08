@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginateResponse } from 'src/common/interface/index.interface';
 import { IndexApplication } from 'src/infrastructure/applications/index.application';
@@ -8,11 +8,11 @@ import { GetSignerService } from 'src/modules/commons/providers/get-signer.servi
 import { Repository } from 'typeorm';
 import { IndexMePartyRequest } from '../requests/index-party.request';
 
+@Injectable()
 export class MyPartiesApplication extends IndexApplication {
     constructor(
         @InjectRepository(PartyModel)
         private readonly repository: Repository<PartyModel>,
-        @Inject(GetSignerService)
         private readonly getSignerService: GetSignerService,
     ) {
         super();

@@ -11,9 +11,10 @@ export class GetJoinRequestService {
     ) {}
 
     async getById(id: string): Promise<JoinRequestModel> {
-        const joinRequest = await this.repository.findOne({
-            where: { id },
-        });
+        const joinRequest = await this.repository
+            .createQueryBuilder('joinRequest')
+            .where('id = :id', { id })
+            .getOne();
 
         if (!joinRequest)
             throw new NotFoundException('Join request not found.');

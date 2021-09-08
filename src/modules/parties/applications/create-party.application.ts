@@ -10,7 +10,7 @@
  * - When fail (with any condition) FE will request to revert data
  */
 import {
-    Inject,
+    Injectable,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -29,13 +29,11 @@ import {
     PrepareOnchainReturn,
 } from 'src/infrastructure/applications/onchain.application';
 
+@Injectable()
 export class CreatePartyApplication extends OnchainSeriesApplication {
     constructor(
-        @Inject(Web3Service)
         private readonly web3Service: Web3Service,
-        @Inject(PartyService)
         private readonly partyService: PartyService,
-        @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
     ) {
         super();
