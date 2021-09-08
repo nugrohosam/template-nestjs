@@ -1,10 +1,9 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { UserModel } from 'src/models/user.model';
 import { Repository } from 'typeorm';
 
-@Injectable()
 export class GetSignerService {
     constructor(
         @Inject(Web3Service)
