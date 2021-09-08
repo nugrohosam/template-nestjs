@@ -4,10 +4,12 @@ import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
+    Entity,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
+@Entity({ name: 'party_tokens' })
 export class PartyTokenModel implements IPartyToken {
     @PrimaryGeneratedColumn('uuid')
     id: string;

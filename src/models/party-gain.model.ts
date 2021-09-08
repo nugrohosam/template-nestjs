@@ -3,11 +3,13 @@ import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
+    Entity,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import BN from 'bn.js';
 
+@Entity({ name: 'party_gains' })
 export class PartyGainModel implements IPartyGain {
     @PrimaryGeneratedColumn('uuid')
     id: string;

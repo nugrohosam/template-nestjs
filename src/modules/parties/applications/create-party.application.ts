@@ -28,10 +28,12 @@ import {
     OnchainSeriesApplication,
     PrepareOnchainReturn,
 } from 'src/infrastructure/applications/onchain.application';
+import { PartyValidation } from '../services/party.validation';
 
 @Injectable()
 export class CreatePartyApplication extends OnchainSeriesApplication {
     constructor(
+        private readonly partyValidation: PartyValidation,
         private readonly web3Service: Web3Service,
         private readonly partyService: PartyService,
         private readonly getPartyService: GetPartyService,
@@ -48,7 +50,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
             this.partyService.generateCreatePartySignatureMessage(request.name),
         );
 
-        const creator = await this.partyService.validateCreatorAddress(
+        const creator = await this.partyValidation.validateCreatorAddress(
             request.memberAddress,
         );
 

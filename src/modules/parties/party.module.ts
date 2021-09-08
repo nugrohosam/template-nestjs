@@ -46,6 +46,9 @@ import { HttpModule } from '@nestjs/axios';
 import { SwapController } from './controllers/swap.controller';
 import { SwapQuoteApplication } from './applications/swap-quote.application';
 import { SwapSignatureSerivce } from './services/swap-signature.service';
+import { PartyValidation } from './services/party.validation';
+import { PartyTokenModel } from 'src/models/party-token.model';
+import { PartyGainModel } from 'src/models/party-gain.model';
 @Module({
     imports: [
         HttpModule,
@@ -60,6 +63,8 @@ import { SwapSignatureSerivce } from './services/swap-signature.service';
             ProposalModel,
             ProposalDistributionModel,
             TransactionModel,
+            PartyTokenModel,
+            PartyGainModel,
         ]),
     ],
     controllers: [
@@ -76,6 +81,7 @@ import { SwapSignatureSerivce } from './services/swap-signature.service';
         CreatePartyApplication,
         IndexPartyApplication,
 
+        PartyValidation,
         PartyService,
         GetPartyService,
         PartyCalculationService,
