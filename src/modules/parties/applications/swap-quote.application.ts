@@ -24,6 +24,7 @@ export class SwapQuoteApplication {
         partyId: string,
         request: SwapQuoteRequest,
     ): Promise<SwapQuoteResponse> {
+        console.log('getPartyService', this.getPartyService);
         const party = await this.getPartyService.getById(partyId);
         // TODO need to validate that request.address is has permission to buy
         // because user will initiate transaction using a party name
