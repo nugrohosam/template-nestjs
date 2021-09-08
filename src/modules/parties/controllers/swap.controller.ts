@@ -1,13 +1,13 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { SwapQuoteApplication } from '../application/swap-quote.application';
+import { SwapQuoteApplication } from '../applications/swap-quote.application';
 import { SwapQuoteRequest } from '../requests/swap-quote.request';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 
-@Controller('swap')
+@Controller('parties')
 export class SwapController {
     constructor(private readonly swapQuoteApplication: SwapQuoteApplication) {}
-    @Get('quote')
+    @Get('/:partyId/swap/quote')
     async getQuote(
         @Param('partyId') partyId: string,
         @Query() query: SwapQuoteRequest,

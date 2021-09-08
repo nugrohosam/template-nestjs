@@ -33,7 +33,7 @@ export class SwapQuoteApplication {
             this.swapSignatureService.generateSwapBuySignature(
                 request.buyToken,
                 request.sellToken,
-                request.buyAmount,
+                request.buyAmount.toString(),
             ),
         );
 
