@@ -1,28 +1,20 @@
-import { Inject } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
 import { OffchainApplication } from 'src/infrastructure/applications/offchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { JoinRequestModel } from 'src/models/join-request.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
-import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { UpdateStatusJoinRequestRequest } from '../requests/join-request/update-status-join-request.request';
 import { GetPartyService } from '../services/get-party.service';
 import { JoinRequestService } from '../services/join-request/join-request.service';
 
+@Injectable()
 export class UpdateJoinRequestStatusApplication extends OffchainApplication {
     constructor(
-        @InjectRepository(JoinRequestModel)
-        private readonly repository: Repository<JoinRequestModel>,
-
-        @Inject(Web3Service)
-        private readonly web3Service: Web3Service,
-        @Inject(JoinRequestService)
-        private readonly joinRequestService: JoinRequestService,
-        @Inject(GetPartyService)
-        private readonly getPartyService: GetPartyService,
-        @Inject(GetUserService)
-        private readonly getUserService: GetUserService,
+        private web3Service: Web3Service,
+        private joinRequestService: JoinRequestService,
+        private getPartyService: GetPartyService,
+        private getUserService: GetUserService,
     ) {
         super();
     }
@@ -50,6 +42,6 @@ export class UpdateJoinRequestStatusApplication extends OffchainApplication {
             await this.joinRequestService.rejectJoinRequest(joinRequest, owner);
         }
 
-        return await this.repository.save(joinRequest);
+        return joinRequest;
     }
 }

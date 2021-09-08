@@ -6,6 +6,7 @@ import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { Repository } from 'typeorm';
+import { GetPartyMemberService } from './get-party-member.service';
 
 @Injectable()
 export class PartyMemberValidation {
@@ -14,12 +15,15 @@ export class PartyMemberValidation {
         private readonly partyMemberRepository: Repository<PartyMemberModel>,
         @InjectRepository(JoinRequestModel)
         private readonly joinRequestRepository: Repository<JoinRequestModel>,
+
+        private readonly getPartyMemberService: GetPartyMemberService,
     ) {}
 
     private async checkOwnerHasJoin(party: PartyModel): Promise<void> {
-        const member = await this.partyMemberRepository.findOne({
-            where: { partyId: party.id, memberId: party.ownerId },
-        });
+        const member = await this.getPartyMemberService.getByMemberParty(
+            party.ownerId,
+            party.id,
+        );
 
         if (!member)
             throw new UnprocessableEntityException(
@@ -55,12 +59,11 @@ export class PartyMemberValidation {
     ): Promise<void> {
         if (user.id === party.ownerId) return;
 
-        const joinRequest = await this.joinRequestRepository.findOne({
-            where: {
-                userId: user.id,
-                partyId: party.id,
-            },
-        });
+        const joinRequest = await this.joinRequestRepository
+            .createQueryBuilder('joinRequest')
+            .where('party_id = :partyId', { partyId: party.id })
+            .where('user_id = :userId', { userId: user.id })
+            .getOne();
 
         if (!joinRequest)
             throw new UnprocessableEntityException(

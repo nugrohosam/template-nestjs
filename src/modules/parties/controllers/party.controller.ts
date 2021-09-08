@@ -3,7 +3,6 @@ import {
     Controller,
     Get,
     Headers,
-    Inject,
     Param,
     Post,
     Put,
@@ -27,10 +26,7 @@ export class PartyController {
     constructor(
         private readonly createPartyApplication: CreatePartyApplication,
         private readonly indexPartyApplication: IndexPartyApplication,
-
-        @Inject(GetSignerService)
         private readonly getSignerService: GetSignerService,
-        @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
     ) {}
 
@@ -96,9 +92,10 @@ export class PartyController {
     ): Promise<IApiResponse<DetailPartyResponse>> {
         const signer = await this.getSignerService.get(signature);
         const party = await this.getPartyService.getById(partyId, signer?.id);
+
         return {
             message: 'Success get party',
-            data: await DetailPartyResponse.mapFromPartyModel(party),
+            data: DetailPartyResponse.mapFromPartyModel(party),
         };
     }
 }

@@ -24,7 +24,13 @@ export class PartyModel implements IParty {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @Column('varchar', { unique: true })
+    @Column('varchar', {
+        unique: true,
+        transformer: {
+            to: (value: string) => value.toLowerCase(),
+            from: (value: string) => value.toLowerCase(),
+        },
+    })
     address?: string;
 
     @Column('varchar')
@@ -84,6 +90,9 @@ export class PartyModel implements IParty {
 
     @Column('enum', { enum: DistributionTypeEnum })
     distribution: DistributionTypeEnum;
+
+    @Column('date', { name: 'distribution_date' })
+    distributionDate: Date;
 
     @Column('varchar')
     signature: string;

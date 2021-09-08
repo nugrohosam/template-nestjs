@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IJoinRequest } from 'src/entities/join-request.entity';
 import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -41,23 +42,29 @@ export class JoinRequestService {
         return await this.repository.save(joinRequest);
     }
 
+    async update(
+        joinRequest: JoinRequestModel,
+        data: IJoinRequest,
+    ): Promise<JoinRequestModel> {
+        joinRequest = Object.assign(joinRequest, data);
+        return this.repository.save(joinRequest);
+    }
+
     async acceptJoinRequest(
         joinRequest: JoinRequestModel,
         processedBy: UserModel,
     ): Promise<void> {
-        await this.repository.update(joinRequest, {
-            acceptedAt: new Date(),
-            processedBy: processedBy.id,
-        });
+        joinRequest.acceptedAt = new Date();
+        joinRequest.processedBy = processedBy.id;
+        await this.repository.save(joinRequest);
     }
 
     async rejectJoinRequest(
         joinRequest: JoinRequestModel,
         processedBy: UserModel,
     ): Promise<void> {
-        await this.repository.update(joinRequest, {
-            rejectedAt: new Date(),
-            processedBy: processedBy.id,
-        });
+        joinRequest.rejectedAt = new Date();
+        joinRequest.processedBy = processedBy.id;
+        await this.repository.save(joinRequest);
     }
 }

@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { OffchainApplication } from 'src/infrastructure/applications/offchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { JoinRequestModel } from 'src/models/join-request.model';
@@ -8,13 +8,11 @@ import { JoinRequestRequest } from '../requests/join-request/join-request.reques
 import { JoinRequestService } from '../services/join-request/join-request.service';
 import { JoinRequestValidation } from '../services/join-request/join-request.validation';
 
+@Injectable()
 export class RequestJoinPartyApplication extends OffchainApplication {
     constructor(
-        @Inject(Web3Service)
         private readonly web3Service: Web3Service,
-        @Inject(JoinRequestService)
         private readonly joinRequestService: JoinRequestService,
-        @Inject(JoinRequestValidation)
         private readonly joinRequestValidation: JoinRequestValidation,
     ) {
         super();

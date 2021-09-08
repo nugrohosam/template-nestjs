@@ -1,18 +1,21 @@
-import { Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import BN from 'bn.js';
 import { IPartyMember } from 'src/entities/party-member.entity';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Repository } from 'typeorm';
+import { GetPartyService } from '../get-party.service';
 
 export class PartyMemberService {
     constructor(
         @InjectRepository(PartyMemberModel)
         private readonly partyMemberRepository: Repository<PartyMemberModel>,
-        @Inject(Web3Service)
+
         private readonly web3Service: Web3Service,
+        private readonly getPartyService: GetPartyService,
+        private readonly getUserService: GetUserService,
     ) {}
 
     async store(data: IPartyMember): Promise<PartyMemberModel> {
@@ -53,8 +56,10 @@ export class PartyMemberService {
     async generatePlatformSignature(
         partyMember: PartyMemberModel,
     ): Promise<string> {
-        const party = partyMember.party;
-        const member = partyMember.member;
+        const party = await this.getPartyService.getById(partyMember.partyId);
+        const member = await this.getUserService.getUserById(
+            partyMember.memberId,
+        );
 
         const message = this.web3Service.soliditySha3([
             { t: 'address', v: member.address },

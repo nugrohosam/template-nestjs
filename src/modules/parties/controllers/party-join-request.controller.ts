@@ -1,13 +1,4 @@
-import {
-    Body,
-    Controller,
-    Get,
-    Inject,
-    Param,
-    Post,
-    Put,
-    Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
@@ -27,11 +18,8 @@ export class PartyJoinRequestController {
         private readonly indexPartyJoinRequestApplication: IndexPartyJoinRequestApplication,
         private readonly updateJoinRequestStatusApplication: UpdateJoinRequestStatusApplication,
 
-        @Inject(GetPartyService)
         private readonly getPartyServie: GetPartyService,
-        @Inject(GetUserService)
         private readonly getUserService: GetUserService,
-        @Inject(GetJoinRequestService)
         private readonly getJoinRequestService: GetJoinRequestService,
     ) {}
 

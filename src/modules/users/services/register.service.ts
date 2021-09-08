@@ -1,8 +1,4 @@
-import {
-    Inject,
-    UnauthorizedException,
-    UnprocessableEntityException,
-} from '@nestjs/common';
+import { Inject, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { UserModel } from 'src/models/user.model';
@@ -24,15 +20,13 @@ export class RegisterService {
     }
 
     private async validateRegisterSignature(
-        registerRequest: RegisterRequest,
+        request: RegisterRequest,
     ): Promise<void> {
-        const signedAddress = await this.web3Service.recover(
-            registerRequest.signature,
-            this.generateRegisterSignatureMessage(registerRequest.tokenAddress),
+        await this.web3Service.validateSignature(
+            request.signature,
+            request.tokenAddress,
+            this.generateRegisterSignatureMessage(request.tokenAddress),
         );
-
-        if (signedAddress !== registerRequest.tokenAddress)
-            throw new UnauthorizedException('Signature is invalid.');
     }
 
     private async validateAddressMustUnique(address: string): Promise<void> {

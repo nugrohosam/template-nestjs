@@ -1,5 +1,5 @@
 import {
-    Inject,
+    Injectable,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -24,19 +24,15 @@ import {
 import { BN } from 'bn.js';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 
+@Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
     private readonly WeiPercentage = 10 ** 4;
 
     constructor(
-        @Inject(Web3Service)
         private readonly web3Service: Web3Service,
-        @Inject(PartyMemberValidation)
         private readonly partyMemberValidation: PartyMemberValidation,
-        @Inject(PartyMemberService)
         private readonly partyMemberService: PartyMemberService,
-        @Inject(TransactionService)
         private readonly transactionService: TransactionService,
-        @Inject(PartyService)
         private readonly partyService: PartyService,
     ) {
         super();

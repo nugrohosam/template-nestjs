@@ -58,4 +58,23 @@ export class Utils {
 
         return (page - 1) * perPage;
     }
+
+    static dateOfNearestDay(startingDate: Date, nearestDay: number): Date {
+        const nearestTime = new Date(startingDate.getTime());
+
+        if (startingDate.getDay() == 6 && nearestDay == 5) {
+            nearestTime.setDate(
+                startingDate.getDate() +
+                    ((7 + nearestDay - startingDate.getDay()) % 7) -
+                    7,
+            );
+        } else {
+            nearestTime.setDate(
+                startingDate.getDate() +
+                    ((7 + nearestDay - startingDate.getDay()) % 7),
+            );
+        }
+
+        return nearestTime;
+    }
 }

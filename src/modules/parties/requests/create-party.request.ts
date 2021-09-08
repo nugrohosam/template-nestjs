@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { Expose, Transform } from 'class-transformer';
-import { IsEnum, IsEthereumAddress, IsNotEmpty } from 'class-validator';
+import { IsDate, IsEnum, IsEthereumAddress, IsNotEmpty } from 'class-validator';
 import {
     DistributionTypeEnum,
     PartyTypeEnum,
@@ -46,8 +46,14 @@ export class CreatePartyRequest
     distribution: DistributionTypeEnum;
 
     @IsNotEmpty()
+    @IsDate()
+    @Expose({ name: 'distribution_date' })
+    distributionDate: Date;
+
+    @IsNotEmpty()
     @IsEthereumAddress()
     @Expose({ name: 'member_address' })
+    @Transform(({ value }) => value.toLowerCase())
     memberAddress: string;
 
     @IsNotEmpty()

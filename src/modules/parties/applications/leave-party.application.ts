@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { LeavePartyRequest } from '../requests/member/leave-party.request';
@@ -12,17 +12,13 @@ import { PartyService } from '../services/party.service';
 import { OnchainParalelApplication } from 'src/infrastructure/applications/onchain.application';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 
+@Injectable()
 export class LeavePartyApplication extends OnchainParalelApplication {
     constructor(
-        @Inject(Web3Service)
         private readonly web3Service: Web3Service,
-        @Inject(PartyMemberService)
         private readonly partyMemberService: PartyMemberService,
-        @Inject(TransactionService)
         private readonly transactionService: TransactionService,
-        @Inject(PartyCalculationService)
         private readonly partyCalculationService: PartyCalculationService,
-        @Inject(PartyService)
         private readonly partyService: PartyService,
     ) {
         super();

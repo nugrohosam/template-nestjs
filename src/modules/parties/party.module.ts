@@ -42,9 +42,13 @@ import { ProposalModel } from 'src/models/proposal.model';
 import { IndexPartyTransactionApplication } from './applications/index-party-transaction.application';
 import { TransactionModel } from 'src/models/transaction.model';
 import { IndexJoinRequestApplication } from './applications/index-join-request.application';
-
+import { HttpModule } from '@nestjs/axios';
+import { SwapController } from './controllers/swap.controller';
+import { SwapQuoteApplication } from './applications/swap-quote.application';
+import { SwapSignatureSerivce } from './services/swap-signature.service';
 @Module({
     imports: [
+        HttpModule,
         Web3Module,
         UserModule,
         TransactionModule,
@@ -64,7 +68,7 @@ import { IndexJoinRequestApplication } from './applications/index-join-request.a
         PartyJoinRequestController,
         PartyProposalController,
         PartyTransactionController,
-
+        SwapController,
         JoinRequestController,
     ],
     providers: [
@@ -110,6 +114,9 @@ import { IndexJoinRequestApplication } from './applications/index-join-request.a
 
         // Transaction
         IndexPartyTransactionApplication,
+
+        SwapQuoteApplication,
+        SwapSignatureSerivce,
     ],
     exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
 })

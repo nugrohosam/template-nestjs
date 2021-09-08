@@ -18,7 +18,12 @@ export class UserModel implements IUser {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @Column('varchar')
+    @Column('varchar', {
+        transformer: {
+            to: (value: string) => value.toLowerCase(),
+            from: (value: string) => value.toLowerCase(),
+        },
+    })
     address: string;
 
     @Column('varchar', { nullable: true })
