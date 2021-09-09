@@ -24,12 +24,5 @@ export class SwapQuoteRequest {
     sellAmount?: BN;
 
     @IsNotEmpty()
-    @BigIntMin(ValidationEnum.MinWei)
-    @BigIntMax(ValidationEnum.MaxWei)
-    @Transform(({ value }) => value && new BN(value.toString()))
-    @Expose({ name: 'buy_amount' })
-    buyAmount?: BN;
-
-    @IsNotEmpty()
     signature: string;
 }

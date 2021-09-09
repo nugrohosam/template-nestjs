@@ -33,14 +33,14 @@ export class SwapQuoteApplication {
             this.swapSignatureService.generateSwapBuySignature(
                 request.buyToken,
                 request.sellToken,
-                request.buyAmount.toString(),
+                request.sellAmount.toString(),
             ),
         );
 
         const quoteResponse = await this.swapQuoteService.getQuote(
             request.buyToken,
             request.sellToken,
-            request.buyAmount.toString(),
+            request.sellAmount.toString(),
         );
 
         const quote = quoteResponse.data;
