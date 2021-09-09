@@ -54,17 +54,19 @@ export class JoinRequestService {
         joinRequest: JoinRequestModel,
         processedBy: UserModel,
     ): Promise<void> {
-        joinRequest.acceptedAt = new Date();
-        joinRequest.processedBy = processedBy.id;
-        await this.repository.save(joinRequest);
+        await this.repository.update(joinRequest, {
+            acceptedAt: new Date(),
+            processedBy: processedBy.id,
+        });
     }
 
     async rejectJoinRequest(
         joinRequest: JoinRequestModel,
         processedBy: UserModel,
     ): Promise<void> {
-        joinRequest.rejectedAt = new Date();
-        joinRequest.processedBy = processedBy.id;
-        await this.repository.save(joinRequest);
+        await this.repository.update(joinRequest, {
+            rejectedAt: new Date(),
+            processedBy: processedBy.id,
+        });
     }
 }
