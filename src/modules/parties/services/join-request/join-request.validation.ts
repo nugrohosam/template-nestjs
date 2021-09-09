@@ -37,7 +37,8 @@ export class JoinRequestValidation {
         const joinRequestCount = await this.joinRequestModelRepository
             .createQueryBuilder('joinRequests')
             .where('user_id = :userId', { userId: user.id })
-            .where('party_id = :partyId', { partyId: party.id })
+            .andWhere('party_id = :partyId', { partyId: party.id })
+            .andWhere('rejected_at IS NULL')
             .getCount();
 
         if (joinRequestCount > 0)
