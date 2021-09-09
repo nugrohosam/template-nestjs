@@ -45,7 +45,8 @@ import { IndexJoinRequestApplication } from './applications/index-join-request.a
 import { HttpModule } from '@nestjs/axios';
 import { SwapController } from './controllers/swap.controller';
 import { SwapQuoteApplication } from './applications/swap-quote.application';
-import { SwapSignatureSerivce } from './services/swap-signature.service';
+import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
+import { SwapQuoteService } from './services/swap/swap-quote.service';
 @Module({
     imports: [
         HttpModule,
@@ -115,8 +116,10 @@ import { SwapSignatureSerivce } from './services/swap-signature.service';
         // Transaction
         IndexPartyTransactionApplication,
 
+        // Swap
         SwapQuoteApplication,
         SwapSignatureSerivce,
+        SwapQuoteService,
     ],
     exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
 })
