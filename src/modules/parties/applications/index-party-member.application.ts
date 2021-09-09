@@ -36,7 +36,7 @@ export class IndexPartyMemberApplication extends IndexApplication {
         query.orderBy(
             request.sort
                 ? `partyMember.${request.sort}`
-                : 'partyMember.created_at',
+                : 'partyMember.createdAt',
             request.order ?? this.DefaultOrder,
         );
         query.limit(request.perPage ?? this.DefaultPerPage);

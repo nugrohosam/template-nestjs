@@ -33,7 +33,7 @@ export class IndexPartyJoinRequestApplication extends IndexApplication {
         query.where('party_id = :partyId', { partyId });
 
         query.orderBy(
-            request.sort ?? 'joinRequests.created_at',
+            request.sort ?? 'joinRequests.createdAt',
             request.order ?? 'DESC',
         );
         query.take(request.perPage ?? this.DefaultPerPage);

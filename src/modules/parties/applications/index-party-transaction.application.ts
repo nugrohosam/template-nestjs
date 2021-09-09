@@ -32,7 +32,7 @@ export class IndexPartyTransactionApplication extends IndexApplication {
         );
 
         query.orderBy(
-            request.sort ?? 'transactions.created_at',
+            request.sort ?? 'transactions.createdAt',
             request.order ?? 'DESC',
         );
         query.take(request.perPage ?? this.DefaultPerPage);

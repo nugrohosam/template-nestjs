@@ -22,7 +22,7 @@ export class IndexPartyProposalApplication extends IndexApplication {
         query.where('party_id = :partyId', { partyId: party.id });
 
         query.orderBy(
-            request.sort ?? 'proposals.created_at',
+            request.sort ?? 'proposals.createdAt',
             request.order ?? 'DESC',
         );
         query.take(request.perPage ?? this.DefaultPerPage);

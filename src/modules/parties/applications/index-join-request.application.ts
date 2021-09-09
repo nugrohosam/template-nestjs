@@ -24,7 +24,7 @@ export class IndexJoinRequestApplication extends IndexApplication {
         query.where('user_id = :userId', { userId: user.id });
 
         query.orderBy(
-            request.sort ?? 'joinRequests.created_at',
+            request.sort ?? 'joinRequests.createdAt',
             request.order ?? 'DESC',
         );
         query.take(request.perPage ?? this.DefaultPerPage);
