@@ -3,8 +3,6 @@ import { IPaginateResponse } from 'src/common/interface/index.interface';
 import { IndexRequest } from 'src/common/request/index.request';
 import { IndexApplication } from 'src/infrastructure/applications/index.application';
 import { JoinRequestModel } from 'src/models/join-request.model';
-import { PartyModel } from 'src/models/party.model';
-import { UserModel } from 'src/models/user.model';
 import { Repository } from 'typeorm';
 
 export class IndexPartyJoinRequestApplication extends IndexApplication {
@@ -20,16 +18,8 @@ export class IndexPartyJoinRequestApplication extends IndexApplication {
         request: IndexRequest,
     ): Promise<IPaginateResponse<JoinRequestModel>> {
         const query = this.repository.createQueryBuilder('joinRequests');
-        query.leftJoinAndSelect(
-            PartyModel,
-            'party',
-            'party.id = joinRequests.party_id',
-        );
-        query.leftJoinAndSelect(
-            UserModel,
-            'user',
-            'user.id = joinRequests.user_id',
-        );
+        query.leftJoinAndSelect('joinRequests.party', 'party');
+        query.leftJoinAndSelect('joinRequests.user', 'user');
         query.where('party_id = :partyId', { partyId });
 
         query.orderBy(
