@@ -17,24 +17,25 @@ import { UpdatePartyMemberRequest } from '../requests/member/update-party-member
 import { JoinPartyResponse } from '../responses/member/join-party.response';
 import { MemberDetailRespose } from '../responses/member/member-detail.response';
 import { GetPartyMemberService } from '../services/members/get-party-member.service';
-import { IndexPartyMemberService } from '../services/members/index-party-member.service';
-import { JoinPartyService } from '../services/members/join-party.service';
-import { LeavePartyService } from '../services/members/leave-party.service';
-import { UpdatePartyMemberService } from '../services/members/update-party-member.service';
+import { JoinPartyApplication } from '../applications/join-party.application';
+import { GetPartyService } from '../services/get-party.service';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
+import { IndexPartyMemberApplication } from '../applications/index-party-member.application';
+import { LeavePartyApplication } from '../applications/leave-party.application';
 
 @Controller('parties/:partyId')
 export class PartyMemberController {
     constructor(
-        @Inject(JoinPartyService)
-        private readonly joinPartyService: JoinPartyService,
-        @Inject(UpdatePartyMemberService)
-        private readonly updatePartyMemberService: UpdatePartyMemberService,
-        @Inject(IndexPartyMemberService)
-        private readonly indexPartyMemberService: IndexPartyMemberService,
+        private readonly joinPartyApplication: JoinPartyApplication,
+        private readonly indexPartyMemberApplication: IndexPartyMemberApplication,
+        private readonly leavePartyApplication: LeavePartyApplication,
+
+        @Inject(GetPartyService)
+        private readonly getPartyService: GetPartyService,
+        @Inject(GetUserService)
+        private readonly getUserService: GetUserService,
         @Inject(GetPartyMemberService)
         private readonly getPartyMemberService: GetPartyMemberService,
-        @Inject(LeavePartyService)
-        private readonly leavePartyService: LeavePartyService,
     ) {}
 
     @Post('join')
@@ -42,25 +43,32 @@ export class PartyMemberController {
         @Param('partyId') partyId: string,
         @Body() request: JoinPartyRequest,
     ): Promise<IApiResponse<JoinPartyResponse>> {
-        const partyMember = await this.joinPartyService.join(partyId, request);
-        const platformSignature =
-            await this.joinPartyService.generatePlatformSignature(partyMember);
+        const party = await this.getPartyService.getById(partyId);
+        const user = await this.getUserService.getUserByAddress(
+            request.userAddress,
+        );
+
+        const { data, platformSignature } =
+            await this.joinPartyApplication.prepare(party, user, request);
 
         return {
             message: 'Success add user to party',
             data: JoinPartyResponse.mapFromPartyMemberModel(
-                partyMember,
+                data,
                 platformSignature,
             ),
         };
     }
 
     @Put('join/:partyMemberId/transaction-hash')
-    async updateIncompleteJoinParty(
+    async commitJoinParty(
         @Param('partyMemberId') partyMemberId: string,
         @Body() request: UpdatePartyMemberRequest,
     ): Promise<IApiResponse<null>> {
-        await this.updatePartyMemberService.update(partyMemberId, request);
+        const partyMember = await this.getPartyMemberService.getById(
+            partyMemberId,
+        );
+        await this.joinPartyApplication.commit(partyMember, request);
         return {
             message: 'Success update join party data',
             data: null,
@@ -68,11 +76,14 @@ export class PartyMemberController {
     }
 
     @Put('join/:partyMemberId/transaction-hash/revert')
-    async deleteIncompleteJoinParty(
+    async revertJoinParty(
         @Param('partyMemberId') partyMemberId: string,
         @Body() request: DeleteIncompleteDataRequest,
     ): Promise<IApiResponse<null>> {
-        await this.updatePartyMemberService.delete(partyMemberId, request);
+        const partyMember = await this.getPartyMemberService.getById(
+            partyMemberId,
+        );
+        await this.joinPartyApplication.revert(partyMember, request);
         return {
             message: 'Success delete incomplete join party data',
             data: null,
@@ -82,13 +93,22 @@ export class PartyMemberController {
     @Get('members')
     async members(
         @Param('partyId') partyId: string,
-        @Query() query: IndexPartyMemberRequest,
+        @Query() request: IndexPartyMemberRequest,
     ): Promise<IApiResponse<MemberDetailRespose[]>> {
-        const result = await this.indexPartyMemberService.fetch(partyId, query);
+        const party = await this.getPartyService.getById(partyId);
+        const { data, meta } = await this.indexPartyMemberApplication.fetch({
+            party,
+            ...request,
+        });
+
+        const response = data.map((datum) => {
+            return MemberDetailRespose.mapFromPartyMemberModel(datum);
+        });
 
         return {
             message: 'Success get user members',
-            ...result,
+            data: response,
+            meta,
         };
     }
 
@@ -126,14 +146,18 @@ export class PartyMemberController {
     async leave(
         @Param('partyId') partyId: string,
         @Body() request: LeavePartyRequest,
-    ): Promise<IApiResponse<{ id: string; deletedAt: Date }>> {
-        const member = await this.leavePartyService.leave(partyId, request);
+    ): Promise<IApiResponse<null>> {
+        const user = await this.getUserService.getUserByAddress(
+            request.userAddress,
+        );
+        const partyMember = await this.getPartyMemberService.getByMemberParty(
+            user.id,
+            partyId,
+        );
+        await this.leavePartyApplication.commit(partyMember, request);
         return {
             message: 'Success leaving party',
-            data: {
-                id: member.id,
-                deletedAt: member.deletedAt,
-            },
+            data: null,
         };
     }
 
@@ -142,7 +166,14 @@ export class PartyMemberController {
         @Param('partyId') partyId: string,
         @Body() request: LeavePartyRequest,
     ): Promise<IApiResponse<null>> {
-        await this.leavePartyService.revert(partyId, request);
+        const user = await this.getUserService.getUserByAddress(
+            request.userAddress,
+        );
+        const partyMember = await this.getPartyMemberService.getByMemberParty(
+            user.id,
+            partyId,
+        );
+        await this.leavePartyApplication.revert(partyMember);
         return {
             message: 'Success revert leave party action',
             data: null,

@@ -20,6 +20,9 @@ export const BigIntMin = (
             options: validationOptions,
             validator: {
                 validate(value: BN, args: ValidationArguments) {
+                    if (!value) {
+                        return false;
+                    }
                     const number = new BN(args.constraints[0]);
                     return value.gte(number);
                 },

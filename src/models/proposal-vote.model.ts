@@ -1,58 +1,50 @@
 import BN from 'bn.js';
-import {
-    BelongsTo,
-    Column,
-    CreatedAt,
-    DataType,
-    Default,
-    DeletedAt,
-    ForeignKey,
-    Model,
-    PrimaryKey,
-    Table,
-    UpdatedAt,
-} from 'sequelize-typescript';
-import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IProposalVote } from 'src/entities/proposal-vote.entity';
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { PartyMemberModel } from './party-member.model';
-import { Proposal } from './proposal.model';
+import { ProposalModel } from './proposal.model';
 
-@Table({ tableName: 'proposal_votes', paranoid: true })
-export class ProposalVoteModel
-    extends Model<IProposalVote, IProposalVote>
-    implements IProposalVote
-{
-    @PrimaryKey
-    @Default(DataType.UUIDV4)
-    @Column(DataType.UUID)
+@Entity({ name: 'proposal_votes' })
+export class ProposalVoteModel implements IProposalVote {
+    @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @ForeignKey(() => Proposal)
-    @Column({ type: DataType.UUID, field: 'proposal_id' })
+    @Column('uuid', { name: 'proposal_id' })
     proposalId: string;
 
-    @ForeignKey(() => PartyMemberModel)
-    @Column({ type: DataType.UUID, field: 'member_id' })
+    @Column('uuid', { name: 'member_id' })
     memberId: string;
 
-    @Column(useBigIntColumn(ProposalVoteModel, 'weight'))
+    @Column('bigint')
     weight: BN;
 
-    @CreatedAt
-    @Column({ type: DataType.DATE, field: 'created_at' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @UpdatedAt
-    @Column({ type: DataType.DATE, field: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @DeletedAt
-    @Column({ type: DataType.DATE, field: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @BelongsTo(() => Proposal, 'proposalId')
-    proposal?: Proposal;
+    @ManyToOne(() => ProposalModel, (proposal) => proposal.votes, {
+        eager: true,
+    })
+    @JoinColumn({ name: 'proposal_id' })
+    proposal?: ProposalModel;
 
-    @BelongsTo(() => PartyMemberModel, 'memberId')
+    @ManyToOne(() => PartyMemberModel, (partyMember) => partyMember.votes, {
+        eager: true,
+    })
+    @JoinColumn({ name: 'member_id' })
     member?: PartyMemberModel;
 }

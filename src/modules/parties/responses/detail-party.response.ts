@@ -1,10 +1,12 @@
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
+    JoinRequestStatusEnum,
 } from 'src/common/enums/party.enum';
 import { IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
+import { MemberResponse } from 'src/modules/users/responses/member.response';
 
 export class DetailPartyResponse
     implements Omit<IParty, 'creatorId' | 'ownerId'>
@@ -34,12 +36,11 @@ export class DetailPartyResponse
 
     static async mapFromPartyModel(
         party: PartyModel,
-        user?: UserModel,
     ): Promise<DetailPartyResponse> {
         return {
             id: party.id,
             isActive: party.isActive,
-            isMember: user ? await party.isMember(user) : false,
+            isMember: party.isMember,
             address: party.address,
             name: party.name,
             type: party.type,
@@ -50,30 +51,19 @@ export class DetailPartyResponse
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
             totalDeposit: party.totalDeposit.toString(),
-            totalMember:
-                party.totalMember === 0
-                    ? party.partyMembers.length ?? 1
-                    : party.totalMember,
+            totalMember: party.totalMember,
             distribution: party.distribution,
-            creator: {
-                id: party.creator.id,
-                firstname: party.creator.firstname,
-                lastname: party.creator.lastname,
-                imageUrl: party.creator.imageUrl,
-            },
-            owner: {
-                id: party.owner.id,
-                firstname: party.owner.firstname,
-                lastname: party.owner.lastname,
-                imageUrl: party.owner.imageUrl,
-            },
+            creator: party.creator
+                ? MemberResponse.mapFromUserModel(party.creator)
+                : null,
+            owner: party.owner
+                ? MemberResponse.mapFromUserModel(party.owner)
+                : null,
             projects: [],
             createdAt: party.createdAt,
             updatedAt: party.updatedAt,
             deletedAt: party.deletedAt,
-            joinRequestStatus: user
-                ? await user.joinRequestStatus(party.id)
-                : undefined,
+            joinRequestStatus: JoinRequestStatusEnum.Pending, // TODO: need to be included in get party query
         };
     }
 }

@@ -1,10 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Proposal } from 'src/models/proposal.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProposalModel } from 'src/models/proposal.model';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class GetProposalService {
-    async getById(id: string): Promise<Proposal> {
-        const proposal = Proposal.findOne({ where: { id } });
+    constructor(
+        @InjectRepository(ProposalModel)
+        private readonly repository: Repository<ProposalModel>,
+    ) {}
+
+    async getById(proposalId: string): Promise<ProposalModel> {
+        const query = this.repository.createQueryBuilder('proposals');
+        query.where('id = :id', { id: proposalId });
+
+        const proposal = await query.getOne();
+
         if (!proposal) throw new NotFoundException('Proposal not found.');
         return proposal;
     }

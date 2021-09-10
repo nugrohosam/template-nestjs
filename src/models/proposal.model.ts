@@ -1,120 +1,107 @@
 import BN from 'bn.js';
-import {
-    AllowNull,
-    BelongsTo,
-    Column,
-    CreatedAt,
-    DataType,
-    Default,
-    DeletedAt,
-    ForeignKey,
-    HasMany,
-    Model,
-    PrimaryKey,
-    Table,
-    UpdatedAt,
-} from 'sequelize-typescript';
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
-import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IProposal } from 'src/entities/proposal.entity';
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { PartyModel } from './party.model';
 import { ProposalDistributionModel } from './proposal-distribution.model';
 import { ProposalVoteModel } from './proposal-vote.model';
 import { UserModel } from './user.model';
 
-@Table({ tableName: 'proposals', paranoid: true })
-export class Proposal extends Model<IProposal, IProposal> implements IProposal {
-    @PrimaryKey
-    @Default(DataType.UUIDV4)
-    @Column(DataType.UUID)
+@Entity({ name: 'proposals' })
+export class ProposalModel implements IProposal {
+    @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @ForeignKey(() => PartyModel)
-    @Column({ type: DataType.UUID, field: 'party_id' })
+    @Column('uuid')
     partyId: string;
 
-    @Column(DataType.STRING)
+    @Column('varchar')
     title: string;
 
-    @Column(DataType.TEXT)
+    @Column('text')
     description: string;
 
-    @Column({ type: DataType.STRING, field: 'contract_address' })
+    @Column('varchar', { name: 'contract_address' })
     contractAddress: string;
 
-    @Column({ type: DataType.STRING, field: 'attachment_url' })
+    @Column('varchar', { name: 'attachment_url' })
     attachmentUrl: string;
 
-    @Column({ type: DataType.DATE, field: 'vote_start' })
+    @Column('datetime', { name: 'vote_start' })
     voteStart: Date;
 
-    @Column({ type: DataType.DATE, field: 'vote_end' })
+    @Column('datetime', { name: 'vote_end' })
     voteEnd: Date;
 
-    @Column({ type: DataType.DATE, field: 'project_start' })
+    @Column('datetime', { name: 'project_start' })
     projectStart: Date;
 
-    @Column({ type: DataType.DATE, field: 'project_end' })
+    @Column('datetime', { name: 'project_end' })
     projectEnd: Date;
 
-    @Column(useBigIntColumn(Proposal, 'amount'))
+    @Column('bigint')
     amount: BN;
 
-    @Column({ type: DataType.INTEGER, field: 'currency_id' })
+    @Column('int', { name: 'currency_id' })
     currencyId: number;
 
-    @ForeignKey(() => UserModel)
-    @Column({ type: DataType.UUID, field: 'creator_id' })
+    @Column('varchar', { name: 'creator_id' })
     creatorId: string;
 
-    @Column(DataType.STRING)
+    @Column('varchar')
     signature: string;
 
-    @AllowNull(true)
-    @Column({ type: DataType.STRING, field: 'transaction_hash' })
+    @Column('varchar', { name: 'transaction_hash', nullable: true })
     transactionHash?: string;
 
-    @AllowNull(true)
-    @Column({ type: DataType.STRING, field: 'approve_signature' })
+    @Column('varchar', { name: 'approve_signature', nullable: true })
     approveSignature?: string;
 
-    @AllowNull(true)
-    @Column({ type: DataType.STRING, field: 'approve_transaction_hash' })
+    @Column('varchar', { name: 'approve_transaction_hash', nullable: true })
     approveTransactionHash?: string;
 
-    @AllowNull(true)
-    @Column({ type: DataType.DATE, field: 'approved_at' })
+    @Column('timestamp', { name: 'approved_at', nullable: true })
     approvedAt?: Date;
 
-    @AllowNull(true)
-    @Column({ type: DataType.DATE, field: 'rejected_at' })
+    @Column('timestamp', { name: 'rejected_at', nullable: true })
     rejectedAt?: Date;
 
-    @CreatedAt
-    @Column({ type: DataType.DATE, field: 'created_at' })
+    @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
-    @UpdatedAt
-    @Column({ type: DataType.DATE, field: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 
-    @DeletedAt
-    @Column({ type: DataType.DATE, field: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt: Date;
 
-    @BelongsTo(() => PartyModel, 'partyId')
+    @ManyToOne(() => PartyModel, (party) => party.proposals, { eager: true })
+    @JoinColumn({ name: 'party_id' })
     party?: PartyModel;
 
-    @BelongsTo(() => UserModel, 'creatorId')
+    @ManyToOne(() => UserModel, (user) => user.proposals, { eager: true })
+    @JoinColumn({ name: 'creator_id' })
     creator?: UserModel;
 
-    @HasMany(() => ProposalVoteModel, 'proposalId')
-    votes?: ProposalVoteModel[];
+    @OneToMany(() => ProposalVoteModel, (vote) => vote.proposal)
+    votes?: ProposalVoteModel;
 
-    @HasMany(() => ProposalDistributionModel, 'proposalId')
-    distributions?: ProposalDistributionModel[];
+    @OneToMany(
+        () => ProposalDistributionModel,
+        (distribution) => distribution.proposal,
+    )
+    distributions?: ProposalDistributionModel;
 
-    @Column({ type: DataType.VIRTUAL })
     get status(): ProposalStatusEnum {
         if (this.approvedAt) {
             return ProposalStatusEnum.Approved;

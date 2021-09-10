@@ -4,17 +4,23 @@ import {
     Injectable,
     UnprocessableEntityException,
 } from '@nestjs/common';
-import { Transaction } from 'sequelize/types';
-import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { GetPartyService } from './get-party.service';
 import { GetPartyMemberService } from './members/get-party-member.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PartyCalculationService {
     constructor(
+        @InjectRepository(PartyModel)
+        private readonly partyRepository: Repository<PartyModel>,
+        @InjectRepository(PartyMemberModel)
+        private readonly partyMemberRepository: Repository<PartyMemberModel>,
+
+        @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
         @Inject(GetUserService) private readonly getUserService: GetUserService,
         private readonly getPartyMemberService: GetPartyMemberService,
@@ -37,34 +43,26 @@ export class PartyCalculationService {
     async updatePartyTotalFund(
         party: PartyModel,
         amount: BN,
-        t?: Transaction,
     ): Promise<PartyModel> {
         party.totalFund = party.totalFund.add(amount);
         party.totalDeposit = party.totalDeposit.add(amount);
-        return await party.save({ transaction: t });
+        return await this.partyRepository.save(party);
     }
 
     async updatePartyMemberTotalFund(
         partyMember: PartyMemberModel,
         amount: BN,
-        t?: Transaction,
     ): Promise<PartyMemberModel> {
         partyMember.totalFund = partyMember.totalFund.add(amount);
         partyMember.totalDeposit = partyMember.totalDeposit.add(amount);
-        return await partyMember.save({ transaction: t });
+        return await this.partyMemberRepository.save(partyMember);
     }
 
     async deposit(
         partyAddress: string,
         memberAddress: string,
         amount: BN,
-        t?: Transaction,
     ): Promise<void> {
-        // begin db transaction, and receive passed transaction if any to used passed transaction instead
-        const dbTransaction: Transaction = await localDatabase.transaction({
-            transaction: t,
-        });
-
         const party = await this.getPartyService.getByAddress(partyAddress);
         const member = await this.getUserService.getUserByAddress(
             memberAddress,
@@ -76,30 +74,15 @@ export class PartyCalculationService {
 
         this.validateDepositAmount(amount, party);
 
-        try {
-            await this.updatePartyTotalFund(party, amount, dbTransaction);
-            await this.updatePartyMemberTotalFund(
-                partyMember,
-                amount,
-                dbTransaction,
-            );
-            dbTransaction.commit();
-        } catch (err) {
-            dbTransaction.rollback();
-            throw err;
-        }
+        await this.updatePartyTotalFund(party, amount);
+        await this.updatePartyMemberTotalFund(partyMember, amount);
     }
 
     async withdraw(
         partyAddress: string,
         memberAddress: string,
         amount: BN,
-        t?: Transaction,
     ): Promise<void> {
-        const dbTransaction: Transaction = await localDatabase.transaction({
-            transaction: t,
-        });
-
         const party = await this.getPartyService.getByAddress(partyAddress);
         const member = await this.getUserService.getUserByAddress(
             memberAddress,
@@ -112,21 +95,7 @@ export class PartyCalculationService {
         this.validateWithdrawAmount(amount, partyMember);
 
         const withdrawAmount = amount.muln(-1);
-        try {
-            await this.updatePartyTotalFund(
-                party,
-                withdrawAmount,
-                dbTransaction,
-            );
-            await this.updatePartyMemberTotalFund(
-                partyMember,
-                withdrawAmount,
-                dbTransaction,
-            );
-            dbTransaction.commit();
-        } catch (err) {
-            dbTransaction.rollback();
-            throw err;
-        }
+        await this.updatePartyTotalFund(party, withdrawAmount);
+        await this.updatePartyMemberTotalFund(partyMember, withdrawAmount);
     }
 }

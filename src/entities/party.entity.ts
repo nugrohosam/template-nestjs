@@ -16,6 +16,7 @@ export interface IParty {
     isPublic: boolean;
     isFeatured?: boolean;
     totalFund?: string | BN;
+    totalDeposit?: string | BN;
     minDeposit?: string | BN;
     maxDeposit?: string | BN;
     totalMember?: number;

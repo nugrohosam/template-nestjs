@@ -1,4 +1,6 @@
 export enum OrderDirectionEnum {
-    Asc = 'asc',
-    Desc = 'desc',
+    Asc = 'ASC',
+    Desc = 'DESC',
 }
+
+export type OrderDirectionType = 'ASC' | 'DESC';

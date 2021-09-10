@@ -3,7 +3,6 @@ import {
     Controller,
     Get,
     Headers,
-    Inject,
     Param,
     Post,
     Put,
@@ -11,7 +10,8 @@ import {
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
-import { IndexTransactionService } from 'src/modules/transactions/services/index-transaction.service';
+import { CreatePartyApplication } from '../applications/create-party.application';
+import { IndexPartyApplication } from '../applications/index-party.application';
 import { CreatePartyRequest } from '../requests/create-party.request';
 import { IndexPartyRequest } from '../requests/index-party.request';
 import { RevertCreatePartyRequest } from '../requests/revert-create-party.request';
@@ -19,49 +19,39 @@ import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-h
 import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
 import { IndexPartyResponse } from '../responses/index-party.response';
-import { CreatePartyService } from '../services/create-party.service';
 import { GetPartyService } from '../services/get-party.service';
-import { IndexPartyService } from '../services/index-party.service';
 
 @Controller('parties')
 export class PartyController {
     constructor(
-        private readonly indexPartyService: IndexPartyService,
-        private readonly getPartyService: GetPartyService,
-        private readonly createPartyService: CreatePartyService,
-        @Inject(GetSignerService)
+        private readonly createPartyApplication: CreatePartyApplication,
+        private readonly indexPartyApplication: IndexPartyApplication,
         private readonly getSignerService: GetSignerService,
-        @Inject(IndexTransactionService)
-        private readonly indexTransactionService: IndexTransactionService,
+        private readonly getPartyService: GetPartyService,
     ) {}
 
     @Post('/create')
-    async store(
+    async prepare(
         @Body() request: CreatePartyRequest,
     ): Promise<IApiResponse<CreatePartyResponse>> {
-        const party = await this.createPartyService.create(request);
-        const creator = await party.$get('creator');
-        const platformSignature =
-            await this.createPartyService.generatePlatformSignature(
-                party,
-                creator,
-            );
+        const { data, platformSignature } =
+            await this.createPartyApplication.prepare(request);
 
         return {
             message: 'Success create party.',
             data: CreatePartyResponse.mapFromPartyModel(
-                party,
+                data,
                 platformSignature,
             ),
         };
     }
 
     @Put('/:partyId/transaction-hash')
-    async updateTransactionHash(
+    async commit(
         @Param('partyId') partyId: string,
         @Body() request: UpdateDeployedPartyDataRequest,
     ): Promise<IApiResponse<null>> {
-        await this.createPartyService.updateTransacionHash(partyId, request);
+        await this.createPartyApplication.commit(partyId, request);
         return {
             message: 'Success update party transaction hash.',
             data: null,
@@ -72,7 +62,7 @@ export class PartyController {
     async revertCreateParty(
         @Body() request: RevertCreatePartyRequest,
     ): Promise<IApiResponse<null>> {
-        await this.createPartyService.revertTransaction(request);
+        await this.createPartyApplication.revert(request);
         return {
             message: 'Success delete party',
             data: null,
@@ -83,10 +73,15 @@ export class PartyController {
     async index(
         @Query() query: IndexPartyRequest,
     ): Promise<IApiResponse<IndexPartyResponse[]>> {
-        const result = await this.indexPartyService.fetch(query);
+        const { data, meta } = await this.indexPartyApplication.fetch(query);
+        const response = data.map((datum) => {
+            return IndexPartyResponse.mapFromPartyModel(datum);
+        });
+
         return {
             message: 'Success fetching parties data',
-            ...result,
+            data: response,
+            meta,
         };
     }
 
@@ -95,13 +90,13 @@ export class PartyController {
         @Headers('Signature') signature: string,
         @Param('partyId') partyId: string,
     ): Promise<IApiResponse<DetailPartyResponse>> {
-        // TODO: need to research about this
+        console.log('this.getSignerService', this.getSignerService);
         const signer = await this.getSignerService.get(signature);
-
-        const party = await this.getPartyService.getById(partyId);
+        console.log('signer', signer);
+        const party = await this.getPartyService.getById(partyId, signer?.id);
         return {
             message: 'Success get party',
-            data: await DetailPartyResponse.mapFromPartyModel(party, signer),
+            data: await DetailPartyResponse.mapFromPartyModel(party),
         };
     }
 }

@@ -8,32 +8,23 @@ export class MemberDetailRespose {
     initialFund: string;
     totalDeposit: string;
     totalFund: string;
-    weight: number;
+    weight: string;
     createdAt: Date;
     updatedAt: Date;
 
-    static async mapFromPartyMemberModel(
+    static mapFromPartyMemberModel(
         partyMember: PartyMemberModel,
-    ): Promise<MemberDetailRespose> {
-        const user = partyMember.member
-            ? partyMember.member
-            : await partyMember.$get('member');
-
-        const party = partyMember.party
-            ? partyMember.party
-            : await partyMember.$get('party');
-
-        const currentWeight =
-            partyMember.totalDeposit.toNumber() / party.totalDeposit.toNumber();
-
+    ): MemberDetailRespose {
         return {
             id: partyMember.id,
-            user: ProfileResponse.mapFromUserModel(user),
+            user: partyMember.member
+                ? ProfileResponse.mapFromUserModel(partyMember.member)
+                : null,
             status: partyMember.status,
             initialFund: partyMember.initialFund.toString(),
             totalDeposit: partyMember.totalDeposit.toString(),
             totalFund: partyMember.totalFund.toString(),
-            weight: currentWeight,
+            weight: partyMember.weight.toString(),
             createdAt: partyMember.createdAt,
             updatedAt: partyMember.updatedAt,
         };

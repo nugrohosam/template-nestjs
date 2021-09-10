@@ -1,10 +1,11 @@
 import { HttpException, Module } from '@nestjs/common';
 import { APP_FILTER, APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { RavenInterceptor, RavenModule } from 'nest-raven';
 import { HttpExceptionFilter } from './common/filters/http-exeception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { ValidationPipe } from './common/pipes/validation.pipe';
-import { DatabaseModule } from './infrastructure/database/database.module';
+import { connectionOption } from './infrastructure/databases';
 import { CommonModule } from './modules/commons/common.module';
 import { MeModule } from './modules/me/me.module';
 import { PartyModule } from './modules/parties/party.module';
@@ -13,7 +14,7 @@ import { UserModule } from './modules/users/user.module';
 
 @Module({
     imports: [
-        DatabaseModule,
+        TypeOrmModule.forRoot(connectionOption),
         RavenModule,
         UserModule,
         PartyModule,

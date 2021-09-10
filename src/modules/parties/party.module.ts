@@ -3,73 +3,123 @@ import { Web3Module } from 'src/infrastructure/web3/web3.module';
 import { TransactionModule } from '../transactions/transaction.module';
 import { UserModule } from '../users/user.module';
 import { PartyMemberController } from './controllers/party-member.controller';
-import { PartyInvitationController } from './controllers/party-invitation.controller';
 import { PartyController } from './controllers/party.controller';
-import { AcceptInvitationService } from './services/invitation/accept-invitation.service';
-import { CreatePartyService } from './services/create-party.service';
+import { PartyService } from './services/party.service';
 import { GetPartyService } from './services/get-party.service';
-import { IndexPartyInvitationService } from './services/invitation/index-party-invitation.service';
-import { IndexPartyMemberService } from './services/members/index-party-member.service';
-import { IndexPartyService } from './services/index-party.service';
-import { JoinPartyService } from './services/members/join-party.service';
-import { UpdatePartyMemberService } from './services/members/update-party-member.service';
+import { PartyMemberService } from './services/members/party-member.service';
 import { GetPartyMemberService } from './services/members/get-party-member.service';
-import { InvitePartyService } from './services/invitation/invite-party.service';
 import { PartyJoinRequestController } from './controllers/party-join-request.controller';
-import { RequestJoinService } from './services/join-request/request-join.service';
-import { IndexJoinRequestService } from './services/join-request/index-join-request.service';
-import { UpdateStatusJoinRequestService } from './services/join-request/update-status-join-request.service';
+import { JoinRequestService } from './services/join-request/join-request.service';
 import { GetJoinRequestService } from './services/join-request/get-join-request.service';
 import { CommonModule } from '../commons/common.module';
 import { JoinRequestController } from './controllers/join-request.controller';
 import { PartyCalculationService } from './services/party-calculation.service';
-import { CreateProposalService } from './services/proposal/create-proposal.service';
+import { ProposalService } from './services/proposal/proposal.service';
 import { PartyProposalController } from './controllers/party-proposal.controller';
-import { IndexProposalService } from './services/proposal/index-proposal.service';
 import { GetProposalService } from './services/proposal/get-proposal.service';
-import { ApproveProposalService } from './services/proposal/approve-proposal.service';
-import { RejectProposalService } from './services/proposal/reject-proposal.service';
-import { LeavePartyService } from './services/members/leave-party.service';
 import { PartyTransactionController } from './controllers/party-transaction.controller';
-
+import { CreatePartyApplication } from './applications/create-party.application';
+import { IndexPartyApplication } from './applications/index-party.application';
+import { JoinPartyApplication } from './applications/join-party.application';
+import { IndexPartyMemberApplication } from './applications/index-party-member.application';
+import { LeavePartyApplication } from './applications/leave-party.application';
+import { RequestJoinPartyApplication } from './applications/request-join-party.application';
+import { IndexPartyJoinRequestApplication } from './applications/index-party-join-request.application';
+import { UpdateJoinRequestStatusApplication } from './applications/update-join-request-status.application';
+import { JoinRequestValidation } from './services/join-request/join-request.validation';
+import { PartyMemberValidation } from './services/members/party-member.validation';
+import { CreateProposalApplication } from './applications/create-proposal.application';
+import { IndexPartyProposalApplication } from './applications/index-party-proposal.application';
+import { ApproveProposalApplication } from './applications/approve-proposal-application';
+import { RejectProposalApplication } from './applications/reject-proposal.application';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PartyModel } from 'src/models/party.model';
+import { PartyMemberModel } from 'src/models/party-member.model';
+import { JoinRequestModel } from 'src/models/join-request.model';
+import { ProposalValidation } from './services/proposal/proposal.validation';
+import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
+import { ProposalModel } from 'src/models/proposal.model';
+import { IndexPartyTransactionApplication } from './applications/index-party-transaction.application';
+import { TransactionModel } from 'src/models/transaction.model';
+import { IndexJoinRequestApplication } from './applications/index-join-request.application';
+import { HttpModule } from '@nestjs/axios';
+import { SwapController } from './controllers/swap.controller';
+import { SwapQuoteApplication } from './applications/swap-quote.application';
+import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
+import { SwapQuoteService } from './services/swap/swap-quote.service';
 @Module({
-    imports: [Web3Module, UserModule, TransactionModule, CommonModule],
+    imports: [
+        HttpModule,
+        Web3Module,
+        UserModule,
+        TransactionModule,
+        CommonModule,
+        TypeOrmModule.forFeature([
+            PartyModel,
+            PartyMemberModel,
+            JoinRequestModel,
+            ProposalModel,
+            ProposalDistributionModel,
+            TransactionModel,
+        ]),
+    ],
     controllers: [
         PartyController,
-        PartyJoinRequestController,
-        PartyInvitationController,
         PartyMemberController,
-        JoinRequestController,
+        PartyJoinRequestController,
         PartyProposalController,
         PartyTransactionController,
+        SwapController,
+        JoinRequestController,
     ],
     providers: [
         // Party Porviders
-        IndexPartyService,
+        CreatePartyApplication,
+        IndexPartyApplication,
+
+        PartyService,
         GetPartyService,
-        CreatePartyService,
         PartyCalculationService,
+
         // Join Request Providers
-        RequestJoinService,
-        IndexJoinRequestService,
+        RequestJoinPartyApplication,
+        UpdateJoinRequestStatusApplication,
+        IndexPartyJoinRequestApplication,
+        IndexJoinRequestApplication,
+
+        JoinRequestService,
         GetJoinRequestService,
-        UpdateStatusJoinRequestService,
-        // Party Invitation Providers
-        InvitePartyService,
-        IndexPartyInvitationService,
-        AcceptInvitationService,
+
+        JoinRequestValidation,
+
         // Party Member / Join Party Providers
-        JoinPartyService,
-        UpdatePartyMemberService,
+        JoinPartyApplication,
+        IndexPartyMemberApplication,
+        LeavePartyApplication,
+
+        PartyMemberService,
         GetPartyMemberService,
-        IndexPartyMemberService,
-        LeavePartyService,
+
+        PartyMemberValidation,
+
         // Proposal
-        CreateProposalService,
-        IndexProposalService,
+        CreateProposalApplication,
+        IndexPartyProposalApplication,
+        ApproveProposalApplication,
+        RejectProposalApplication,
+
+        ProposalService,
         GetProposalService,
-        ApproveProposalService,
-        RejectProposalService,
+
+        ProposalValidation,
+
+        // Transaction
+        IndexPartyTransactionApplication,
+
+        // Swap
+        SwapQuoteApplication,
+        SwapSignatureSerivce,
+        SwapQuoteService,
     ],
     exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
 })

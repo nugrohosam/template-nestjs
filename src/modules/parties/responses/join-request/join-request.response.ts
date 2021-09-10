@@ -18,21 +18,17 @@ export class JoinRequestResponse
     acceptedAt?: Date;
     rejectedAt?: Date;
 
-    static async mapFromJoinRequestModel(
+    static mapFromJoinRequestModel(
         model: JoinRequestModel,
-    ): Promise<JoinRequestResponse> {
+    ): JoinRequestResponse {
         return {
             id: model.id,
             user: model.user
-                ? {
-                      id: model.user.id,
-                      address: model.user.address,
-                      username: model.user.username,
-                  }
-                : undefined,
+                ? MemberResponse.mapFromUserModel(model.user)
+                : null,
             party: model.party
-                ? await IndexPartyResponse.mapFromPartyModel(model.party)
-                : undefined,
+                ? IndexPartyResponse.mapFromPartyModel(model.party)
+                : null,
             acceptedAt: model.acceptedAt,
             rejectedAt: model.rejectedAt,
             status: model.status,

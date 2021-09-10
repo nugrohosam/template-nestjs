@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { OrderDirectionEnum } from '../enums/index.enum';
+import { OrderDirectionEnum, OrderDirectionType } from '../enums/index.enum';
 import { IPaginateRequest, ISortRequest } from '../interface/index.interface';
 
 export class IndexRequest implements ISortRequest, IPaginateRequest {
@@ -10,7 +10,7 @@ export class IndexRequest implements ISortRequest, IPaginateRequest {
 
     @IsOptional()
     @IsEnum(OrderDirectionEnum)
-    order?: OrderDirectionEnum;
+    order?: OrderDirectionType;
 
     @IsOptional()
     @IsNumber()

@@ -44,7 +44,9 @@ export class Web3Service {
         if (config.disableSignatureValidation) return;
 
         const signer = await this.recover(signature, message);
-        if (signer !== address)
+        console.log('address', address);
+        console.log('signer', signer);
+        if (signer.toLowerCase() !== address.toLowerCase())
             throw new UnauthorizedException('Signature invalid!');
     }
 
@@ -99,6 +101,8 @@ export class Web3Service {
         abiItem: AbiItem,
         validations: { [key: number]: string },
     ): Promise<boolean> {
+        if (config.nodeEnv === 'local') return true;
+
         const receipt = await this.getTransactionReceipt(transactionHash);
 
         if (!receipt)

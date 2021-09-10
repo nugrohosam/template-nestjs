@@ -1,48 +1,33 @@
-import {
-    AllowNull,
-    AutoIncrement,
-    Column,
-    CreatedAt,
-    DataType,
-    DeletedAt,
-    Model,
-    PrimaryKey,
-    Table,
-    UpdatedAt,
-} from 'sequelize-typescript';
 import { ICurrency } from 'src/entities/currency.entity';
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
-@Table({ tableName: 'currencies', paranoid: true })
-export class CurrencyModel
-    extends Model<ICurrency, ICurrency>
-    implements ICurrency
-{
-    @PrimaryKey
-    @AutoIncrement
-    @AllowNull(false)
-    @Column(DataType.INTEGER)
+@Entity({ name: 'currencies' })
+export class CurrencyModel implements ICurrency {
+    @PrimaryGeneratedColumn('increment')
     id?: number;
 
-    @AllowNull(false)
-    @Column(DataType.STRING)
+    @Column('varchar')
     symbol: string;
 
-    @AllowNull(false)
-    @Column(DataType.STRING)
+    @Column('varchar')
     address: string;
 
-    @Column(DataType.TEXT)
+    @Column('text', { nullable: true })
     description?: string;
 
-    @CreatedAt
-    @Column({ type: DataType.DATE, field: 'created_at' })
-    createdAt?: Date | null;
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt?: Date;
 
-    @UpdatedAt
-    @Column({ type: DataType.DATE, field: 'updated_at' })
-    updatedAt?: Date | null;
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt?: Date;
 
-    @DeletedAt
-    @Column({ type: DataType.DATE, field: 'deleted_at' })
-    deletedAt?: Date | null;
+    @DeleteDateColumn({ name: 'deleted_at' })
+    deletedAt?: Date;
 }

@@ -2,6 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as Sentry from '@sentry/node';
 import { config } from './config';
+import {
+    initializeTransactionalContext,
+    patchTypeORMRepositoryWithBaseRepository,
+} from 'typeorm-transactional-cls-hooked';
 
 async function bootstrap() {
     // Sentry
@@ -11,6 +15,9 @@ async function bootstrap() {
         debug: config.nodeEnv !== 'local',
         environment: config.nodeEnv,
     });
+
+    initializeTransactionalContext();
+    patchTypeORMRepositoryWithBaseRepository();
 
     const app = await NestFactory.create(AppModule);
 

@@ -1,5 +1,5 @@
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { MemberResponse } from 'src/modules/users/responses/member.response';
 import { IndexPartyResponse } from '../index-party.response';
 
@@ -15,9 +15,9 @@ export class IndexProposalResponse {
     party: IndexPartyResponse;
     creator: MemberResponse;
 
-    static async mapFromProposalModel(
-        proposal: Proposal,
-    ): Promise<IndexProposalResponse> {
+    static mapFromProposalModel(
+        proposal: ProposalModel,
+    ): IndexProposalResponse {
         return {
             id: proposal.id,
             title: proposal.title,
@@ -27,12 +27,12 @@ export class IndexProposalResponse {
             amount: proposal.amount.toString(),
             attachmentUrl: proposal.attachmentUrl,
             createdAt: proposal.createdAt,
-            party: await IndexPartyResponse.mapFromPartyModel(
-                await proposal.$get('party'),
-            ),
-            creator: MemberResponse.mapFromUserModel(
-                await proposal.$get('creator'),
-            ),
+            party: proposal.party
+                ? IndexPartyResponse.mapFromPartyModel(proposal.party)
+                : null,
+            creator: proposal.creator
+                ? MemberResponse.mapFromUserModel(proposal.creator)
+                : null,
         };
     }
 }

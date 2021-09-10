@@ -38,4 +38,8 @@ export const config = {
 
     disableSignatureValidation:
         process.env.DISABLE_SIGNATURE_VALIDATION === 'true',
+
+    api: {
+        zerox: process.env.API_0X_URL,
+    },
 };

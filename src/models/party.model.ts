@@ -1,212 +1,153 @@
 import BN from 'bn.js';
 import {
-    BelongsTo,
-    BelongsToMany,
-    Column,
-    CreatedAt,
-    DataType,
-    Default,
-    DefaultScope,
-    DeletedAt,
-    ForeignKey,
-    HasMany,
-    Model,
-    Table,
-    UpdatedAt,
-} from 'sequelize-typescript';
-import {
     DistributionTypeEnum,
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
-import { useBigIntColumn } from 'src/common/utils/bigint-column.util';
 import { IParty } from 'src/entities/party.entity';
-import { PartyInvitationModel } from './party-invitation.model';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+import { JoinRequestModel } from './join-request.model';
 import { PartyMemberModel } from './party-member.model';
+import { ProposalModel } from './proposal.model';
 import { UserModel } from './user.model';
+import { TransformBN } from 'src/common/utils/typeorm.util';
 
-@DefaultScope(() => ({
-    include: [
-        { model: PartyMemberModel, as: 'partyMembers' },
-        { model: UserModel, as: 'owner', required: true },
-    ],
-}))
-@Table({ tableName: 'parties', paranoid: true })
-export class PartyModel extends Model<IParty, IParty> implements IParty {
-    @Column({
-        primaryKey: true,
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-        allowNull: false,
-    })
+@Entity({ name: 'parties' })
+export class PartyModel implements IParty {
+    @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: true,
+    @Column('varchar', {
+        unique: true,
+        transformer: {
+            to: (value: string) => value.toLowerCase(),
+            from: (value: string) => value.toLowerCase(),
+        },
     })
     address?: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
+    @Column('varchar')
     name: string;
 
-    @Column({
-        type: DataType.ENUM(
-            PartyTypeEnum.Monarchy,
-            PartyTypeEnum.Republic,
-            PartyTypeEnum.Democracy,
-            PartyTypeEnum.WeightedDemocracy,
-        ),
-        allowNull: false,
-    })
+    @Column('enum', { enum: PartyTypeEnum })
     type: PartyTypeEnum;
 
-    @Column({
-        type: DataType.TEXT,
-        allowNull: false,
-    })
+    @Column('varchar')
     purpose: string;
 
-    @Column({
-        field: 'image_url',
-        type: DataType.TEXT,
-        allowNull: true,
-    })
+    @Column('varchar', { name: 'image_url', nullable: true })
     imageUrl?: string;
 
-    @Column({
-        field: 'creator_id',
-        type: DataType.UUID,
-        allowNull: true,
-    })
-    @ForeignKey(() => UserModel)
+    @Column('uuid', { name: 'creator_id', nullable: true })
     creatorId: string;
 
-    @Column({
-        field: 'owner_id',
-        type: DataType.UUID,
-        allowNull: true,
-    })
-    @ForeignKey(() => UserModel)
+    @Column('uuid', { name: 'owner_id', nullable: true })
     ownerId: string;
 
-    @Column({
-        field: 'is_public',
-        type: DataType.BOOLEAN,
-        allowNull: false,
-    })
+    @Column('boolean', { name: 'is_public' })
     isPublic: boolean;
 
-    @Default(false)
-    @Column({ field: 'is_featured', type: DataType.BOOLEAN })
+    @Column('boolean', { name: 'is_featured', nullable: true })
     isFeatured?: boolean;
 
-    @Column(useBigIntColumn(PartyModel, 'totalFund', 'total_fund'))
+    @Column('bigint', {
+        name: 'total_fund',
+        nullable: true,
+        transformer: TransformBN,
+    })
     totalFund?: BN;
 
-    @Column(useBigIntColumn(PartyModel, 'minDeposit', 'min_deposit'))
+    @Column('bigint', {
+        name: 'min_deposit',
+        nullable: true,
+        transformer: TransformBN,
+    })
     minDeposit?: BN;
 
-    @Column(useBigIntColumn(PartyModel, 'maxDeposit', 'max_deposit'))
+    @Column('bigint', {
+        name: 'max_deposit',
+        nullable: true,
+        transformer: TransformBN,
+    })
     maxDeposit?: BN;
 
-    @Column(useBigIntColumn(PartyModel, 'totalDeposit', 'total_deposit'))
+    @Column('bigint', {
+        name: 'total_deposit',
+        nullable: true,
+        transformer: TransformBN,
+    })
     totalDeposit?: BN;
 
-    @Column({
-        field: 'total_member',
-        type: DataType.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-    })
+    @Column('int', { name: 'total_member', nullable: true })
     totalMember?: number;
 
-    @Column({
-        type: DataType.ENUM(
-            DistributionTypeEnum.Daily,
-            DistributionTypeEnum.Monthly,
-            DistributionTypeEnum.Yearly,
-        ),
-        allowNull: false,
-    })
+    @Column('enum', { enum: DistributionTypeEnum })
     distribution: DistributionTypeEnum;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: true,
-    })
+    @Column('varchar')
     signature: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: true,
-    })
+    @Column('varchar', { name: 'transaction_hash', nullable: true })
     transactionHash?: string;
 
-    @Column({
-        field: 'created_at',
-        allowNull: true,
-        type: DataType.DATE,
-    })
-    @CreatedAt
+    @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @Column({
-        field: 'updated_at',
-        allowNull: true,
-        type: DataType.DATE,
-    })
-    @UpdatedAt
+    @CreateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @Column({
-        field: 'deleted_at',
-        allowNull: true,
-        type: DataType.DATE,
-    })
-    @DeletedAt
+    @CreateDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @BelongsTo(() => UserModel, 'ownerId')
-    readonly owner?: UserModel;
+    @ManyToOne(() => UserModel, (user) => user.ownedParties, { eager: true })
+    @JoinColumn({ name: 'owner_id' })
+    owner?: UserModel;
 
-    @BelongsTo(() => UserModel, 'creatorId')
-    readonly creator?: UserModel;
+    @ManyToOne(() => UserModel, (user) => user.createdParties, { eager: true })
+    @JoinColumn({ name: 'creator_id' })
+    creator?: UserModel;
 
-    @HasMany(() => PartyMemberModel, 'partyId')
-    readonly partyMembers?: PartyMemberModel[];
+    @OneToMany(() => JoinRequestModel, (joinRequest) => joinRequest.party)
+    joinRequests?: JoinRequestModel;
 
-    @BelongsToMany(
-        () => UserModel,
-        () => PartyMemberModel,
-        'partyId',
-        'memberId',
-    )
-    readonly members?: UserModel[];
+    @OneToMany(() => PartyMemberModel, (partyMember) => partyMember.party)
+    partyMembers?: PartyMemberModel;
 
-    @HasMany(() => PartyInvitationModel)
-    readonly invitations?: PartyInvitationModel[];
+    @OneToMany(() => ProposalModel, (proposal) => proposal.party)
+    proposals?: ProposalModel;
 
-    get isActive(): boolean {
-        if (!this.address || !this.transactionHash) return false;
+    // Computed Columns
 
-        const partyMembers = this.partyMembers
-            ? this.partyMembers.filter(
-                  (partyMember) => partyMember.memberId === this.ownerId,
-              )
-            : [];
-        if (partyMembers.length <= 0) return false;
+    @Column({
+        type: 'varchar',
+        length: 1,
+        select: false,
+        update: false,
+        insert: false,
+        transformer: {
+            to: (value) => value == 1 || value === 'true',
+            from: (value) => value == 1 || value === 'true',
+        },
+    })
+    isActive?: boolean;
 
-        return true;
-    }
-
-    async isMember(user: UserModel): Promise<boolean> {
-        const partyMembers = await PartyMemberModel.findOne({
-            where: { memberId: user.id, partyId: this.id },
-        });
-
-        return partyMembers !== null;
-    }
+    @Column({
+        type: 'varchar',
+        length: 1,
+        select: false,
+        update: false,
+        insert: false,
+        transformer: {
+            to: (value) => value == 1 || value === 'true',
+            from: (value) => value == 1 || value === 'true',
+        },
+    })
+    isMember?: boolean;
 }

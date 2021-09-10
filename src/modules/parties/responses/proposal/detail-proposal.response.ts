@@ -1,6 +1,6 @@
 import { ProposalStatusEnum } from 'src/common/enums/party.enum';
 import { IProposal } from 'src/entities/proposal.entity';
-import { Proposal } from 'src/models/proposal.model';
+import { ProposalModel } from 'src/models/proposal.model';
 import { MemberResponse } from 'src/modules/users/responses/member.response';
 import { IndexPartyResponse } from '../index-party.response';
 
@@ -27,7 +27,7 @@ export class DetailProposalResponse
     creator?: MemberResponse;
 
     static async mapFromProposalModel(
-        proposal: Proposal,
+        proposal: ProposalModel,
     ): Promise<DetailProposalResponse> {
         return {
             id: proposal.id,
@@ -46,11 +46,9 @@ export class DetailProposalResponse
             approvedAt: proposal.approvedAt,
             rejectedAt: proposal.rejectedAt,
             party: await IndexPartyResponse.mapFromPartyModel(
-                await proposal.$get('party'),
+                await proposal.party,
             ),
-            creator: MemberResponse.mapFromUserModel(
-                await proposal.$get('creator'),
-            ),
+            creator: MemberResponse.mapFromUserModel(await proposal.creator),
         };
     }
 }

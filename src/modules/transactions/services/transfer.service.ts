@@ -3,7 +3,6 @@ import {
     Injectable,
     UnprocessableEntityException,
 } from '@nestjs/common';
-import { Transaction } from 'sequelize/types';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
@@ -15,12 +14,15 @@ import { TransferRequest } from '../requests/transfer.request';
 import { depositEvent } from 'src/contracts/DepositEvent.json';
 import { withdrawEvent } from 'src/contracts/WithdrawEvent.json';
 import { AbiItem } from 'web3-utils';
-import { localDatabase } from 'src/infrastructure/database/database.provider';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TransferService {
     constructor(
+        @InjectRepository(TransactionModel)
+        private readonly repository: Repository<TransactionModel>,
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
         @Inject(GetUserService)
@@ -91,29 +93,26 @@ export class TransferService {
     async storeTransaction(
         request: TransferRequest,
         transactionStatus: boolean,
-        t?: Transaction,
     ): Promise<TransactionModel> {
-        let transaction: TransactionModel = await TransactionModel.findOne({
+        let transaction: TransactionModel = await this.repository.findOne({
             where: { transactionHash: request.transactionHash },
         });
 
         if (!transaction) {
-            transaction = await TransactionModel.create(
-                {
-                    addressFrom: request.addressFrom,
-                    addressTo: request.addressTo,
-                    amount: request.amount,
-                    currencyId: request.currencyId,
-                    type: request.type,
-                    description: request.description,
-                    signature: request.signature,
-                    transactionHash: request.transactionHash,
-                    transactionHashStatus: transactionStatus,
-                },
-                { transaction: t },
-            );
+            transaction = this.repository.create({
+                addressFrom: request.addressFrom,
+                addressTo: request.addressTo,
+                amount: request.amount,
+                currencyId: request.currencyId,
+                type: request.type,
+                description: request.description,
+                signature: request.signature,
+                transactionHash: request.transactionHash,
+                transactionHashStatus: transactionStatus,
+            });
         } else {
-            transaction = await transaction.update(
+            await this.repository.update(
+                { id: transaction.id },
                 {
                     addressFrom: request.addressFrom,
                     addressTo: request.addressTo,
@@ -125,7 +124,6 @@ export class TransferService {
                     transactionHash: request.transactionHash,
                     transactionHashStatus: transactionStatus,
                 },
-                { transaction: t },
             );
         }
 
@@ -134,21 +132,18 @@ export class TransferService {
 
     private async processTransaferCalculation(
         transaction: TransactionModel,
-        dbTransaction?: Transaction,
     ): Promise<void> {
         if (transaction.type === TransactionTypeEnum.Deposit) {
             await this.partyCalculationService.deposit(
                 transaction.addressTo,
                 transaction.addressFrom,
                 transaction.amount,
-                dbTransaction,
             );
         } else if (transaction.type === TransactionTypeEnum.Withdraw) {
             await this.partyCalculationService.withdraw(
                 transaction.addressFrom,
                 transaction.addressTo,
                 transaction.amount,
-                dbTransaction,
             );
         }
     }
@@ -174,24 +169,14 @@ export class TransferService {
             { 0: user.address, 1: party.address, 2: request.amount.toString() },
         );
 
-        const dbTransaction = await localDatabase.transaction();
-        try {
-            const transaction = await this.storeTransaction(
-                request,
-                transactionStatus,
-            );
+        const transaction = await this.storeTransaction(
+            request,
+            transactionStatus,
+        );
 
-            if (transactionStatus)
-                await this.processTransaferCalculation(
-                    transaction,
-                    dbTransaction,
-                );
+        if (transactionStatus)
+            await this.processTransaferCalculation(transaction);
 
-            await dbTransaction.commit();
-            return transaction;
-        } catch (err) {
-            await dbTransaction.rollback();
-            throw err;
-        }
+        return transaction;
     }
 }

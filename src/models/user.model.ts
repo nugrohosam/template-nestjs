@@ -1,81 +1,76 @@
-import {
-    Model,
-    Table,
-    Column,
-    DataType,
-    CreatedAt,
-    UpdatedAt,
-    DeletedAt,
-    HasMany,
-    Index,
-} from 'sequelize-typescript';
 import { IUser } from 'src/entities/user.entity';
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { JoinRequestModel } from './join-request.model';
+import { PartyMemberModel } from './party-member.model';
 import { PartyModel } from './party.model';
+import { ProposalModel } from './proposal.model';
 
-@Table({ tableName: 'users', paranoid: true })
-export class UserModel extends Model<IUser, IUser> implements IUser {
-    @Column({
-        field: 'id',
-        primaryKey: true,
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-    })
+@Entity('users')
+export class UserModel implements IUser {
+    @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @Index
-    @Column({ field: 'address', type: DataType.STRING, allowNull: false })
+    @Column('varchar', {
+        transformer: {
+            to: (value: string) => value.toLowerCase(),
+            from: (value: string) => value.toLowerCase(),
+        },
+    })
     address: string;
 
-    @Column({ field: 'username', type: DataType.STRING })
+    @Column('varchar', { nullable: true })
     username?: string;
 
-    @Column({ field: 'firstname', type: DataType.STRING })
+    @Column('varchar', { nullable: true })
     firstname?: string;
 
-    @Column({ field: 'lastname', type: DataType.STRING })
+    @Column('varchar', { nullable: true })
     lastname?: string;
 
-    @Column({ field: 'image_url', type: DataType.TEXT })
+    @Column('varchar', { nullable: true, name: 'image_url' })
     imageUrl?: string;
 
-    @Column({ field: 'location', type: DataType.STRING })
+    @Column('varchar', { nullable: true })
     location?: string;
 
-    @Column({ field: 'email', type: DataType.STRING })
+    @Column('varchar', { nullable: true })
     email?: string;
 
-    @Column({ field: 'about', type: DataType.TEXT })
+    @Column('text', { nullable: true })
     about?: string;
 
-    @Column({ field: 'website', type: DataType.STRING })
+    @Column('varchar', { nullable: true })
     website?: string;
 
-    @Column({ field: 'created_at', type: DataType.DATE })
-    @CreatedAt
+    @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @Column({ field: 'updated_at', type: DataType.DATE })
-    @UpdatedAt
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @Column({ field: 'deleted_at', type: DataType.DATE })
-    @DeletedAt
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
-    @HasMany(() => PartyModel, 'creatorId')
+    @OneToMany(() => PartyModel, (party) => party.owner)
     ownedParties?: PartyModel[];
 
-    async joinRequestStatus(partyId: string): Promise<string | undefined> {
-        const joinRequest = await JoinRequestModel.findOne({
-            where: {
-                partyId,
-                userId: this.id,
-            },
-        });
+    @OneToMany(() => PartyModel, (party) => party.creator)
+    createdParties?: PartyModel[];
 
-        if (!joinRequest) return undefined;
+    @OneToMany(() => JoinRequestModel, (joinRequest) => joinRequest.user)
+    joinRequests?: JoinRequestModel[];
 
-        return joinRequest.status;
-    }
+    @OneToMany(() => PartyMemberModel, (partyMember) => partyMember.member)
+    joinedPartyMembers?: PartyMemberModel[];
+
+    @OneToMany(() => ProposalModel, (proposal) => proposal.creator)
+    proposals?: ProposalModel[];
 }

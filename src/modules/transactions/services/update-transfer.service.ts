@@ -4,14 +4,18 @@ import {
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { TransactionModel } from 'src/models/transaction.model';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UpdateTransferService {
     constructor(
         @Inject(Web3Service)
         private readonly web3Service: Web3Service,
+        @InjectRepository(TransactionModel)
+        private readonly repository: Repository<TransactionModel>,
     ) {}
 
     async delete(
@@ -32,6 +36,6 @@ export class UpdateTransferService {
                 );
         }
 
-        await transaction.destroy({ force: true });
+        await this.repository.delete(transaction);
     }
 }
