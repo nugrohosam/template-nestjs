@@ -1,9 +1,10 @@
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 
+@Injectable()
 export class GetPartyService {
     constructor(
         @InjectRepository(PartyModel)
