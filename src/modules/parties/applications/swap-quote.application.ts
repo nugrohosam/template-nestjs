@@ -4,17 +4,16 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { SwapQuoteRequest } from '../requests/swap-quote.request';
 import { SwapSignatureSerivce } from '../services/swap/swap-signature.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
-import { HttpService } from '@nestjs/axios';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
-
+import { Injectable } from '@nestjs/common';
+@Injectable()
 export class SwapQuoteApplication {
     constructor(
         private readonly web3Service: Web3Service,
         private readonly swapSignatureService: SwapSignatureSerivce,
         private readonly swapQuoteService: SwapQuoteService,
         private readonly getPartyService: GetPartyService,
-        private readonly httpService: HttpService,
     ) {}
 
     @Transactional()
@@ -22,7 +21,6 @@ export class SwapQuoteApplication {
         partyId: string,
         request: SwapQuoteRequest,
     ): Promise<SwapQuoteResponse> {
-        console.log('getPartyService', this.getPartyService);
         const party = await this.getPartyService.getById(partyId);
         // TODO need to validate that request.address is has permission to buy
         // because user will initiate transaction using a party name

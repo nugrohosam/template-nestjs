@@ -14,7 +14,6 @@ export class SwapSignatureSerivce {
         console.log('[create-party]: ' + message);
         return message;
     }
-
     async generatePlatformSignature(
         sellTokenAddress: string,
         spender: string,
