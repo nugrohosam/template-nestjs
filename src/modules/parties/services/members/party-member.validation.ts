@@ -62,16 +62,14 @@ export class PartyMemberValidation {
         const joinRequest = await this.joinRequestRepository
             .createQueryBuilder('joinRequest')
             .where('party_id = :partyId', { partyId: party.id })
-            .where('user_id = :userId', { userId: user.id })
+            .andWhere('user_id = :userId', { userId: user.id })
+            .andWhere('rejected_at IS NULL')
             .getOne();
 
         if (!joinRequest)
             throw new UnprocessableEntityException(
                 'User must request to join first.',
             );
-
-        if (joinRequest.rejectedAt)
-            throw new UnprocessableEntityException('Join request rejected.');
 
         if (!joinRequest.acceptedAt) {
             throw new UnprocessableEntityException(

@@ -2,19 +2,17 @@ import { Web3Service } from 'src/infrastructure/web3/web3.service';
 
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { SwapQuoteRequest } from '../requests/swap-quote.request';
-import { SwapSignatureSerivce } from '../services/swap-signature.service';
+import { SwapSignatureSerivce } from '../services/swap/swap-signature.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { HttpService } from '@nestjs/axios';
-import { config } from 'src/config';
-import {
-    ISwap0xResponse,
-    SwapQuoteResponse,
-} from '../responses/swap-quote.response';
+import { SwapQuoteResponse } from '../responses/swap-quote.response';
+import { SwapQuoteService } from '../services/swap/swap-quote.service';
 
 export class SwapQuoteApplication {
     constructor(
         private readonly web3Service: Web3Service,
         private readonly swapSignatureService: SwapSignatureSerivce,
+        private readonly swapQuoteService: SwapQuoteService,
         private readonly getPartyService: GetPartyService,
         private readonly httpService: HttpService,
     ) {}
@@ -35,19 +33,15 @@ export class SwapQuoteApplication {
             this.swapSignatureService.generateSwapBuySignature(
                 request.buyToken,
                 request.sellToken,
-                request.buyAmount.toString(),
+                request.sellAmount.toString(),
             ),
         );
 
-        const quoteResponse = await this.httpService
-            .get<ISwap0xResponse>(`${config.api.zerox}/swap`, {
-                params: {
-                    buyToken: request.buyToken,
-                    sellToken: request.sellToken,
-                    sellAmount: request.buyAmount,
-                },
-            })
-            .toPromise();
+        const quoteResponse = await this.swapQuoteService.getQuote(
+            request.buyToken,
+            request.sellToken,
+            request.sellAmount.toString(),
+        );
 
         const quote = quoteResponse.data;
         const platformSignature =

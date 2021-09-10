@@ -9,7 +9,6 @@ export class JoinPartyRequest {
     @IsNotEmpty()
     @IsEthereumAddress()
     @Expose({ name: 'user_address' })
-    @Transform(({ value }) => value.toLowerCase())
     userAddress: string;
 
     @IsNotEmpty()

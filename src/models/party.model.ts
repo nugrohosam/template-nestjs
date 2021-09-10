@@ -26,9 +26,10 @@ export class PartyModel implements IParty {
 
     @Column('varchar', {
         unique: true,
+        nullable: true,
         transformer: {
-            to: (value: string) => value.toLowerCase(),
-            from: (value: string) => value.toLowerCase(),
+            to: (value?: string) => value?.toLowerCase(),
+            from: (value?: string) => value?.toLowerCase(),
         },
     })
     address?: string;

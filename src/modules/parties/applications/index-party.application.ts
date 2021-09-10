@@ -46,7 +46,7 @@ export class IndexPartyApplication extends IndexApplication {
         }
 
         query.orderBy(
-            request.sort ?? 'party.created_at',
+            request.sort ?? 'party.createdAt',
             request.order ?? 'DESC',
         );
         query.take(request.perPage ?? 10);

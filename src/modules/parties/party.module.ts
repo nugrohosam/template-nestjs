@@ -45,12 +45,13 @@ import { IndexJoinRequestApplication } from './applications/index-join-request.a
 import { HttpModule } from '@nestjs/axios';
 import { SwapController } from './controllers/swap.controller';
 import { SwapQuoteApplication } from './applications/swap-quote.application';
-import { SwapSignatureSerivce } from './services/swap-signature.service';
 import { PartyValidation } from './services/party.validation';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { GetTokenService } from './services/token/get-token.service';
 import { CurrencyModel } from 'src/models/currency.model';
+import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
+import { SwapQuoteService } from './services/swap/swap-quote.service';
 @Module({
     imports: [
         HttpModule,
@@ -127,8 +128,10 @@ import { CurrencyModel } from 'src/models/currency.model';
         // Transaction
         IndexPartyTransactionApplication,
 
+        // Swap
         SwapQuoteApplication,
         SwapSignatureSerivce,
+        SwapQuoteService,
     ],
     exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
 })

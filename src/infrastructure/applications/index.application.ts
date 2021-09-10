@@ -15,7 +15,7 @@ import {
 export abstract class IndexApplication {
     readonly DefaultPerPage: number = 10;
     readonly DefaultPage: number = 1;
-    readonly DefaultSort: string = 'created_at';
+    readonly DefaultSort: string = 'createdAt';
     readonly DefaultOrder: OrderDirectionType = 'DESC';
 
     abstract fetch(arg0: any, arg1: any): Promise<IPaginateResponse<any>>;

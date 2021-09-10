@@ -8,9 +8,9 @@ export class SwapSignatureSerivce {
     generateSwapBuySignature(
         buyToken: string,
         sellToken: string,
-        buyAmount: string,
+        sellAmount: string,
     ): string {
-        const message = `I want to buy token with address ${buyToken} ${buyAmount} using token with address ${sellToken}`;
+        const message = `I want to buy token with address ${buyToken} using token with address ${sellToken} ${sellAmount}`;
         console.log('[create-party]: ' + message);
         return message;
     }

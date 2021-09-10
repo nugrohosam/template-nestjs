@@ -87,6 +87,7 @@ export class PartyService {
                 partyId: party.id,
                 address: token.address,
                 symbol: token.symbol,
+                balance: new BN(0),
             });
         }
 

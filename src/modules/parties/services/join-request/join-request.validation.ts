@@ -26,10 +26,9 @@ export class JoinRequestValidation {
     ): Promise<void> {
         const memberCount = await this.partyMemberModelRepository
             .createQueryBuilder('partyMembers')
-            .leftJoinAndSelect('partyMembers.member', 'member')
-            .where('member.id = :userId', { userId: user.id })
+            .where('member_id = :userId', { userId: user.id })
+            .andWhere('partyMembers.id = :partyId', { partyId: party.id })
             .getCount();
-
         if (memberCount > 0)
             throw new UnprocessableEntityException(
                 'User already a member of party.',
@@ -38,7 +37,8 @@ export class JoinRequestValidation {
         const joinRequestCount = await this.joinRequestModelRepository
             .createQueryBuilder('joinRequests')
             .where('user_id = :userId', { userId: user.id })
-            .where('party_id = :partyId', { partyId: party.id })
+            .andWhere('party_id = :partyId', { partyId: party.id })
+            .andWhere('rejected_at IS NULL')
             .getCount();
 
         if (joinRequestCount > 0)
