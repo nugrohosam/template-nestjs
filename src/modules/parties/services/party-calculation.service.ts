@@ -40,6 +40,10 @@ export class PartyCalculationService {
             );
     }
 
+    getCutAmount(amount: BN): BN {
+        return amount.muln(5).divn(1000);
+    }
+
     async updatePartyTotalFund(
         party: PartyModel,
         amount: BN,
@@ -58,19 +62,10 @@ export class PartyCalculationService {
         return await this.partyMemberRepository.save(partyMember);
     }
 
-    async deposit(
-        partyAddress: string,
-        memberAddress: string,
-        amount: BN,
-    ): Promise<void> {
-        const party = await this.getPartyService.getByAddress(partyAddress);
-        const member = await this.getUserService.getUserByAddress(
-            memberAddress,
-        );
-        const partyMember = await this.getPartyMemberService.getByMemberParty(
-            member.id,
-            party.id,
-        );
+    async deposit(partyMember: PartyMemberModel, amount: BN): Promise<void> {
+        const party =
+            partyMember.party ??
+            (await this.getPartyService.getById(partyMember.partyId));
 
         this.validateDepositAmount(amount, party);
 

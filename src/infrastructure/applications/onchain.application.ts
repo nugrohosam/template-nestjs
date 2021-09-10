@@ -19,7 +19,7 @@ export type PrepareOnchainReturn<T = any> = {
  * - Transaction has mined with status eather true or false
  */
 export abstract class OnchainParalelApplication {
-    abstract commit(arg0: any, arg1: any): Promise<any>;
+    abstract commit(arg0: any, arg1: any, arg2: any): Promise<any>;
     abstract revert(arg0: any, arg1: any): Promise<void>;
 }
 

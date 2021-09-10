@@ -1,7 +1,9 @@
 import { config } from 'src/config';
 import { CurrencyModel } from 'src/models/currency.model';
 import { JoinRequestModel } from 'src/models/join-request.model';
+import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
+import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyModel } from 'src/models/party.model';
 import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { ProposalVoteModel } from 'src/models/proposal-vote.model';
@@ -24,6 +26,8 @@ export const connectionOption: ConnectionOptions = {
         JoinRequestModel,
         TransactionModel,
         CurrencyModel,
+        PartyTokenModel,
+        PartyGainModel,
         ProposalModel,
         ProposalVoteModel,
         ProposalDistributionModel,

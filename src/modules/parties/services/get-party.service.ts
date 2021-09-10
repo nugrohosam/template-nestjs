@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
+import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 
@@ -8,11 +10,15 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 export class GetPartyService {
     constructor(
         @InjectRepository(PartyModel)
-        private readonly repository: Repository<PartyModel>,
+        private readonly partyRepository: Repository<PartyModel>,
+        @InjectRepository(PartyTokenModel)
+        private readonly partyTokenRepository: Repository<PartyTokenModel>,
+        @InjectRepository(PartyGainModel)
+        private readonly partyGainRepository: Repository<PartyGainModel>,
     ) {}
 
     getBaseQuery(userId?: string): SelectQueryBuilder<PartyModel> {
-        const query = this.repository.createQueryBuilder('party');
+        const query = this.partyRepository.createQueryBuilder('party');
         query.leftJoinAndSelect('party.creator', 'creator');
         query.leftJoinAndSelect('party.owner', 'owner');
 
@@ -72,5 +78,24 @@ export class GetPartyService {
         if (!party) throw new NotFoundException('Party not found');
 
         return party;
+    }
+
+    async getPartyTokenByAddress(
+        partyId: string,
+        tokenAddress: string,
+    ): Promise<PartyTokenModel> {
+        return await this.partyTokenRepository
+            .createQueryBuilder('partyToken')
+            .where('party_id = :partyId', { partyId })
+            .where('address = :tokenAddress', { tokenAddress })
+            .getOne();
+    }
+
+    async getCurrentPartyGain(partyId: string): Promise<PartyGainModel> {
+        return await this.partyGainRepository
+            .createQueryBuilder('partyGain')
+            .where('party_id = :partyId', { partyId })
+            .orderBy('date', 'DESC')
+            .getOne();
     }
 }
