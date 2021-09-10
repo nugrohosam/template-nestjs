@@ -49,6 +49,8 @@ import { SwapSignatureSerivce } from './services/swap-signature.service';
 import { PartyValidation } from './services/party.validation';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyGainModel } from 'src/models/party-gain.model';
+import { GetTokenService } from './services/token/get-token.service';
+import { CurrencyModel } from 'src/models/currency.model';
 @Module({
     imports: [
         HttpModule,
@@ -58,6 +60,7 @@ import { PartyGainModel } from 'src/models/party-gain.model';
         CommonModule,
         TypeOrmModule.forFeature([
             PartyModel,
+            CurrencyModel,
             PartyMemberModel,
             JoinRequestModel,
             ProposalModel,
@@ -85,6 +88,9 @@ import { PartyGainModel } from 'src/models/party-gain.model';
         PartyService,
         GetPartyService,
         PartyCalculationService,
+
+        // Party Tokens
+        GetTokenService,
 
         // Join Request Providers
         RequestJoinPartyApplication,

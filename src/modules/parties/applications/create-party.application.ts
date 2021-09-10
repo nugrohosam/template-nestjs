@@ -29,6 +29,8 @@ import {
     PrepareOnchainReturn,
 } from 'src/infrastructure/applications/onchain.application';
 import { PartyValidation } from '../services/party.validation';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { GetTokenService } from '../services/token/get-token.service';
 
 @Injectable()
 export class CreatePartyApplication extends OnchainSeriesApplication {
@@ -36,6 +38,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         private readonly partyValidation: PartyValidation,
         private readonly web3Service: Web3Service,
         private readonly partyService: PartyService,
+        private readonly getTokenService: GetTokenService,
         private readonly getPartyService: GetPartyService,
     ) {
         super();
@@ -73,11 +76,12 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         };
     }
 
+    @Transactional()
     async commit(
         partyId: string,
         request: UpdateDeployedPartyDataRequest,
     ): Promise<PartyModel> {
-        const party = await this.getPartyService.getById(partyId);
+        let party = await this.getPartyService.getById(partyId);
 
         if (request.memberSignature !== party.signature)
             throw new UnauthorizedException('Invalid Signature');
@@ -90,10 +94,14 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
             { 2: party.id },
         );
 
-        await this.partyService.update(party, {
+        party = await this.partyService.update(party, {
             address: request.partyAddress,
             transactionHash: request.transactionHash,
         });
+
+        // Base assets of party for now use USDC only
+        const token = await this.getTokenService.getById(1);
+        await this.partyService.storeToken(party, token, new BN(0));
 
         return null;
     }
