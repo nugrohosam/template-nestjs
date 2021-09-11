@@ -31,6 +31,7 @@ import {
 import { PartyValidation } from '../services/party.validation';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { GetTokenService } from '../services/token/get-token.service';
+import { WSService } from 'src/modules/commons/providers/ws-service';
 
 @Injectable()
 export class CreatePartyApplication extends OnchainSeriesApplication {
@@ -40,8 +41,15 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         private readonly partyService: PartyService,
         private readonly getTokenService: GetTokenService,
         private readonly getPartyService: GetPartyService,
+        private readonly wsService: WSService,
     ) {
         super();
+        this.wsService.registerHandler(
+            '0x758acae23e5cbf74ea7784d279d692222523adbb183849099d658f81f63c0a9d',
+            (data) => {
+                console.log('data', data);
+            },
+        );
     }
 
     async prepare(

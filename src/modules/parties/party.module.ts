@@ -52,9 +52,11 @@ import { GetTokenService } from './services/token/get-token.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
 import { SwapQuoteService } from './services/swap/swap-quote.service';
+import { WSService } from '../commons/providers/ws-service';
 @Module({
     imports: [
         HttpModule,
+        WSService,
         Web3Module,
         UserModule,
         TransactionModule,

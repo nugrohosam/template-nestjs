@@ -25,6 +25,7 @@ export const config = {
     // Services
     web3: {
         httpProvider: process.env.RPC_SERVER,
+        websocketProvider: process.env.RPC_SERVER_WS,
     },
 
     platform: {
