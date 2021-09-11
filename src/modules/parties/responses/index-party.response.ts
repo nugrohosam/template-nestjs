@@ -26,6 +26,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     nextDistribution: Date;
 
     static mapFromPartyModel(party: PartyModel): IndexPartyResponse {
+        // TODO converting response data can be handled on partyModel
         return {
             id: party.id,
             name: party.name,
@@ -39,10 +40,14 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             totalMember: party.totalMember,
             totalFund: party.totalFund.toString(),
             distribution: party.distribution,
-            distributionDay: party.distributionDate?.getDay() ?? 1,
+            distributionDay: party.distributionDate
+                ? new Date(party.distributionDate).getDay()
+                : 1,
             nextDistribution: Utils.dateOfNearestDay(
                 new Date(),
-                party.distributionDate?.getDay() ?? 1,
+                party.distributionDate
+                    ? new Date(party.distributionDate).getDay()
+                    : 1,
             ),
             ownerId: party.ownerId,
             createdAt: party.createdAt,
