@@ -14,7 +14,7 @@ export class SwapQuoteService {
         sellAmount: string,
     ): Promise<AxiosResponse<ISwap0xResponse>> {
         return this.httpService
-            .get<ISwap0xResponse>(`${config.api.zerox}/swap`, {
+            .get<ISwap0xResponse>(`${config.api.zerox}/swap/v1/quote`, {
                 params: {
                     buyToken,
                     sellToken,
