@@ -45,6 +45,11 @@ import { IndexJoinRequestApplication } from './applications/index-join-request.a
 import { HttpModule } from '@nestjs/axios';
 import { SwapController } from './controllers/swap.controller';
 import { SwapQuoteApplication } from './applications/swap-quote.application';
+import { PartyValidation } from './services/party.validation';
+import { PartyTokenModel } from 'src/models/party-token.model';
+import { PartyGainModel } from 'src/models/party-gain.model';
+import { GetTokenService } from './services/token/get-token.service';
+import { CurrencyModel } from 'src/models/currency.model';
 import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
 import { SwapQuoteService } from './services/swap/swap-quote.service';
 @Module({
@@ -56,11 +61,14 @@ import { SwapQuoteService } from './services/swap/swap-quote.service';
         CommonModule,
         TypeOrmModule.forFeature([
             PartyModel,
+            CurrencyModel,
             PartyMemberModel,
             JoinRequestModel,
             ProposalModel,
             ProposalDistributionModel,
             TransactionModel,
+            PartyTokenModel,
+            PartyGainModel,
         ]),
     ],
     controllers: [
@@ -77,9 +85,13 @@ import { SwapQuoteService } from './services/swap/swap-quote.service';
         CreatePartyApplication,
         IndexPartyApplication,
 
+        PartyValidation,
         PartyService,
         GetPartyService,
         PartyCalculationService,
+
+        // Party Tokens
+        GetTokenService,
 
         // Join Request Providers
         RequestJoinPartyApplication,

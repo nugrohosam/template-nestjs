@@ -1,39 +1,35 @@
-import { Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { config } from 'src/config';
-import { GetPartyService } from './get-party.service';
 import { IParty } from 'src/entities/party.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GetUserService } from 'src/modules/users/services/get-user.service';
+import { CurrencyModel } from 'src/models/currency.model';
+import { PartyTokenModel } from 'src/models/party-token.model';
+import BN from 'bn.js';
+import { GetPartyService } from './get-party.service';
+import { PartyGainModel } from 'src/models/party-gain.model';
 
+@Injectable()
 export class PartyService {
     constructor(
         @InjectRepository(PartyModel)
-        private readonly repository: Repository<PartyModel>,
-        @Inject(Web3Service)
+        private readonly partyRepository: Repository<PartyModel>,
+        @InjectRepository(PartyTokenModel)
+        private readonly partyTokenRepository: Repository<PartyTokenModel>,
+        @InjectRepository(PartyGainModel)
+        private readonly partyGainRepository: Repository<PartyGainModel>,
+
         private readonly web3Service: Web3Service,
-        @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
-        @Inject(GetUserService)
-        private readonly getUserService: GetUserService,
     ) {}
 
     generateCreatePartySignatureMessage(partyName: string): string {
         const message = `I want to create party with name ${partyName}`;
         console.log('[create-party]: ' + message);
         return message;
-    }
-
-    async validateCreatorAddress(address: string): Promise<UserModel> {
-        return await this.getUserService.getUserByAddress(address);
-    }
-
-    async store(data: IParty): Promise<PartyModel> {
-        const party = this.repository.create(data);
-        return await this.repository.save(party);
     }
 
     async generatePlatformSignature(
@@ -53,22 +49,64 @@ export class PartyService {
         return await this.web3Service.sign(message);
     }
 
+    async store(data: IParty): Promise<PartyModel> {
+        const party = this.partyRepository.create(data);
+        return await this.partyRepository.save(party);
+    }
+
     async update(
         party: PartyModel,
         data: Partial<IParty>,
     ): Promise<PartyModel> {
         party = Object.assign(party, data);
-        this.repository.save(party);
+        this.partyRepository.save(party);
         return party;
     }
 
     async decreaseTotalMember({ id }: PartyModel, by = 1): Promise<void> {
-        await this.repository.update(id, {
+        await this.partyRepository.update(id, {
             totalMember: () => `total_member - ${by}`,
         });
     }
 
     async delete(party: PartyModel): Promise<void> {
-        await this.repository.delete(party);
+        await this.partyRepository.delete(party);
+    }
+
+    async storeToken(
+        party: PartyModel,
+        token: CurrencyModel,
+        amount: BN,
+    ): Promise<PartyTokenModel> {
+        let partyToken = await this.getPartyService.getPartyTokenByAddress(
+            party.id,
+            token.address,
+        );
+        if (!partyToken) {
+            partyToken = this.partyTokenRepository.create({
+                partyId: party.id,
+                address: token.address,
+                symbol: token.symbol,
+                balance: new BN(0),
+            });
+        }
+
+        partyToken.balance = partyToken.balance.add(amount);
+        return await this.partyTokenRepository.save(partyToken);
+    }
+
+    async updatePartyGain(party: PartyModel): Promise<PartyGainModel> {
+        const previousGain = await this.getPartyService.getCurrentPartyGain(
+            party.id,
+        );
+
+        const updatedPartyGain = this.partyGainRepository.create({
+            partyId: party.id,
+            date: new Date(),
+            fund: party.totalFund,
+            gain: previousGain.fund.sub(party.totalFund),
+        });
+
+        return await this.partyGainRepository.save(updatedPartyGain);
     }
 }

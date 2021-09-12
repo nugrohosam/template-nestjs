@@ -58,4 +58,31 @@ export class Utils {
 
         return (page - 1) * perPage;
     }
+
+    /**
+     * find the next occurance date of the day specified
+     * ex. startingDate is friday 2021-09-10
+     * then the next monday is on 2021-09-13
+     * @param startingDate the starting date
+     * @param nearestDay the day expected in number (0 - 6)
+     * @returns {Date}
+     */
+    static dateOfNearestDay(startingDate: Date, nearestDay: number): Date {
+        const nearestTime = new Date(startingDate.getTime());
+
+        if (startingDate.getDay() == 6 && nearestDay == 5) {
+            nearestTime.setDate(
+                startingDate.getDate() +
+                    ((7 + nearestDay - startingDate.getDay()) % 7) -
+                    7,
+            );
+        } else {
+            nearestTime.setDate(
+                startingDate.getDate() +
+                    ((7 + nearestDay - startingDate.getDay()) % 7),
+            );
+        }
+
+        return nearestTime;
+    }
 }

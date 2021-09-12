@@ -26,7 +26,7 @@ export class MyPartiesApplication extends IndexApplication {
         const query = this.repository.createQueryBuilder('parties');
 
         if (request.onlyOwner && !request.onlyMember) {
-            query.where('owner_id = :userId');
+            query.where('owner_id = :userId', { userId: user.id });
         } else if (request.onlyMember && !request.onlyOwner) {
             query.where((qb) => {
                 const subQuery = qb
@@ -47,7 +47,9 @@ export class MyPartiesApplication extends IndexApplication {
                     .select('party_members.member_id')
                     .from(PartyMemberModel, 'party_members')
                     .where('party_members.party_id = parties.id')
-                    .where('party_members.member_id = :userId')
+                    .where('party_members.member_id = :userId', {
+                        userId: user.id,
+                    })
                     .getQuery();
                 return 'exists ' + subQuery;
             });

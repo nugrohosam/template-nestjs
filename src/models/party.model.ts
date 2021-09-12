@@ -92,6 +92,9 @@ export class PartyModel implements IParty {
     @Column('enum', { enum: DistributionTypeEnum })
     distribution: DistributionTypeEnum;
 
+    @Column('date', { name: 'distribution_date' })
+    distributionDate: Date;
+
     @Column('varchar')
     signature: string;
 
