@@ -34,13 +34,13 @@ export class IndexPartyApplication extends IndexApplication {
         query.where(`${isActiveQuery} is not null`);
 
         if (request.search) {
-            query.where('party.name like "%:search%"', {
+            query.andWhere('party.name like "%:search%"', {
                 search: request.search,
             });
         }
 
         if (request.isFeatured) {
-            query.where('party.is_featured = :isFeatured', {
+            query.andWhere('party.is_featured = :isFeatured', {
                 isFeatured: request.isFeatured,
             });
         }
