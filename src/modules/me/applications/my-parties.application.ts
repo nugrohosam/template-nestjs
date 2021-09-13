@@ -37,6 +37,7 @@ export class MyPartiesApplication extends IndexApplication {
                     .andWhere('party_members.member_id = :userId', {
                         userId: user.id,
                     })
+                    .andWhere('owner_id != :userId', { userId: user.id })
                     .getQuery();
                 return 'exists ' + subQuery;
             });
