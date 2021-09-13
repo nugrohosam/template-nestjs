@@ -46,6 +46,7 @@ export class IndexPartyApplication extends IndexApplication {
         }
 
         if (request.name) {
+            // will filter the exac name of the party
             query.andWhere('name = :name', { name: request.name });
         }
 
