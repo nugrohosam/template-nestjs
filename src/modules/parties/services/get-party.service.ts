@@ -40,7 +40,7 @@ export class GetPartyService {
             .select('pm.id')
             .from(PartyMemberModel, 'pm')
             .where('pm.party_id = party.id')
-            .where('pm.member_id = :userId', { userId })
+            .andWhere('pm.member_id = :userId', { userId })
             .take(1)
             .getQuery();
         query.addSelect(`${isMemberQuery} is not null`, 'party_isMember');
