@@ -45,6 +45,10 @@ export class IndexPartyApplication extends IndexApplication {
             });
         }
 
+        if (request.name) {
+            query.andWhere('name = :name', { name: request.name });
+        }
+
         query.orderBy(
             request.sort ?? 'party.createdAt',
             request.order ?? 'DESC',
