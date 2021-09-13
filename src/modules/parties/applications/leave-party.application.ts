@@ -11,6 +11,8 @@ import { PartyCalculationService } from '../services/party-calculation.service';
 import { PartyService } from '../services/party.service';
 import { OnchainParalelApplication } from 'src/infrastructure/applications/onchain.application';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { GetPartyService } from '../services/get-party.service';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 
 @Injectable()
 export class LeavePartyApplication extends OnchainParalelApplication {
@@ -20,6 +22,8 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly partyService: PartyService,
+        private readonly getPartyService: GetPartyService,
+        private readonly getUserService: GetUserService,
     ) {
         super();
     }
@@ -29,8 +33,10 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         partyMember: PartyMemberModel,
         request: LeavePartyRequest,
     ): Promise<void> {
-        const party = await partyMember.party;
-        const user = await partyMember.member;
+        const party = await this.getPartyService.getById(partyMember.partyId);
+        const user = await this.getUserService.getUserById(
+            partyMember.memberId,
+        );
 
         const message =
             this.partyMemberService.generateLeaveSignatureMessage(party);
