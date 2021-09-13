@@ -12,9 +12,9 @@ import { TransactionModel } from 'src/models/transaction.model';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
-import { TransferRequest } from 'src/modules/transactions/requests/transfer.request';
 import { DepositApplication } from '../applications/deposit.application';
 import { MyPartiesApplication } from '../applications/my-parties.application';
+import { DepositRequest } from '../requests/deposit.request';
 import { IndexMePartyRequest } from '../requests/index-party.request';
 
 @Controller('me/parties')
@@ -52,7 +52,7 @@ export class MePartiesController {
     async deposit(
         @Headers('Signature') signature: string,
         @Param('partyId') partyId: string,
-        @Body() request: TransferRequest,
+        @Body() request: DepositRequest,
     ): Promise<IApiResponse<TransactionModel>> {
         const user = await this.getSignerService.get(signature);
         const party = await this.getPartyService.getById(partyId);
