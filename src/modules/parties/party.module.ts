@@ -54,6 +54,8 @@ import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
 import { SwapQuoteService } from './services/swap/swap-quote.service';
 import { PartyTokenController } from './controllers/party-token.controller';
 import { IndexPartyTokenApplication } from './applications/index-party-token.application';
+import { IndexPartyGainApplication } from './applications/index-party-gain.application';
+import { PartyGainController } from './controllers/party-gain.controller';
 @Module({
     imports: [
         HttpModule,
@@ -82,6 +84,7 @@ import { IndexPartyTokenApplication } from './applications/index-party-token.app
         SwapController,
         JoinRequestController,
         PartyTokenController,
+        PartyGainController,
     ],
     providers: [
         // Party Porviders
@@ -138,6 +141,9 @@ import { IndexPartyTokenApplication } from './applications/index-party-token.app
 
         // Token
         IndexPartyTokenApplication,
+
+        // Gain
+        IndexPartyGainApplication,
     ],
     exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
 })
