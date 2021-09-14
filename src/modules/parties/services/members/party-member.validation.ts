@@ -23,6 +23,7 @@ export class PartyMemberValidation {
         const member = await this.getPartyMemberService.getByMemberParty(
             party.ownerId,
             party.id,
+            false,
         );
 
         if (!member)

@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
 import { ValidationEnum } from 'src/common/enums/validation.enum';
 import { BigIntMax } from 'src/common/rules/big-int-max.rule';
@@ -16,5 +16,6 @@ export class DepositRequest {
     signature: string;
 
     @IsNotEmpty()
+    @Expose({ name: 'transaction_hash' })
     transactionHash: string;
 }

@@ -1,4 +1,4 @@
-import { UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { config } from 'src/config';
 import { DepositEventAbi } from 'src/contracts/events';
@@ -9,11 +9,13 @@ import { TransactionModel } from 'src/models/transaction.model';
 import { UserModel } from 'src/models/user.model';
 import { GetPartyMemberService } from 'src/modules/parties/services/members/get-party-member.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
+import { GetTokenService } from 'src/modules/parties/services/token/get-token.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { DepositRequest } from '../requests/deposit.request';
 import { MeService } from '../services/me.service';
 
+@Injectable()
 export class DepositApplication extends OffchainApplication {
     constructor(
         private readonly web3Service: Web3Service,
@@ -21,6 +23,7 @@ export class DepositApplication extends OffchainApplication {
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly getPartyMemberService: GetPartyMemberService,
+        private readonly getTokenService: GetTokenService,
     ) {
         super();
     }
@@ -54,11 +57,12 @@ export class DepositApplication extends OffchainApplication {
             request.amount,
         );
 
+        const token = await this.getTokenService.getDefaultToken();
         const depositTransaction = await this.transactionService.store({
             addressFrom: user.address,
             addressTo: party.address,
             type: TransactionTypeEnum.Deposit,
-            currencyId: 1, // TODO: need to handle this for next feature (multi currencies)
+            currencyId: token.id,
             amount: request.amount.sub(cutAmount),
             description: `Deposit from ${user.address} to party ${party.address}`,
             signature: request.signature,
@@ -70,7 +74,7 @@ export class DepositApplication extends OffchainApplication {
             addressFrom: user.address,
             addressTo: config.platform.address,
             type: TransactionTypeEnum.Charge,
-            currencyId: 1, // TODO: need to handle this for next feature (multi currencies)
+            currencyId: token.id,
             amount: cutAmount,
             description: `Charge of deposit transaction from ${user.address} to party ${party.address}`,
             signature: request.signature,

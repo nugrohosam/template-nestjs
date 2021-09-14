@@ -145,6 +145,11 @@ import { PartyGainController } from './controllers/party-gain.controller';
         // Gain
         IndexPartyGainApplication,
     ],
-    exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
+    exports: [
+        GetPartyService,
+        GetPartyMemberService,
+        PartyCalculationService,
+        GetTokenService,
+    ],
 })
 export class PartyModule {}

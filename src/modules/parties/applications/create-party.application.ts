@@ -100,7 +100,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         });
 
         // Base assets of party for now use USDC only
-        const token = await this.getTokenService.getById(1);
+        const token = await this.getTokenService.getDefaultToken();
         await this.partyService.storeToken(party, token, new BN(0));
 
         return null;

@@ -54,7 +54,7 @@ export class MePartiesController {
         @Param('partyId') partyId: string,
         @Body() request: DepositRequest,
     ): Promise<IApiResponse<TransactionModel>> {
-        const user = await this.getSignerService.get(signature);
+        const user = await this.getSignerService.get(signature, true);
         const party = await this.getPartyService.getById(partyId);
 
         const depositTransaction = await this.depositApplication.call(

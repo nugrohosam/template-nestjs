@@ -1,16 +1,14 @@
 import BN from 'bn.js';
-import {
-    Inject,
-    Injectable,
-    UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
-import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { GetPartyService } from './get-party.service';
 import { GetPartyMemberService } from './members/get-party-member.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PartyService } from './party.service';
+import { GetTokenService } from './token/get-token.service';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 
 @Injectable()
 export class PartyCalculationService {
@@ -20,10 +18,11 @@ export class PartyCalculationService {
         @InjectRepository(PartyMemberModel)
         private readonly partyMemberRepository: Repository<PartyMemberModel>,
 
-        @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
-        @Inject(GetUserService) private readonly getUserService: GetUserService,
+        private readonly getUserService: GetUserService,
         private readonly getPartyMemberService: GetPartyMemberService,
+        private readonly partyService: PartyService,
+        private readonly getTokenService: GetTokenService,
     ) {}
 
     validateDepositAmount(amount: BN, party: PartyModel): void {
@@ -69,8 +68,11 @@ export class PartyCalculationService {
 
         this.validateDepositAmount(amount, party);
 
+        const token = await this.getTokenService.getDefaultToken();
+
         await this.updatePartyTotalFund(party, amount);
         await this.updatePartyMemberTotalFund(partyMember, amount);
+        await this.partyService.storeToken(party, token, amount);
     }
 
     async withdraw(
