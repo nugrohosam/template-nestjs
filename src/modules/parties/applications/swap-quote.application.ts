@@ -45,6 +45,7 @@ export class SwapQuoteApplication {
         const platformSignature =
             await this.swapSignatureService.generatePlatformSignature(
                 quote.sellTokenAddress,
+                quote.buyTokenAddress,
                 quote.allowanceTarget,
                 quote.to,
                 quote.sellAmount,
