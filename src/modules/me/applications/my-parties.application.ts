@@ -34,9 +34,10 @@ export class MyPartiesApplication extends IndexApplication {
                     .select('party_members.member_id')
                     .from(PartyMemberModel, 'party_members')
                     .where('party_members.party_id = parties.id')
-                    .where('party_members.member_id = :userId', {
+                    .andWhere('party_members.member_id = :userId', {
                         userId: user.id,
                     })
+                    .andWhere('owner_id != :userId', { userId: user.id })
                     .getQuery();
                 return 'exists ' + subQuery;
             });
@@ -47,7 +48,7 @@ export class MyPartiesApplication extends IndexApplication {
                     .select('party_members.member_id')
                     .from(PartyMemberModel, 'party_members')
                     .where('party_members.party_id = parties.id')
-                    .where('party_members.member_id = :userId', {
+                    .andWhere('party_members.member_id = :userId', {
                         userId: user.id,
                     })
                     .getQuery();

@@ -55,6 +55,8 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
     async prepare(
         request: CreatePartyRequest,
     ): Promise<PrepareOnchainReturn<PartyModel>> {
+        await this.partyValidation.validatePartyName(request.name);
+
         await this.web3Service.validateSignature(
             request.memberSignature,
             request.memberAddress,

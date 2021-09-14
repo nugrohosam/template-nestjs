@@ -56,10 +56,14 @@ export class DetailPartyResponse
             totalDeposit: party.totalDeposit.toString(),
             totalMember: party.totalMember,
             distribution: party.distribution,
-            distributionDay: party.distributionDate?.getDay() ?? 1,
+            distributionDay: party.distributionDate
+                ? new Date(party.distributionDate).getDay()
+                : 1,
             nextDistribution: Utils.dateOfNearestDay(
                 new Date(),
-                party.distributionDate?.getDay() ?? 1,
+                party.distributionDate
+                    ? new Date(party.distributionDate).getDay()
+                    : 1,
             ),
             creator: {
                 id: creator.id,
