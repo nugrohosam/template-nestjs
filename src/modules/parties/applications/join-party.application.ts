@@ -23,6 +23,7 @@ import {
 } from 'src/infrastructure/applications/onchain.application';
 import { BN } from 'bn.js';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { GetTokenService } from '../services/token/get-token.service';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
@@ -34,6 +35,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly transactionService: TransactionService,
         private readonly partyService: PartyService,
+        private readonly getTokenService: GetTokenService,
     ) {
         super();
     }
@@ -98,11 +100,12 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             { 2: partyMember.id },
         );
 
+        const token = await this.getTokenService.getDefaultToken();
         const transaction = await this.transactionService.store({
             addressFrom: member.address,
             addressTo: party.address,
             amount: partyMember.initialFund,
-            currencyId: 1,
+            currencyId: token.id,
             type: TransactionTypeEnum.Deposit,
             signature: request.joinPartySignature,
             transactionHash: request.transactionHash,
@@ -126,6 +129,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 .mul(new BN(this.WeiPercentage))
                 .div(party.totalDeposit),
         });
+
+        await this.partyService.storeToken(party, token, transaction.amount);
 
         return partyMember;
     }

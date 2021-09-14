@@ -52,6 +52,10 @@ import { GetTokenService } from './services/token/get-token.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
 import { SwapQuoteService } from './services/swap/swap-quote.service';
+import { PartyTokenController } from './controllers/party-token.controller';
+import { IndexPartyTokenApplication } from './applications/index-party-token.application';
+import { IndexPartyGainApplication } from './applications/index-party-gain.application';
+import { PartyGainController } from './controllers/party-gain.controller';
 @Module({
     imports: [
         HttpModule,
@@ -79,6 +83,8 @@ import { SwapQuoteService } from './services/swap/swap-quote.service';
         PartyTransactionController,
         SwapController,
         JoinRequestController,
+        PartyTokenController,
+        PartyGainController,
     ],
     providers: [
         // Party Porviders
@@ -132,7 +138,18 @@ import { SwapQuoteService } from './services/swap/swap-quote.service';
         SwapQuoteApplication,
         SwapSignatureSerivce,
         SwapQuoteService,
+
+        // Token
+        IndexPartyTokenApplication,
+
+        // Gain
+        IndexPartyGainApplication,
     ],
-    exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
+    exports: [
+        GetPartyService,
+        GetPartyMemberService,
+        PartyCalculationService,
+        GetTokenService,
+    ],
 })
 export class PartyModule {}
