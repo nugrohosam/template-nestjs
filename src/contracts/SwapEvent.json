@@ -1,0 +1,52 @@
+{
+    "SwapEvent": {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "contract IERC20",
+                "name": "sellTokenAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "contract IERC20",
+                "name": "buyTokenAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "spender",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "swapTarget",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "transactionType",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "sellAmount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "buyAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "Qoute0xSwap",
+        "type": "event"
+    },
+    "eventSignature": "0xa7d44fa99c7e5fd1b6513ae4abcf4a5c62aa54c10955a391eecae3b3ce03a0e2"
+}

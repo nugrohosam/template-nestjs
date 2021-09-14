@@ -7,6 +7,9 @@ import { GetPartyService } from 'src/modules/parties/services/get-party.service'
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
 import { Injectable } from '@nestjs/common';
+import { IEventLogData } from '../types/logData';
+import { SwapEvent, eventSignature } from 'src/contracts/SwapEvent.json';
+import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
@@ -14,6 +17,7 @@ export class SwapQuoteApplication {
         private readonly swapSignatureService: SwapSignatureSerivce,
         private readonly swapQuoteService: SwapQuoteService,
         private readonly getPartyService: GetPartyService,
+        private readonly transactionService: TransactionService,
     ) {}
 
     @Transactional()
@@ -49,11 +53,51 @@ export class SwapQuoteApplication {
                 quote.allowanceTarget,
                 quote.to,
                 quote.sellAmount,
+                quote.buyAmount,
             );
 
         return {
             data: quote,
             platformSignature,
         };
+    }
+
+    async buySync(data: IEventLogData) {
+        if (!data.params) {
+            return;
+        }
+        // GET data from Event
+        const log = data.params.result;
+        const receipt = await this.web3Service.getTransactionReceipt(
+            log.transactionHash,
+        );
+        // Option 1
+        // bisa save terlebih dahulu data fill quote dari FE ke BE
+        // simpan segaai preparation data
+        // jika event sudah ada validasi dan eksekusi sync party token
+
+        // ambil dari event
+        let decodedLog;
+        receipt.logs.some((log) => {
+            // handle Event Swap
+            if (eventSignature == log.topics[0]) {
+                decodedLog = this.web3Service.decodeTopicLog(
+                    SwapEvent.inputs,
+                    log.data,
+                    log.topics.slice(1),
+                );
+
+                return true;
+            }
+        });
+        const swapEventData = {
+            sellTokenAddress: decodedLog[0],
+            buyTokenAddress: decodedLog[1],
+            transactionType: decodedLog[4],
+            sellAmount: decodedLog[5],
+            buyAmount: decodedLog[6],
+        };
+        console.log('swapEventData', swapEventData);
+        // Process sync data, save new token value to party token
     }
 }

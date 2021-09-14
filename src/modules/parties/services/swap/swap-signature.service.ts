@@ -19,14 +19,16 @@ export class SwapSignatureSerivce {
         buyTokenAddress: string,
         spender: string,
         swapTarget: string,
-        amount: string,
+        sellAmount: string,
+        buyAmount: string,
     ): Promise<string> {
         const message = this.web3Service.soliditySha3([
             { t: 'address', v: sellTokenAddress },
             { t: 'address', v: buyTokenAddress },
             { t: 'address', v: spender },
             { t: 'address', v: swapTarget },
-            { t: 'uint256', v: amount },
+            { t: 'uint256', v: sellAmount },
+            { t: 'uint256', v: buyAmount },
         ]);
         // TODO: need to removed after testing
         console.log('message[platform-swap-quote]: ' + message);

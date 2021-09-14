@@ -5,6 +5,7 @@ import { SwapQuoteApplication } from '../applications/swap-quote.application';
 import { SwapQuoteRequest } from '../requests/swap-quote.request';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { eventSignature as SwapEventSignature } from 'src/contracts/SwapEvent.json';
+import { IEventLogData } from '../types/logData';
 
 @Controller('parties')
 export class SwapController {
@@ -12,9 +13,12 @@ export class SwapController {
         private readonly swapQuoteApplication: SwapQuoteApplication,
         private readonly wsService: WSService,
     ) {
-        this.wsService.registerHandler(SwapEventSignature, (data) => {
-            console.log('data', data);
-        });
+        this.wsService.registerHandler(
+            SwapEventSignature,
+            (data: IEventLogData) => {
+                this.swapQuoteApplication.buySync(data);
+            },
+        );
     }
     @Get('/:partyId/swap/quote')
     async getQuote(
