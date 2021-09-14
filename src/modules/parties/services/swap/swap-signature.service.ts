@@ -16,12 +16,14 @@ export class SwapSignatureSerivce {
     }
     async generatePlatformSignature(
         sellTokenAddress: string,
+        buyTokenAddress: string,
         spender: string,
         swapTarget: string,
         amount: string,
     ): Promise<string> {
         const message = this.web3Service.soliditySha3([
             { t: 'address', v: sellTokenAddress },
+            { t: 'address', v: buyTokenAddress },
             { t: 'address', v: spender },
             { t: 'address', v: swapTarget },
             { t: 'uint256', v: amount },
