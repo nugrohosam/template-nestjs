@@ -16,4 +16,7 @@ export class IndexPartyRequest extends IndexRequest {
     @IsBoolean()
     @Expose({ name: 'is_featured' })
     isFeatured?: boolean;
+
+    @IsOptional()
+    name?: string;
 }
