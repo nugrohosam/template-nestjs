@@ -59,8 +59,7 @@ export class PartyService {
         data: Partial<IParty>,
     ): Promise<PartyModel> {
         party = Object.assign(party, data);
-        this.partyRepository.save(party);
-        return party;
+        return await this.partyRepository.save(party);
     }
 
     async decreaseTotalMember({ id }: PartyModel, by = 1): Promise<void> {

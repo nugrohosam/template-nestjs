@@ -25,6 +25,7 @@ export const config = {
     // Services
     web3: {
         httpProvider: process.env.RPC_SERVER,
+        websocketProvider: process.env.RPC_SERVER_WS,
     },
 
     platform: {
@@ -38,6 +39,10 @@ export const config = {
 
     disableSignatureValidation:
         process.env.DISABLE_SIGNATURE_VALIDATION === 'true',
+    defaultToken: {
+        symbol: process.env.DEFAULT_TOKEN_SYMBOL ?? 'usdc',
+        address: process.env.DEFAULT_TOKEN_ADDRESS,
+    },
 
     api: {
         zerox: process.env.API_0X_URL,

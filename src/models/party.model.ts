@@ -1,6 +1,7 @@
 import BN from 'bn.js';
 import {
     DistributionTypeEnum,
+    JoinRequestStatusEnum,
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
 import { IParty } from 'src/entities/party.entity';
@@ -154,4 +155,12 @@ export class PartyModel implements IParty {
         },
     })
     isMember?: boolean;
+
+    @Column({
+        type: 'varchar',
+        select: false,
+        update: false,
+        insert: false,
+    })
+    joinRequestStatus?: JoinRequestStatusEnum;
 }

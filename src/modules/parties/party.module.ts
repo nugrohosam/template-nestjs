@@ -48,13 +48,19 @@ import { SwapQuoteApplication } from './applications/swap-quote.application';
 import { PartyValidation } from './services/party.validation';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyGainModel } from 'src/models/party-gain.model';
-import { GetTokenService } from './services/token/get-token.service';
+import { TokenService } from './services/token/token.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
 import { SwapQuoteService } from './services/swap/swap-quote.service';
+import { PartyTokenController } from './controllers/party-token.controller';
+import { IndexPartyTokenApplication } from './applications/index-party-token.application';
+import { IndexPartyGainApplication } from './applications/index-party-gain.application';
+import { PartyGainController } from './controllers/party-gain.controller';
+import { WSService } from '../commons/providers/ws-service';
 @Module({
     imports: [
         HttpModule,
+        WSService,
         Web3Module,
         UserModule,
         TransactionModule,
@@ -79,6 +85,8 @@ import { SwapQuoteService } from './services/swap/swap-quote.service';
         PartyTransactionController,
         SwapController,
         JoinRequestController,
+        PartyTokenController,
+        PartyGainController,
     ],
     providers: [
         // Party Porviders
@@ -91,7 +99,7 @@ import { SwapQuoteService } from './services/swap/swap-quote.service';
         PartyCalculationService,
 
         // Party Tokens
-        GetTokenService,
+        TokenService,
 
         // Join Request Providers
         RequestJoinPartyApplication,
@@ -132,7 +140,18 @@ import { SwapQuoteService } from './services/swap/swap-quote.service';
         SwapQuoteApplication,
         SwapSignatureSerivce,
         SwapQuoteService,
+
+        // Token
+        IndexPartyTokenApplication,
+
+        // Gain
+        IndexPartyGainApplication,
     ],
-    exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
+    exports: [
+        GetPartyService,
+        GetPartyMemberService,
+        PartyCalculationService,
+        TokenService,
+    ],
 })
 export class PartyModule {}

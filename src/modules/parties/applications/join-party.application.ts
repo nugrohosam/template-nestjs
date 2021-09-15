@@ -23,6 +23,11 @@ import {
 } from 'src/infrastructure/applications/onchain.application';
 import { BN } from 'bn.js';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { TokenService } from '../services/token/token.service';
+import { GetPartyService } from '../services/get-party.service';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
+import { PartyCalculationService } from '../services/party-calculation.service';
+import { config } from 'src/config';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
@@ -34,6 +39,10 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly transactionService: TransactionService,
         private readonly partyService: PartyService,
+        private readonly tokenService: TokenService,
+        private readonly getPartyService: GetPartyService,
+        private readonly getUserService: GetUserService,
+        private readonly partyCalculationService: PartyCalculationService,
     ) {
         super();
     }
@@ -85,29 +94,49 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         partyMember: PartyMemberModel,
         request: UpdatePartyMemberRequest,
     ): Promise<PartyMemberModel> {
-        let party = partyMember.party;
-        const member = partyMember.member;
+        let party =
+            partyMember.party ??
+            (await this.getPartyService.getById(partyMember.partyId));
+        const member =
+            partyMember.member ??
+            (await this.getUserService.getUserById(partyMember.memberId));
 
         if (request.joinPartySignature !== partyMember.signature)
             throw new UnauthorizedException('Signature not valid');
 
-        await this.web3Service.validateTransaction(
+        const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
             member.address,
             JoinPartyEvent as AbiItem,
             { 2: partyMember.id },
         );
+        if (!transactionStatus) return; // will ignore below process when transaction still false
 
+        const token = await this.tokenService.getDefaultToken();
+        const cutAmount = this.partyCalculationService.getCutAmount(
+            partyMember.initialFund,
+        );
         const transaction = await this.transactionService.store({
             addressFrom: member.address,
             addressTo: party.address,
-            amount: partyMember.initialFund,
-            currencyId: 1,
+            amount: partyMember.initialFund.sub(cutAmount),
+            currencyId: token.id,
             type: TransactionTypeEnum.Deposit,
             signature: request.joinPartySignature,
             transactionHash: request.transactionHash,
             transactionHashStatus: true,
             description: 'Initial Deposit',
+        });
+        await this.transactionService.store({
+            addressFrom: member.address,
+            addressTo: config.platform.address,
+            type: TransactionTypeEnum.Charge,
+            currencyId: token.id,
+            amount: cutAmount,
+            description: `Charge of deposit transaction from ${member.address} to party ${party.address}`,
+            signature: request.joinPartySignature,
+            transactionHash: request.transactionHash,
+            transactionHashStatus: true,
         });
 
         partyMember = await this.partyMemberService.update(partyMember, {
@@ -126,6 +155,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 .mul(new BN(this.WeiPercentage))
                 .div(party.totalDeposit),
         });
+
+        await this.partyService.storeToken(party, token, transaction.amount);
 
         return partyMember;
     }
