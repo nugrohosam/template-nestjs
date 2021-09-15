@@ -61,6 +61,10 @@ export class PartyMemberService {
             partyMember.memberId,
         );
 
+        console.log({
+            partyAddress: party.address,
+            memberAddress: member.address,
+        });
         const message = this.web3Service.soliditySha3([
             { t: 'address', v: member.address },
             { t: 'address', v: party.address },
