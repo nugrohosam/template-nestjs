@@ -22,7 +22,6 @@ export class PartyValidation {
             .createQueryBuilder('party')
             .where('name = :partyName', { partyName })
             .getOne();
-
         if (party)
             throw new UnprocessableEntityException(
                 `Party with name ${partyName} already exists. Please choose different name.`,

@@ -9,7 +9,7 @@ import { TransactionModel } from 'src/models/transaction.model';
 import { UserModel } from 'src/models/user.model';
 import { GetPartyMemberService } from 'src/modules/parties/services/members/get-party-member.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
-import { GetTokenService } from 'src/modules/parties/services/token/get-token.service';
+import { TokenService } from 'src/modules/parties/services/token/token.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { DepositRequest } from '../requests/deposit.request';
@@ -23,7 +23,7 @@ export class DepositApplication extends OffchainApplication {
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly getPartyMemberService: GetPartyMemberService,
-        private readonly getTokenService: GetTokenService,
+        private readonly tokenService: TokenService,
     ) {
         super();
     }
@@ -57,7 +57,7 @@ export class DepositApplication extends OffchainApplication {
             request.amount,
         );
 
-        const token = await this.getTokenService.getDefaultToken();
+        const token = await this.tokenService.getDefaultToken();
         const depositTransaction = await this.transactionService.store({
             addressFrom: user.address,
             addressTo: party.address,

@@ -23,7 +23,7 @@ import {
 } from 'src/infrastructure/applications/onchain.application';
 import { BN } from 'bn.js';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { GetTokenService } from '../services/token/get-token.service';
+import { TokenService } from '../services/token/token.service';
 import { GetPartyService } from '../services/get-party.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { PartyCalculationService } from '../services/party-calculation.service';
@@ -39,7 +39,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly transactionService: TransactionService,
         private readonly partyService: PartyService,
-        private readonly getTokenService: GetTokenService,
+        private readonly tokenService: TokenService,
         private readonly getPartyService: GetPartyService,
         private readonly getUserService: GetUserService,
         private readonly partyCalculationService: PartyCalculationService,
@@ -112,7 +112,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         );
         if (!transactionStatus) return; // will ignore below process when transaction still false
 
-        const token = await this.getTokenService.getDefaultToken();
+        const token = await this.tokenService.getDefaultToken();
         const cutAmount = this.partyCalculationService.getCutAmount(
             partyMember.initialFund,
         );
