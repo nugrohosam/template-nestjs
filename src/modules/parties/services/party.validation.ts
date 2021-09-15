@@ -18,7 +18,7 @@ export class PartyValidation {
     }
 
     async validatePartyName(partyName: string): Promise<void> {
-        const party = this.partyRepository
+        const party = await this.partyRepository
             .createQueryBuilder('party')
             .where('name = :partyName', { partyName })
             .getOne();

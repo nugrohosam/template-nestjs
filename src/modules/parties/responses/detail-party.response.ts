@@ -1,7 +1,6 @@
 import {
     PartyTypeEnum,
     DistributionTypeEnum,
-    JoinRequestStatusEnum,
 } from 'src/common/enums/party.enum';
 import { Utils } from 'src/common/utils/util';
 import { IParty } from 'src/entities/party.entity';
@@ -81,7 +80,7 @@ export class DetailPartyResponse
             createdAt: party.createdAt,
             updatedAt: party.updatedAt,
             deletedAt: party.deletedAt,
-            joinRequestStatus: JoinRequestStatusEnum.Pending, // TODO: need to be included in get party query
+            joinRequestStatus: party.joinRequestStatus,
         };
     }
 }
