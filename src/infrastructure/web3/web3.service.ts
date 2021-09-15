@@ -28,6 +28,10 @@ export class Web3Service {
         }
     }
 
+    async getContractInstance(abi: AbiItem | AbiItem[], address: string) {
+        return new this.web3.eth.Contract(abi, address);
+    }
+
     /**
      * Validate signature
      *

@@ -30,8 +30,7 @@ import {
 } from 'src/infrastructure/applications/onchain.application';
 import { PartyValidation } from '../services/party.validation';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { GetTokenService } from '../services/token/get-token.service';
-import { WSService } from 'src/modules/commons/providers/ws-service';
+import { TokenService } from '../services/token/get-token.service';
 
 @Injectable()
 export class CreatePartyApplication extends OnchainSeriesApplication {
@@ -39,17 +38,10 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         private readonly partyValidation: PartyValidation,
         private readonly web3Service: Web3Service,
         private readonly partyService: PartyService,
-        private readonly getTokenService: GetTokenService,
+        private readonly tokenService: TokenService,
         private readonly getPartyService: GetPartyService,
-        private readonly wsService: WSService,
     ) {
         super();
-        this.wsService.registerHandler(
-            '0x758acae23e5cbf74ea7784d279d692222523adbb183849099d658f81f63c0a9d',
-            (data) => {
-                console.log('data', data);
-            },
-        );
     }
 
     async prepare(
@@ -110,7 +102,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         });
 
         // Base assets of party for now use USDC only
-        const token = await this.getTokenService.getById(1);
+        const token = await this.tokenService.getById(1);
         await this.partyService.storeToken(party, token, new BN(0));
 
         return null;

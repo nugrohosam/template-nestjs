@@ -1,4 +1,4 @@
-interface ILogParams {
+export interface ILogParams {
     subscription: string;
     result: {
         address: string;

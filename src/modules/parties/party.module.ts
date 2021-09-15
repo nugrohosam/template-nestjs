@@ -48,7 +48,7 @@ import { SwapQuoteApplication } from './applications/swap-quote.application';
 import { PartyValidation } from './services/party.validation';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyGainModel } from 'src/models/party-gain.model';
-import { GetTokenService } from './services/token/get-token.service';
+import { TokenService } from './services/token/get-token.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
 import { SwapQuoteService } from './services/swap/swap-quote.service';
@@ -93,7 +93,7 @@ import { WSService } from '../commons/providers/ws-service';
         PartyCalculationService,
 
         // Party Tokens
-        GetTokenService,
+        TokenService,
 
         // Join Request Providers
         RequestJoinPartyApplication,
