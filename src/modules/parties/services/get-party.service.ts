@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -35,15 +36,37 @@ export class GetPartyService {
             .getQuery();
         query.addSelect(`${isActiveQuery} is not null`, 'party_isActive');
 
-        const isMemberQuery = query
-            .subQuery()
-            .select('pm.id')
-            .from(PartyMemberModel, 'pm')
-            .where('pm.party_id = party.id')
-            .andWhere('pm.member_id = :userId', { userId })
-            .take(1)
-            .getQuery();
-        query.addSelect(`${isMemberQuery} is not null`, 'party_isMember');
+        if (userId) {
+            const isMemberQuery = query
+                .subQuery()
+                .select('pm.id')
+                .from(PartyMemberModel, 'pm')
+                .where('pm.party_id = party.id')
+                .andWhere('pm.member_id = :userId', { userId })
+                .take(1)
+                .getQuery();
+            query.addSelect(`${isMemberQuery} is not null`, 'party_isMember');
+
+            const joinRequestStatusQuery = query
+                .subQuery()
+                .select(
+                    `case
+                        when jr.accepted_at is not null then 'accepted'
+                        when jr.rejected_at is not null then 'rejected'
+                        else 'pending'
+                    end`,
+                    'status',
+                )
+                .from(JoinRequestModel, 'jr')
+                .where('jr.party_id = party.id')
+                .andWhere('jr.user_id = :userId', { userId })
+                .take(1)
+                .getQuery();
+            query.addSelect(
+                `${joinRequestStatusQuery}`,
+                'party_joinRequestStatus',
+            );
+        }
 
         return query;
     }
