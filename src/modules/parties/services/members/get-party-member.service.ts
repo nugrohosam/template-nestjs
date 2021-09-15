@@ -31,13 +31,17 @@ export class GetPartyMemberService {
     async getByMemberParty(
         memberId: string,
         partyId: string,
+        required = true,
     ): Promise<PartyMemberModel> {
         const partyMember = await this.getBaseQuery()
             .where('party_id = :partyId', { partyId })
-            .where('member_id = :memberId', { memberId })
+            .andWhere('member_id = :memberId', { memberId })
             .getOne();
 
-        if (!partyMember) throw new NotFoundException('Party Member not found');
+        if (required) {
+            if (!partyMember)
+                throw new NotFoundException('Party Member not found');
+        }
 
         return partyMember;
     }

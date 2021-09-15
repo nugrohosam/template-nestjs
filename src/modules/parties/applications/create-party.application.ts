@@ -30,7 +30,7 @@ import {
 } from 'src/infrastructure/applications/onchain.application';
 import { PartyValidation } from '../services/party.validation';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { TokenService } from '../services/token/get-token.service';
+import { TokenService } from '../services/token/token.service';
 
 @Injectable()
 export class CreatePartyApplication extends OnchainSeriesApplication {
@@ -102,7 +102,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         });
 
         // Base assets of party for now use USDC only
-        const token = await this.tokenService.getById(1);
+        const token = await this.tokenService.getDefaultToken();
         await this.partyService.storeToken(party, token, new BN(0));
 
         return null;

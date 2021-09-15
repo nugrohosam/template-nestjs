@@ -12,7 +12,7 @@ import { abi as ERC20ABI } from 'src/contracts/ERC20.json';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
-import { TokenService } from '../services/token/get-token.service';
+import { TokenService } from '../services/token/token.service';
 import { BN } from 'bn.js';
 import { AbiItem } from 'web3-utils';
 @Injectable()

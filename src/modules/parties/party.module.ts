@@ -48,10 +48,14 @@ import { SwapQuoteApplication } from './applications/swap-quote.application';
 import { PartyValidation } from './services/party.validation';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyGainModel } from 'src/models/party-gain.model';
-import { TokenService } from './services/token/get-token.service';
+import { TokenService } from './services/token/token.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { SwapSignatureSerivce } from './services/swap/swap-signature.service';
 import { SwapQuoteService } from './services/swap/swap-quote.service';
+import { PartyTokenController } from './controllers/party-token.controller';
+import { IndexPartyTokenApplication } from './applications/index-party-token.application';
+import { IndexPartyGainApplication } from './applications/index-party-gain.application';
+import { PartyGainController } from './controllers/party-gain.controller';
 import { WSService } from '../commons/providers/ws-service';
 @Module({
     imports: [
@@ -81,6 +85,8 @@ import { WSService } from '../commons/providers/ws-service';
         PartyTransactionController,
         SwapController,
         JoinRequestController,
+        PartyTokenController,
+        PartyGainController,
     ],
     providers: [
         // Party Porviders
@@ -134,7 +140,18 @@ import { WSService } from '../commons/providers/ws-service';
         SwapQuoteApplication,
         SwapSignatureSerivce,
         SwapQuoteService,
+
+        // Token
+        IndexPartyTokenApplication,
+
+        // Gain
+        IndexPartyGainApplication,
     ],
-    exports: [GetPartyService, GetPartyMemberService, PartyCalculationService],
+    exports: [
+        GetPartyService,
+        GetPartyMemberService,
+        PartyCalculationService,
+        TokenService,
+    ],
 })
 export class PartyModule {}
