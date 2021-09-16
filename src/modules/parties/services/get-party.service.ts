@@ -81,24 +81,27 @@ export class GetPartyService {
         return party;
     }
 
-    async getByAddress(address: string): Promise<PartyModel> {
+    async getByAddress(address: string, required = true): Promise<PartyModel> {
         const query = this.getBaseQuery();
         query.where('party.address = :address', { address });
 
         const party = await query.getOne();
-        if (!party) throw new NotFoundException('Party not found');
+        if (required && !party) throw new NotFoundException('Party not found');
 
         return party;
     }
 
-    async getByTransactionHash(transactionHash: string): Promise<PartyModel> {
+    async getByTransactionHash(
+        transactionHash: string,
+        required = true,
+    ): Promise<PartyModel> {
         const query = this.getBaseQuery();
         query.where('party.transaction_hash = :transactionHash', {
             transactionHash,
         });
 
         const party = await query.getOne();
-        if (!party) throw new NotFoundException('Party not found');
+        if (required && !party) throw new NotFoundException('Party not found');
 
         return party;
     }
@@ -110,7 +113,7 @@ export class GetPartyService {
         return await this.partyTokenRepository
             .createQueryBuilder('partyToken')
             .where('party_id = :partyId', { partyId })
-            .where('address = :tokenAddress', { tokenAddress })
+            .andWhere('address = :tokenAddress', { tokenAddress })
             .getOne();
     }
 

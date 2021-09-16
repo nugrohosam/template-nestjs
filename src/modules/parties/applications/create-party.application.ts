@@ -83,6 +83,13 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         partyId: string,
         request: UpdateDeployedPartyDataRequest,
     ): Promise<PartyModel> {
+        await this.partyValidation.validateTransactionHashNotExists(
+            request.transactionHash,
+        );
+        await this.partyValidation.validateAddressNotExists(
+            request.partyAddress,
+        );
+
         let party = await this.getPartyService.getById(partyId);
 
         if (request.memberSignature !== party.signature)
