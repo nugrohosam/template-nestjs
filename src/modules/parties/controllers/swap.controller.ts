@@ -17,7 +17,7 @@ import { ILogParams } from '../types/logData';
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
 
-@Controller('parties')
+@Controller('parties/:partyId/swap')
 export class SwapController {
     constructor(
         private readonly getSignerService: GetSignerService,
@@ -48,7 +48,7 @@ export class SwapController {
         };
     }
 
-    @Get('/:partyId/swap/quote')
+    @Get('/quote')
     async getQuote(
         @Param('partyId') partyId: string,
         @Query() query: SwapQuoteRequest,
