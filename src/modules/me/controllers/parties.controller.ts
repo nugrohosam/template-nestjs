@@ -8,10 +8,10 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { TransactionModel } from 'src/models/transaction.model';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
+import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
 import { DepositApplication } from '../applications/deposit.application';
 import { MyPartiesApplication } from '../applications/my-parties.application';
 import { DepositRequest } from '../requests/deposit.request';
@@ -53,7 +53,7 @@ export class MePartiesController {
         @Headers('Signature') signature: string,
         @Param('partyId') partyId: string,
         @Body() request: DepositRequest,
-    ): Promise<IApiResponse<TransactionModel>> {
+    ): Promise<IApiResponse<TransactionResponse>> {
         const user = await this.getSignerService.get(signature, true);
         const party = await this.getPartyService.getById(partyId);
 
@@ -65,7 +65,9 @@ export class MePartiesController {
 
         return {
             message: 'Success deposit to party',
-            data: depositTransaction,
+            data: TransactionResponse.mapFromTransactionModel(
+                depositTransaction,
+            ),
         };
     }
 }

@@ -1,6 +1,4 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
-import { config } from 'src/config';
 import { DepositEventAbi } from 'src/contracts/events';
 import { OffchainApplication } from 'src/infrastructure/applications/offchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
@@ -53,44 +51,24 @@ export class DepositApplication extends OffchainApplication {
         if (!transactionStatus)
             throw new UnprocessableEntityException('Transaction hash failed.');
 
-        const cutAmount = this.partyCalculationService.getCutAmount(
-            request.amount,
-        );
-
-        const token = await this.tokenService.getDefaultToken();
-        const depositTransaction = await this.transactionService.store({
-            addressFrom: user.address,
-            addressTo: party.address,
-            type: TransactionTypeEnum.Deposit,
-            currencyId: token.id,
-            amount: request.amount.sub(cutAmount),
-            description: `Deposit from ${user.address} to party ${party.address}`,
-            signature: request.signature,
-            transactionHash: request.transactionHash,
-            transactionHashStatus: transactionStatus,
-        });
-
-        await this.transactionService.store({
-            addressFrom: user.address,
-            addressTo: config.platform.address,
-            type: TransactionTypeEnum.Charge,
-            currencyId: token.id,
-            amount: cutAmount,
-            description: `Charge of deposit transaction from ${user.address} to party ${party.address}`,
-            signature: request.signature,
-            transactionHash: request.transactionHash,
-            transactionHashStatus: transactionStatus,
-        });
-
         const partyMember = await this.getPartyMemberService.getByMemberParty(
             user.id,
             party.id,
         );
+
+        const transaction =
+            await this.transactionService.storeDepositTransaction(
+                partyMember,
+                request.amount,
+                request.signature,
+                request.transactionHash,
+            );
+
         await this.partyCalculationService.deposit(
             partyMember,
-            depositTransaction.amount,
+            transaction.amount,
         );
 
-        return depositTransaction;
+        return transaction;
     }
 }

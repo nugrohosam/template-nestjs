@@ -40,7 +40,7 @@ export class PartyCalculationService {
             );
     }
 
-    getCutAmount(amount: BN): BN {
+    getChargeAmount(amount: BN): BN {
         return amount.muln(5).divn(1000);
     }
 

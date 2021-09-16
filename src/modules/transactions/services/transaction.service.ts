@@ -37,6 +37,8 @@ export class TransactionService {
     async storeDepositTransaction(
         partyMember: PartyMemberModel,
         amount: BN,
+        signature: string,
+        transactionHash: string,
     ): Promise<TransactionModel> {
         const member = partyMember.member ?? (await partyMember.getMember);
         const party = partyMember.party ?? (await partyMember.getParty);
@@ -49,23 +51,24 @@ export class TransactionService {
             amount: amount,
             currencyId: token.id,
             type: TransactionTypeEnum.Deposit,
-            signature: partyMember.signature,
-            transactionHash: partyMember.transactionHash,
+            signature: signature,
+            transactionHash: transactionHash,
             transactionHashStatus: true,
             description: 'Initial Deposit',
         });
 
         // store cut transaction for deposit
-        const cutAmount = this.partyCalculationService.getCutAmount(amount);
+        const chargeAmount =
+            this.partyCalculationService.getChargeAmount(amount);
         await this.store({
             addressFrom: member.address,
             addressTo: config.platform.address,
             type: TransactionTypeEnum.Charge,
             currencyId: token.id,
-            amount: cutAmount,
+            amount: chargeAmount,
             description: `Charge of deposit transaction from ${member.address} to party ${party.address}`,
-            signature: partyMember.signature,
-            transactionHash: partyMember.transactionHash,
+            signature: signature,
+            transactionHash: transactionHash,
             transactionHashStatus: true,
         });
 
