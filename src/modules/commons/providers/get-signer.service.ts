@@ -33,7 +33,7 @@ export class GetSignerService {
         );
 
         const user = await this.repository.findOne({
-            where: { address: signerAddress.toLowerCase() },
+            where: { address: signerAddress },
         });
 
         if (required) {
