@@ -4,6 +4,7 @@ import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Repository } from 'typeorm';
+import { GetPartyService } from './get-party.service';
 
 @Injectable()
 export class PartyValidation {
@@ -11,6 +12,7 @@ export class PartyValidation {
         @InjectRepository(PartyModel)
         private readonly partyRepository: Repository<PartyModel>,
         private readonly getUserService: GetUserService,
+        private readonly getPartyService: GetPartyService,
     ) {}
 
     async validateCreatorAddress(address: string): Promise<UserModel> {
@@ -26,5 +28,27 @@ export class PartyValidation {
             throw new UnprocessableEntityException(
                 `Party with name ${partyName} already exists. Please choose different name.`,
             );
+    }
+
+    async validateAddressNotExists(address: string): Promise<void> {
+        if (await this.getPartyService.getByAddress(address, false)) {
+            throw new UnprocessableEntityException(
+                'Party with given address already exists.',
+            );
+        }
+    }
+    async validateTransactionHashNotExists(
+        transactionHash: string,
+    ): Promise<void> {
+        if (
+            await this.getPartyService.getByTransactionHash(
+                transactionHash,
+                false,
+            )
+        ) {
+            throw new UnprocessableEntityException(
+                'Party with given transaction hash already exists.',
+            );
+        }
     }
 }

@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { PartyService } from './party.service';
 import { TokenService } from './token/token.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class PartyCalculationService {
@@ -61,6 +62,7 @@ export class PartyCalculationService {
         return await this.partyMemberRepository.save(partyMember);
     }
 
+    @Transactional()
     async deposit(partyMember: PartyMemberModel, amount: BN): Promise<void> {
         const party =
             partyMember.party ??
@@ -69,7 +71,6 @@ export class PartyCalculationService {
         this.validateDepositAmount(amount, party);
 
         const token = await this.tokenService.getDefaultToken();
-
         await this.updatePartyTotalFund(party, amount);
         await this.updatePartyMemberTotalFund(partyMember, amount);
         await this.partyService.storeToken(party, token, amount);
