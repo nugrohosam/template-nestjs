@@ -42,12 +42,11 @@ export class TransactionService {
         const party = partyMember.party ?? (await partyMember.getParty);
         const token = await this.tokenService.getDefaultToken();
 
-        const cutAmount = this.partyCalculationService.getCutAmount(amount);
-
+        // store deposit transaction log
         const transaction = await this.store({
             addressFrom: member.address,
             addressTo: party.address,
-            amount: partyMember.initialFund,
+            amount: amount,
             currencyId: token.id,
             type: TransactionTypeEnum.Deposit,
             signature: partyMember.signature,
@@ -56,6 +55,8 @@ export class TransactionService {
             description: 'Initial Deposit',
         });
 
+        // store cut transaction for deposit
+        const cutAmount = this.partyCalculationService.getCutAmount(amount);
         await this.store({
             addressFrom: member.address,
             addressTo: config.platform.address,
