@@ -119,9 +119,7 @@ export class PartyMemberController {
         const partyMember = await this.getPartyMemberService.getById(memberId);
         return {
             message: 'Success get user member detail',
-            data: await MemberDetailRespose.mapFromPartyMemberModel(
-                partyMember,
-            ),
+            data: MemberDetailRespose.mapFromPartyMemberModel(partyMember),
         };
     }
 
