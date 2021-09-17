@@ -11,7 +11,6 @@ import { TransactionService } from 'src/modules/transactions/services/transactio
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
 import { TokenService } from '../services/token/token.service';
-import { BN } from 'bn.js';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
@@ -166,7 +165,7 @@ export class SwapQuoteApplication {
                 swapEventData.buyTokenAddress,
             );
         }
-        this.partyService.storeToken(partyAddress, token, new BN(0));
+        this.partyService.storeToken(partyAddress, token);
         // Update transaction status to success
         this.transactionService.updateTxHashStatus(log.transactionHash, true);
         // Process sync data, save new token value to party token

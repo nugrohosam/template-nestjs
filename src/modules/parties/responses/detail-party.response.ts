@@ -19,7 +19,6 @@ export class DetailPartyResponse
     purpose: string;
     imageUrl: string;
     isPublic: boolean;
-    totalFund: string;
     minDeposit: string;
     maxDeposit: string;
     totalDeposit: string;
@@ -49,7 +48,6 @@ export class DetailPartyResponse
             purpose: party.purpose,
             imageUrl: party.imageUrl,
             isPublic: party.isPublic,
-            totalFund: party.totalFund.toString(),
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
             totalDeposit: party.totalDeposit.toString(),

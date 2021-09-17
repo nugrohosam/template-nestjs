@@ -60,13 +60,6 @@ export class PartyModel implements IParty {
     isFeatured?: boolean;
 
     @Column('bigint', {
-        name: 'total_fund',
-        nullable: true,
-        transformer: TransformBN,
-    })
-    totalFund?: BN;
-
-    @Column('bigint', {
         name: 'min_deposit',
         nullable: true,
         transformer: TransformBN,

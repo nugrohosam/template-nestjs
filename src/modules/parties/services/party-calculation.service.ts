@@ -37,7 +37,6 @@ export class PartyCalculationService {
         party: PartyModel,
         amount: BN,
     ): Promise<PartyModel> {
-        party.totalFund = party.totalFund.add(amount);
         party.totalDeposit = party.totalDeposit.add(amount);
         return await this.partyRepository.save(party);
     }
@@ -73,7 +72,7 @@ export class PartyCalculationService {
         await this.updatePartyTotalFund(party, amount);
         await this.updatePartyMemberTotalFund(partyMember, amount);
         await this.updatePartyMemberWeight(partyMember);
-        await this.partyService.storeToken(party, token, amount);
+        await this.partyService.storeToken(party, token);
     }
 
     async withdraw(

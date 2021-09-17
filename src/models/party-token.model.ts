@@ -1,5 +1,4 @@
 import { IPartyToken } from '../entities/party-token.entity';
-import BN from 'bn.js';
 import {
     Column,
     CreateDateColumn,
@@ -8,7 +7,6 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { TransformBN } from 'src/common/utils/typeorm.util';
 
 @Entity({ name: 'party_tokens' })
 export class PartyTokenModel implements IPartyToken {
@@ -23,11 +21,6 @@ export class PartyTokenModel implements IPartyToken {
 
     @Column('varchar')
     address: string;
-
-    @Column('bigint', {
-        transformer: TransformBN,
-    })
-    balance: BN;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
