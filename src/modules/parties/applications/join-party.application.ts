@@ -41,9 +41,9 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         request: JoinPartyRequest,
     ): Promise<PrepareOnchainReturn<PartyMemberModel>> {
         await this.partyMemberValidation.validateUser(user, party);
-        this.partyMemberValidation.validateUserInitialDeposit(
-            party,
+        this.partyMemberValidation.validateDepositAmount(
             request.initialDeposit,
+            party,
         );
 
         const message = this.partyMemberService.generateJoinSignature(
@@ -99,10 +99,13 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         );
         if (!transactionStatus) return; // will ignore below process when transaction still false
 
+        partyMember.transactionHash = request.transactionHash;
         const transaction =
             await this.transactionService.storeDepositTransaction(
                 partyMember,
                 partyMember.initialFund,
+                request.joinPartySignature,
+                request.transactionHash,
             );
 
         partyMember = await this.partyMemberService.update(partyMember, {
@@ -112,7 +115,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
 
         await this.partyCalculationService.deposit(
             partyMember,
-            partyMember.initialFund,
+            transaction.amount,
         );
 
         return partyMember;

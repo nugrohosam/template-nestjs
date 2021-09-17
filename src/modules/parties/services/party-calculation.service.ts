@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { GetPartyService } from './get-party.service';
@@ -10,6 +10,7 @@ import { PartyService } from './party.service';
 import { TokenService } from './token/token.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { config } from 'src/config';
 
 @Injectable()
 export class PartyCalculationService {
@@ -26,22 +27,10 @@ export class PartyCalculationService {
         private readonly tokenService: TokenService,
     ) {}
 
-    validateDepositAmount(amount: BN, party: PartyModel): void {
-        if (amount.gt(party.maxDeposit) || amount.lt(party.minDeposit))
-            throw new UnprocessableEntityException(
-                `Deposit amount must be between ${party.minDeposit} and ${party.maxDeposit}`,
-            );
-    }
-
-    validateWithdrawAmount(amount: BN, partyMember: PartyMemberModel): void {
-        if (amount.gt(partyMember.totalFund))
-            throw new UnprocessableEntityException(
-                `Withdraw amount must be less then or equal to current total fund in the party`,
-            );
-    }
-
-    getCutAmount(amount: BN): BN {
-        return amount.muln(5).divn(1000);
+    getChargeAmount(amount: BN): BN {
+        return amount
+            .mul(new BN(config.fee.platformFee))
+            .div(new BN(config.fee.maxFeePercentage));
     }
 
     async updatePartyTotalFund(
@@ -68,8 +57,6 @@ export class PartyCalculationService {
             partyMember.party ??
             (await this.getPartyService.getById(partyMember.partyId));
 
-        this.validateDepositAmount(amount, party);
-
         const token = await this.tokenService.getDefaultToken();
         await this.updatePartyTotalFund(party, amount);
         await this.updatePartyMemberTotalFund(partyMember, amount);
@@ -89,8 +76,6 @@ export class PartyCalculationService {
             member.id,
             party.id,
         );
-
-        this.validateWithdrawAmount(amount, partyMember);
 
         const withdrawAmount = amount.muln(-1);
         await this.updatePartyTotalFund(party, withdrawAmount);

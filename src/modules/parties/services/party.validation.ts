@@ -37,6 +37,7 @@ export class PartyValidation {
             );
         }
     }
+
     async validateTransactionHashNotExists(
         transactionHash: string,
     ): Promise<void> {
