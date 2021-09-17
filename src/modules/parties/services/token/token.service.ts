@@ -1,14 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { config } from 'src/config';
+import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { Repository } from 'typeorm';
+import { AbiItem } from 'web3-utils';
+import { abi as ERC20ABI } from 'src/contracts/ERC20.json';
+import { ContractSendMethod } from 'web3-eth-contract';
 
 @Injectable()
 export class TokenService {
     constructor(
         @InjectRepository(CurrencyModel)
         private readonly repository: Repository<CurrencyModel>,
+        private readonly web3Service: Web3Service,
     ) {}
 
     async getDefaultToken(): Promise<CurrencyModel> {
@@ -39,13 +44,18 @@ export class TokenService {
             .where('address = :address', { address })
             .getOne();
     }
-    async registerToken(
-        address: string,
-        symbol: string,
-    ): Promise<CurrencyModel> {
+    async registerToken(tokenAddress: string): Promise<CurrencyModel> {
+        const tokenInstance = await this.web3Service.getContractInstance(
+            ERC20ABI as AbiItem[],
+            tokenAddress,
+        );
+        const contractMethod =
+            tokenInstance.methods.name() as ContractSendMethod;
+        const symbol: string = await contractMethod.call();
+        console.log('name token', symbol);
         const currency = this.repository.create({
-            address,
-            symbol,
+            address: tokenAddress,
+            symbol: symbol,
         });
         return this.repository.save(currency);
     }

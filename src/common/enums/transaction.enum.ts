@@ -3,4 +3,5 @@ export enum TransactionTypeEnum {
     Withdraw = 'withdraw',
     Distribution = 'distribution',
     Charge = 'charge',
+    Swap = 'swap',
 }
