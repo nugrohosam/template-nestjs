@@ -91,11 +91,17 @@ export class PartyMemberValidation {
         }
     }
 
-    validateUserInitialDeposit(party: PartyModel, deposit: BN): void {
-        if (deposit.lt(party.minDeposit) || deposit.gt(party.maxDeposit)) {
+    validateDepositAmount(amount: BN, party: PartyModel): void {
+        if (amount.gt(party.maxDeposit) || amount.lt(party.minDeposit))
             throw new UnprocessableEntityException(
-                `Deposit must be between ${party.minDeposit} and ${party.maxDeposit}`,
+                `Deposit amount must be between ${party.minDeposit} and ${party.maxDeposit}`,
             );
-        }
+    }
+
+    validateWithdrawAmount(amount: BN, partyMember: PartyMemberModel): void {
+        if (amount.gt(partyMember.totalFund))
+            throw new UnprocessableEntityException(
+                `Withdraw amount must be less then or equal to current total fund in the party`,
+            );
     }
 }

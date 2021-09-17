@@ -41,9 +41,9 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         request: JoinPartyRequest,
     ): Promise<PrepareOnchainReturn<PartyMemberModel>> {
         await this.partyMemberValidation.validateUser(user, party);
-        this.partyMemberValidation.validateUserInitialDeposit(
-            party,
+        this.partyMemberValidation.validateDepositAmount(
             request.initialDeposit,
+            party,
         );
 
         const message = this.partyMemberService.generateJoinSignature(
