@@ -13,35 +13,22 @@ import { PartyMemberService } from '../services/members/party-member.service';
 import { JoinPartyEvent } from 'src/contracts/JoinPartyEvent.json';
 import { AbiItem } from 'web3-utils';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
-import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { PartyMemberValidation } from '../services/members/party-member.validation';
-import { PartyService } from '../services/party.service';
 import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
 import {
     OnchainSeriesApplication,
     PrepareOnchainReturn,
 } from 'src/infrastructure/applications/onchain.application';
-import { BN } from 'bn.js';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { TokenService } from '../services/token/token.service';
-import { GetPartyService } from '../services/get-party.service';
-import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { PartyCalculationService } from '../services/party-calculation.service';
-import { config } from 'src/config';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
-    private readonly WeiPercentage = 10 ** 4;
-
     constructor(
         private readonly web3Service: Web3Service,
         private readonly partyMemberValidation: PartyMemberValidation,
         private readonly partyMemberService: PartyMemberService,
         private readonly transactionService: TransactionService,
-        private readonly partyService: PartyService,
-        private readonly tokenService: TokenService,
-        private readonly getPartyService: GetPartyService,
-        private readonly getUserService: GetUserService,
         private readonly partyCalculationService: PartyCalculationService,
     ) {
         super();
@@ -94,15 +81,15 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         partyMember: PartyMemberModel,
         request: UpdatePartyMemberRequest,
     ): Promise<PartyMemberModel> {
-        let party =
-            partyMember.party ??
-            (await this.getPartyService.getById(partyMember.partyId));
-        const member =
-            partyMember.member ??
-            (await this.getUserService.getUserById(partyMember.memberId));
+        const member = partyMember.member ?? (await partyMember.getMember);
 
         if (request.joinPartySignature !== partyMember.signature)
             throw new UnauthorizedException('Signature not valid');
+
+        if (partyMember.transactionHash)
+            throw new UnprocessableEntityException(
+                'Party member transaction hash already commited.',
+            );
 
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
@@ -112,51 +99,21 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         );
         if (!transactionStatus) return; // will ignore below process when transaction still false
 
-        const token = await this.tokenService.getDefaultToken();
-        const cutAmount = this.partyCalculationService.getCutAmount(
-            partyMember.initialFund,
-        );
-        const transaction = await this.transactionService.store({
-            addressFrom: member.address,
-            addressTo: party.address,
-            amount: partyMember.initialFund.sub(cutAmount),
-            currencyId: token.id,
-            type: TransactionTypeEnum.Deposit,
-            signature: request.joinPartySignature,
-            transactionHash: request.transactionHash,
-            transactionHashStatus: true,
-            description: 'Initial Deposit',
-        });
-        await this.transactionService.store({
-            addressFrom: member.address,
-            addressTo: config.platform.address,
-            type: TransactionTypeEnum.Charge,
-            currencyId: token.id,
-            amount: cutAmount,
-            description: `Charge of deposit transaction from ${member.address} to party ${party.address}`,
-            signature: request.joinPartySignature,
-            transactionHash: request.transactionHash,
-            transactionHashStatus: true,
-        });
+        const transaction =
+            await this.transactionService.storeDepositTransaction(
+                partyMember,
+                partyMember.initialFund,
+            );
 
         partyMember = await this.partyMemberService.update(partyMember, {
             transactionHash: request.transactionHash,
             depositTransactionId: transaction.id,
         });
 
-        party = await this.partyService.update(party, {
-            totalFund: party.totalFund.add(transaction.amount),
-            totalDeposit: party.totalDeposit.add(transaction.amount),
-            totalMember: party.totalMember + 1,
-        });
-
-        partyMember = await this.partyMemberService.update(partyMember, {
-            weight: partyMember.totalDeposit
-                .mul(new BN(this.WeiPercentage))
-                .div(party.totalDeposit),
-        });
-
-        await this.partyService.storeToken(party, token, transaction.amount);
+        await this.partyCalculationService.deposit(
+            partyMember,
+            partyMember.initialFund,
+        );
 
         return partyMember;
     }

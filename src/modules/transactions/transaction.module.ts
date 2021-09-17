@@ -7,7 +7,6 @@ import { UserModule } from '../users/user.module';
 import { IndexTransactionApplication } from './applications/index-transaction.application';
 import { GetTransactionService } from './services/get-transaction.service';
 import { TransactionService } from './services/transaction.service';
-import { UpdateTransferService } from './services/update-transfer.service';
 
 @Module({
     imports: [
@@ -22,8 +21,6 @@ import { UpdateTransferService } from './services/update-transfer.service';
 
         GetTransactionService,
         TransactionService,
-
-        UpdateTransferService,
     ],
     exports: [TransactionService],
 })
