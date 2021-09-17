@@ -57,6 +57,7 @@ import { IndexPartyTokenApplication } from './applications/index-party-token.app
 import { IndexPartyGainApplication } from './applications/index-party-gain.application';
 import { PartyGainController } from './controllers/party-gain.controller';
 import { WSService } from '../commons/providers/ws-service';
+import { SwapFeeService } from './services/swap/swap-fee.service';
 @Module({
     imports: [
         HttpModule,
@@ -140,6 +141,7 @@ import { WSService } from '../commons/providers/ws-service';
         SwapQuoteApplication,
         SwapSignatureSerivce,
         SwapQuoteService,
+        SwapFeeService,
 
         // Token
         IndexPartyTokenApplication,
