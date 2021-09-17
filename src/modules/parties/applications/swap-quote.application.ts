@@ -16,7 +16,7 @@ import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
 import { UserModel } from 'src/models/user.model';
-import { config } from 'src/config';
+import { SwapFeeService } from '../services/swap/swap-fee.service';
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
@@ -28,6 +28,7 @@ export class SwapQuoteApplication {
         private readonly transactionService: TransactionService,
         private readonly getTransactionService: GetTransactionService,
         private readonly partyService: PartyService,
+        private readonly swapFeeService: SwapFeeService,
     ) {}
 
     @Transactional()
@@ -78,9 +79,7 @@ export class SwapQuoteApplication {
             addressTo: request.to,
             type: TransactionTypeEnum.Charge,
             currencyId: token.id,
-            amount: request.sellAmount
-                .mul(new BN(config.fee.platformFee))
-                .div(new BN(config.fee.maxFeePercentage)),
+            amount: this.swapFeeService.getFee(request.sellAmount),
             description: `Charge Swap to buy token with address ${request.to}`,
             signature: request.signature,
             transactionHash: request.transactionHash,
