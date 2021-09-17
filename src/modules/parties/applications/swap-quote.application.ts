@@ -1,5 +1,4 @@
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
-import { ContractSendMethod } from 'web3-eth-contract';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { SwapQuoteRequest } from '../requests/swap-quote.request';
 import { SwapSignatureSerivce } from '../services/swap/swap-signature.service';
@@ -8,13 +7,16 @@ import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
 import { Injectable } from '@nestjs/common';
 import { SwapEvent, eventSignature } from 'src/contracts/SwapEvent.json';
-import { abi as ERC20ABI } from 'src/contracts/ERC20.json';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
 import { TokenService } from '../services/token/token.service';
 import { BN } from 'bn.js';
-import { AbiItem } from 'web3-utils';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
+import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
+import { UserModel } from 'src/models/user.model';
+import { SwapFeeService } from '../services/swap/swap-fee.service';
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
@@ -22,10 +24,70 @@ export class SwapQuoteApplication {
         private readonly swapSignatureService: SwapSignatureSerivce,
         private readonly swapQuoteService: SwapQuoteService,
         private readonly getPartyService: GetPartyService,
-        private readonly getTokenService: TokenService,
+        private readonly tokenService: TokenService,
         private readonly transactionService: TransactionService,
+        private readonly getTransactionService: GetTransactionService,
         private readonly partyService: PartyService,
+        private readonly swapFeeService: SwapFeeService,
     ) {}
+
+    @Transactional()
+    async transaction(
+        request: SwapQuoteTransactionRequest,
+        user: UserModel,
+    ): Promise<string> {
+        await this.web3Service.validateSignature(
+            request.signature,
+            user.address,
+            this.swapSignatureService.generateSwapBuySignature(
+                request.buyTokenAddress,
+                request.sellTokenAddress,
+                request.sellAmount.toString(),
+            ),
+        );
+
+        let token = await this.tokenService.getByAddress(
+            request.buyTokenAddress,
+        );
+        if (!token) {
+            token = await this.tokenService.registerToken(
+                request.buyTokenAddress,
+            );
+        }
+        const transaction = await this.getTransactionService.getByTx(
+            request.transactionHash,
+            TransactionTypeEnum.Swap,
+        );
+        if (transaction) {
+            return 'Transaction has been created before';
+        }
+
+        const swapTx = this.transactionService.store({
+            addressFrom: request.from,
+            addressTo: request.to,
+            type: TransactionTypeEnum.Swap,
+            currencyId: token.id,
+            amount: request.sellAmount,
+            description: `Swap to buy token with address ${request.to}`,
+            signature: request.signature,
+            transactionHash: request.transactionHash,
+            transactionHashStatus: false,
+        });
+
+        const chargeTx = this.transactionService.store({
+            addressFrom: request.from,
+            addressTo: request.to,
+            type: TransactionTypeEnum.Charge,
+            currencyId: token.id,
+            amount: this.swapFeeService.getFee(request.sellAmount),
+            description: `Charge Swap to buy token with address ${request.to}`,
+            signature: request.signature,
+            transactionHash: request.transactionHash,
+            transactionHashStatus: false,
+        });
+        await Promise.all([swapTx, chargeTx]);
+        return 'Create Transaction success';
+    }
 
     @Transactional()
     async buy(
@@ -96,25 +158,17 @@ export class SwapQuoteApplication {
             buyAmount: decodedLog[6],
         };
         const partyAddress = await this.getPartyService.getByAddress(address);
-        let token = await this.getTokenService.getByAddress(
+        let token = await this.tokenService.getByAddress(
             swapEventData.buyTokenAddress,
         );
         if (!token) {
-            // create token
-            const tokenInstance = await this.web3Service.getContractInstance(
-                ERC20ABI as AbiItem[],
+            token = await this.tokenService.registerToken(
                 swapEventData.buyTokenAddress,
-            );
-            const contractMethod =
-                tokenInstance.methods.name() as ContractSendMethod;
-            const name: string = await contractMethod.call();
-            console.log('name token', name);
-            token = await this.getTokenService.registerToken(
-                swapEventData.buyTokenAddress,
-                name,
             );
         }
         this.partyService.storeToken(partyAddress, token, new BN(0));
+        // Update transaction status to success
+        this.transactionService.updateTxHashStatus(log.transactionHash, true);
         // Process sync data, save new token value to party token
     }
 }

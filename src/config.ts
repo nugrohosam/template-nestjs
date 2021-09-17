@@ -47,4 +47,8 @@ export const config = {
     api: {
         zerox: process.env.API_0X_URL,
     },
+    fee: {
+        platformFee: process.env.PLATFORM_FEE || 5,
+        maxFeePercentage: process.env.MAX_FEE_PERCENTAGE || 1000,
+    },
 };
