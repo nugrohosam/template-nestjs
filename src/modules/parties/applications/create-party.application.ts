@@ -64,7 +64,6 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
             signature: request.memberSignature,
             creatorId: creator.id,
             ownerId: creator.id,
-            totalFund: new BN(0),
             totalDeposit: new BN(0),
             totalMember: 0,
         });
@@ -110,7 +109,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
 
         // Base assets of party for now use USDC only
         const token = await this.tokenService.getDefaultToken();
-        await this.partyService.storeToken(party, token, new BN(0));
+        await this.partyService.storeToken(party, token);
 
         return null;
     }

@@ -5,7 +5,6 @@ export class PartyTokenResponse {
     partyId: string;
     symbol: string;
     address: string;
-    balance: string;
 
     static mapFromPartyTokenModel(model: PartyTokenModel): PartyTokenResponse {
         return {
@@ -13,7 +12,6 @@ export class PartyTokenResponse {
             partyId: model.partyId,
             symbol: model.symbol,
             address: model.address,
-            balance: model.balance.toString(),
         };
     }
 }

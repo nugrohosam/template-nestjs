@@ -75,7 +75,6 @@ export class PartyService {
     async storeToken(
         party: PartyModel,
         token: CurrencyModel,
-        amount: BN,
     ): Promise<PartyTokenModel> {
         let partyToken = await this.getPartyService.getPartyTokenByAddress(
             party.id,
@@ -86,11 +85,9 @@ export class PartyService {
                 partyId: party.id,
                 address: token.address,
                 symbol: token.symbol,
-                balance: new BN(0),
             });
         }
 
-        partyToken.balance = partyToken.balance.add(amount);
         return await this.partyTokenRepository.save(partyToken);
     }
 
@@ -99,11 +96,12 @@ export class PartyService {
             party.id,
         );
 
+        const currentBalance = new BN(0); // TODO: need to get current party's total assets in base token
         const updatedPartyGain = this.partyGainRepository.create({
             partyId: party.id,
             date: new Date(),
-            fund: party.totalFund,
-            gain: previousGain.fund.sub(party.totalFund),
+            fund: currentBalance,
+            gain: previousGain.fund.sub(currentBalance),
         });
 
         return await this.partyGainRepository.save(updatedPartyGain);

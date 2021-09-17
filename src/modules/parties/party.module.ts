@@ -14,9 +14,6 @@ import { GetJoinRequestService } from './services/join-request/get-join-request.
 import { CommonModule } from '../commons/common.module';
 import { JoinRequestController } from './controllers/join-request.controller';
 import { PartyCalculationService } from './services/party-calculation.service';
-import { ProposalService } from './services/proposal/proposal.service';
-import { PartyProposalController } from './controllers/party-proposal.controller';
-import { GetProposalService } from './services/proposal/get-proposal.service';
 import { PartyTransactionController } from './controllers/party-transaction.controller';
 import { CreatePartyApplication } from './applications/create-party.application';
 import { IndexPartyApplication } from './applications/index-party.application';
@@ -28,15 +25,10 @@ import { IndexPartyJoinRequestApplication } from './applications/index-party-joi
 import { UpdateJoinRequestStatusApplication } from './applications/update-join-request-status.application';
 import { JoinRequestValidation } from './services/join-request/join-request.validation';
 import { PartyMemberValidation } from './services/members/party-member.validation';
-import { CreateProposalApplication } from './applications/create-proposal.application';
-import { IndexPartyProposalApplication } from './applications/index-party-proposal.application';
-import { ApproveProposalApplication } from './applications/approve-proposal-application';
-import { RejectProposalApplication } from './applications/reject-proposal.application';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PartyModel } from 'src/models/party.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { JoinRequestModel } from 'src/models/join-request.model';
-import { ProposalValidation } from './services/proposal/proposal.validation';
 import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { ProposalModel } from 'src/models/proposal.model';
 import { IndexPartyTransactionApplication } from './applications/index-party-transaction.application';
@@ -82,7 +74,6 @@ import { SwapFeeService } from './services/swap/swap-fee.service';
         PartyController,
         PartyMemberController,
         PartyJoinRequestController,
-        PartyProposalController,
         PartyTransactionController,
         SwapController,
         JoinRequestController,
@@ -122,17 +113,6 @@ import { SwapFeeService } from './services/swap/swap-fee.service';
         GetPartyMemberService,
 
         PartyMemberValidation,
-
-        // Proposal
-        CreateProposalApplication,
-        IndexPartyProposalApplication,
-        ApproveProposalApplication,
-        RejectProposalApplication,
-
-        ProposalService,
-        GetProposalService,
-
-        ProposalValidation,
 
         // Transaction
         IndexPartyTransactionApplication,
