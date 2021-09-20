@@ -86,10 +86,12 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         if (request.joinPartySignature !== partyMember.signature)
             throw new UnauthorizedException('Signature not valid');
 
-        if (partyMember.transactionHash)
-            throw new UnprocessableEntityException(
-                'Party member transaction hash already commited.',
-            );
+        // REVIEW : ini untuk handling case apa ?
+        // kalau ada condition ini ketika txHash sudah tercatat tapi belum success statusnya bakal kena exception ini
+        // if (partyMember.transactionHash)
+        //     throw new UnprocessableEntityException(
+        //         'Party member transaction hash already commited.',
+        //     );
 
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
@@ -99,7 +101,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         );
         if (!transactionStatus) return; // will ignore below process when transaction still false
 
-        partyMember.transactionHash = request.transactionHash;
+        // REVIEW kenapa di assign klu di bawah ada update menggunakan request.transactionHash ?
+        // partyMember.transactionHash = request.transactionHash;
         const transaction =
             await this.transactionService.storeDepositTransaction(
                 partyMember,
