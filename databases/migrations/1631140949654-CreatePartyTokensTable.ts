@@ -15,7 +15,7 @@ export class CreatePartyTokensTable1631140949654 implements MigrationInterface {
                     },
                     { name: 'party_id', type: 'varchar(36)' },
                     { name: 'symbol', type: 'varchar(10)' },
-                    { name: 'address', type: 'varchar', isUnique: true },
+                    { name: 'address', type: 'varchar' },
                     { name: 'balance', type: 'bigint', default: 0 },
                     {
                         name: 'created_at',

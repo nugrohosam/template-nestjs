@@ -1,5 +1,6 @@
 import { config } from 'src/config';
 import { CurrencyModel } from 'src/models/currency.model';
+import { GeckoCoinModel } from 'src/models/gecko-coin.model';
 import { JoinRequestModel } from 'src/models/join-request.model';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -31,9 +32,11 @@ export const connectionOption: ConnectionOptions = {
         ProposalModel,
         ProposalVoteModel,
         ProposalDistributionModel,
+        GeckoCoinModel,
     ],
     synchronize: false,
     logging: config.nodeEnv === 'local',
+    charset: 'utf8mb4_unicode_ci',
 };
 
 export const databaseConnection = createConnection(connectionOption);

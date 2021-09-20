@@ -20,7 +20,8 @@
         "test:e2e": "cross-env NODE_PATH=. jest --config ./test/jest-e2e.json --testTimeout 30000 --detectOpenHandles",
         "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config databases/config.js",
         "migrate": "npm run typeorm -- migration:run",
-        "pre-commit": "lint-staged"
+        "pre-commit": "lint-staged",
+        "seed": "ts-node -r tsconfig-paths/register src/seed.ts"
     },
     "dependencies": {
         "@nestjs/axios": "^0.0.1",
@@ -35,12 +36,14 @@
         "@nestjs/typeorm": "^7.1.5",
         "@sentry/node": "^6.5.1",
         "@types/bn.js": "^5.1.0",
+        "@types/coingecko-api": "^1.0.2",
         "@types/lodash": "^4.14.170",
         "@types/passport-http": "^0.3.8",
         "@types/pluralize": "^0.0.29",
         "bn.js": "^5.2.0",
         "class-transformer": "^0.4.0",
         "class-validator": "^0.13.1",
+        "coingecko-api": "^1.0.10",
         "cross-env": "^7.0.3",
         "dotenv": "^9.0.0",
         "mysql2": "^2.3.0",
