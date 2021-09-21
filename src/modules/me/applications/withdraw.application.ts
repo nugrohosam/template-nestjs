@@ -12,7 +12,7 @@ import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.r
 import { MeService } from '../services/me.service';
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { TokenService } from 'src/modules/parties/services/token/token.service';
-import { SwapQuoteResponse } from 'src/modules/parties/responses/swap-quote.response';
+import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 import { SwapSignatureSerivce } from 'src/modules/parties/services/swap/swap-signature.service';
 
 @Injectable()
@@ -55,36 +55,30 @@ export class WithdrawApplication {
             .getMany();
 
         const defaultToken = await this.tokenService.getDefaultToken();
-        const partyTokenBalances: IPartyTokenBalance[] = [];
-        const swapQuotes: SwapQuoteResponse[] = [];
-
-        for (let i = 0; i < tokens.length; i++) {
-            const balance = await this.tokenService.getTokenBalance(
-                party.address,
-                tokens[i].address,
-            );
-            partyTokenBalances.push({ ...tokens[i], balance });
-
-            if (tokens[i].address === defaultToken.address) continue;
-            const withdrawAmount = balance.mul(weight).divn(10000);
-            const response = await this.swapQuoteService.getQuote(
-                defaultToken.address,
-                tokens[i].address,
-                withdrawAmount.toString(),
-            );
-            const quote = response.data;
-            const platformSignature =
-                await this.swapSignatureService.generatePlatformSignature(
-                    quote.sellTokenAddress,
-                    quote.buyTokenAddress,
-                    quote.allowanceTarget,
-                    quote.to,
-                    quote.sellAmount,
-                    quote.buyAmount,
+        const partyTokenBalances: IPartyTokenBalance[] = await Promise.all(
+            tokens.map(async (token) => {
+                const balance = await this.tokenService.getTokenBalance(
+                    party.address,
+                    token.address,
                 );
-
-            swapQuotes.push({ data: quote, platformSignature });
-        }
+                return { ...token, balance };
+            }),
+        );
+        const swapQuotes: ISwap0xResponse[] = await Promise.all(
+            partyTokenBalances
+                .filter((token) => token.address != defaultToken.address)
+                .map(async (token) => {
+                    const withdrawAmount = token.balance
+                        .mul(weight)
+                        .divn(10000);
+                    const { data } = await this.swapQuoteService.getQuote(
+                        defaultToken.address,
+                        token.address,
+                        withdrawAmount.toString(),
+                    );
+                    return data;
+                }),
+        );
 
         return {
             weight,
