@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { AbiItem } from 'web3-utils';
 import { abi as ERC20ABI } from 'src/contracts/ERC20.json';
 import { ContractSendMethod } from 'web3-eth-contract';
+import BN from 'bn.js';
 
 @Injectable()
 export class TokenService {
@@ -38,12 +39,14 @@ export class TokenService {
             .where('id = :id', { id })
             .getOne();
     }
+
     async getByAddress(address: string): Promise<CurrencyModel> {
         return await this.repository
             .createQueryBuilder('currency')
             .where('address = :address', { address })
             .getOne();
     }
+
     async registerToken(tokenAddress: string): Promise<CurrencyModel> {
         const tokenInstance = await this.web3Service.getContractInstance(
             ERC20ABI as AbiItem[],
@@ -58,5 +61,21 @@ export class TokenService {
             symbol: symbol,
         });
         return this.repository.save(currency);
+    }
+
+    async getTokenBalance(
+        ownerAddress: string,
+        tokenAddress: string,
+    ): Promise<BN> {
+        const erc20Contract = await this.web3Service.getContractInstance(
+            ERC20ABI as AbiItem[],
+            tokenAddress,
+        );
+
+        const balance = await erc20Contract.methods
+            .balanceOf(ownerAddress)
+            .call();
+
+        return new BN(balance);
     }
 }

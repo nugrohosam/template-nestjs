@@ -14,14 +14,18 @@ import { GetPartyService } from 'src/modules/parties/services/get-party.service'
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
 import { DepositApplication } from '../applications/deposit.application';
 import { MyPartiesApplication } from '../applications/my-parties.application';
+import { WithdrawApplication } from '../applications/withdraw.application';
 import { DepositRequest } from '../requests/deposit.request';
 import { IndexMePartyRequest } from '../requests/index-party.request';
+import { WithdrawRequest } from '../requests/withdraw.request';
+import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.response';
 
 @Controller('me/parties')
 export class MePartiesController {
     constructor(
         private readonly myPartyApplication: MyPartiesApplication,
         private readonly depositApplication: DepositApplication,
+        private readonly withdrawApplication: WithdrawApplication,
 
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
@@ -68,6 +72,27 @@ export class MePartiesController {
             data: TransactionResponse.mapFromTransactionModel(
                 depositTransaction,
             ),
+        };
+    }
+
+    @Post(':partyId/withdraw')
+    async withdraw(
+        @Headers('Signature') signature: string,
+        @Param('partyId') partyId: string,
+        @Body() request: WithdrawRequest,
+    ): Promise<IApiResponse<WithdrawPreparationResponse>> {
+        const user = await this.getSignerService.get(signature, true);
+        const party = await this.getPartyService.getById(partyId);
+
+        const withdrawPreparation = await this.withdrawApplication.prepare(
+            user,
+            party,
+            request,
+        );
+
+        return {
+            message: 'Success get withdraw preparation data',
+            data: withdrawPreparation,
         };
     }
 }

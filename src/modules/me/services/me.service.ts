@@ -6,4 +6,10 @@ export class MeService {
         console.log(`message[deposit]: ${message}`);
         return message;
     }
+
+    generateWithdrawSignature(partyName: string, percentage: number): string {
+        const message = `I want to withdraw ${percentage}% of my money at ${partyName}`;
+        console.log(`message[withdraw]: ${message}`);
+        return message;
+    }
 }

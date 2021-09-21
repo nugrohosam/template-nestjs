@@ -134,6 +134,8 @@ import { SwapFeeService } from './services/swap/swap-fee.service';
         GetPartyMemberService,
         PartyCalculationService,
         TokenService,
+        SwapQuoteService,
+        SwapSignatureSerivce,
     ],
 })
 export class PartyModule {}
