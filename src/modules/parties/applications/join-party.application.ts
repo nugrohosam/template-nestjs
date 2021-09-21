@@ -10,8 +10,7 @@ import { UserModel } from 'src/models/user.model';
 import { JoinPartyRequest } from '../requests/member/join-party.request';
 import { UpdatePartyMemberRequest } from '../requests/member/update-party-member.request';
 import { PartyMemberService } from '../services/members/party-member.service';
-import { JoinPartyEvent } from 'src/contracts/JoinPartyEvent.json';
-import { AbiItem } from 'web3-utils';
+import { JoinPartyEvent } from 'src/contracts/JoinPartyEvent';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { PartyMemberValidation } from '../services/members/party-member.validation';
 import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
@@ -96,7 +95,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
             member.address,
-            JoinPartyEvent as AbiItem,
+            JoinPartyEvent.abi,
             { 2: partyMember.id },
         );
         if (!transactionStatus) return; // will ignore below process when transaction still false

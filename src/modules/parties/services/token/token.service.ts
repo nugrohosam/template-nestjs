@@ -4,10 +4,9 @@ import { config } from 'src/config';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { Repository } from 'typeorm';
-import { AbiItem } from 'web3-utils';
-import { abi as ERC20ABI } from 'src/contracts/ERC20.json';
 import { ContractSendMethod } from 'web3-eth-contract';
 import BN from 'bn.js';
+import { ERC20 } from 'src/contracts/ERC20';
 
 @Injectable()
 export class TokenService {
@@ -49,7 +48,7 @@ export class TokenService {
 
     async registerToken(tokenAddress: string): Promise<CurrencyModel> {
         const tokenInstance = await this.web3Service.getContractInstance(
-            ERC20ABI as AbiItem[],
+            ERC20.abi,
             tokenAddress,
         );
         const contractMethod =
@@ -68,7 +67,7 @@ export class TokenService {
         tokenAddress: string,
     ): Promise<BN> {
         const erc20Contract = await this.web3Service.getContractInstance(
-            ERC20ABI as AbiItem[],
+            ERC20.abi,
             tokenAddress,
         );
 

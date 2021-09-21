@@ -21,8 +21,7 @@ import { CreatePartyRequest } from '../requests/create-party.request';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { PartyService } from '../services/party.service';
 import { GetPartyService } from '../services/get-party.service';
-import { CreatePartyEvent } from 'src/contracts/CreatePartyEvent.json';
-import { AbiItem } from 'web3-utils';
+import { CreatePartyEvent } from 'src/contracts/CreatePartyEvent';
 import { RevertCreatePartyRequest } from '../requests/revert-create-party.request';
 import {
     OnchainSeriesApplication,
@@ -98,7 +97,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         await this.web3Service.validateTransaction(
             request.transactionHash,
             creator.address,
-            CreatePartyEvent as AbiItem,
+            CreatePartyEvent.abi,
             { 2: party.id },
         );
 

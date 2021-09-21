@@ -12,10 +12,10 @@ import { WSService } from 'src/modules/commons/providers/ws-service';
 import { SwapQuoteApplication } from '../applications/swap-quote.application';
 import { SwapQuoteRequest } from '../requests/swap-quote.request';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
-import { eventSignature as SwapEventSignature } from 'src/contracts/SwapEvent.json';
 import { ILogParams } from '../types/logData';
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
+import { SwapEvent } from 'src/contracts/SwapEvent';
 
 @Controller('parties/:partyId/swap')
 export class SwapController {
@@ -25,7 +25,7 @@ export class SwapController {
         private readonly wsService: WSService,
     ) {
         this.wsService.registerHandler(
-            SwapEventSignature,
+            SwapEvent.signature,
             async (data: ILogParams) => {
                 await this.swapQuoteApplication.buySync(data);
             },
