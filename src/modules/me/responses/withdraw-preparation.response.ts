@@ -5,5 +5,5 @@ import BN from 'bn.js';
 export class WithdrawPreparationResponse {
     weight: BN;
     tokens: PartyTokenResponse[];
-    swap: ISwap0xResponse[];
+    swaps: ISwap0xResponse[];
 }

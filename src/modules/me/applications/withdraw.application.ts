@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IPartyTokenBalance } from 'src/entities/party-token.entity';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyModel } from 'src/models/party.model';
@@ -12,8 +11,7 @@ import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.r
 import { MeService } from '../services/me.service';
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { TokenService } from 'src/modules/parties/services/token/token.service';
-import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
-import { SwapSignatureSerivce } from 'src/modules/parties/services/swap/swap-signature.service';
+import { IPartyTokenBalance } from 'src/entities/party-token.entity';
 
 @Injectable()
 export class WithdrawApplication {
@@ -26,7 +24,6 @@ export class WithdrawApplication {
         private readonly web3Service: Web3Service,
         private readonly tokenService: TokenService,
         private readonly swapQuoteService: SwapQuoteService,
-        private readonly swapSignatureService: SwapSignatureSerivce,
     ) {}
 
     async prepare(
@@ -55,35 +52,34 @@ export class WithdrawApplication {
             .getMany();
 
         const defaultToken = await this.tokenService.getDefaultToken();
-        const partyTokenBalances: IPartyTokenBalance[] = await Promise.all(
+
+        const results = await Promise.all(
             tokens.map(async (token) => {
                 const balance = await this.tokenService.getTokenBalance(
                     party.address,
                     token.address,
                 );
-                return { ...token, balance };
+                const withdrawAmount = balance.mul(weight).divn(1000);
+                const swapResponse = await this.swapQuoteService.getQuote(
+                    defaultToken.address,
+                    token.address,
+                    withdrawAmount.toString(),
+                );
+
+                return {
+                    tokens: {
+                        ...token,
+                        balance,
+                    } as IPartyTokenBalance,
+                    swap: swapResponse.data,
+                };
             }),
-        );
-        const swapQuotes: ISwap0xResponse[] = await Promise.all(
-            partyTokenBalances
-                .filter((token) => token.address != defaultToken.address)
-                .map(async (token) => {
-                    const withdrawAmount = token.balance
-                        .mul(weight)
-                        .divn(10000);
-                    const { data } = await this.swapQuoteService.getQuote(
-                        defaultToken.address,
-                        token.address,
-                        withdrawAmount.toString(),
-                    );
-                    return data;
-                }),
         );
 
         return {
             weight,
-            tokens: partyTokenBalances,
-            swap: swapQuotes,
+            tokens: results.map((result) => result.tokens),
+            swaps: results.map((result) => result.swap),
         };
     }
 }
