@@ -23,6 +23,14 @@ export class GetPartyService {
         query.leftJoinAndSelect('party.creator', 'creator');
         query.leftJoinAndSelect('party.owner', 'owner');
 
+        const totalMemberQuery = query
+            .subQuery()
+            .select('count(pm.id) as count')
+            .from(PartyMemberModel, 'pm')
+            .where('pm.party_id = party.id')
+            .getSql();
+        query.addSelect(`${totalMemberQuery} as party_totalMember`);
+
         const isActiveQuery = query
             .subQuery()
             .select('p.id')
