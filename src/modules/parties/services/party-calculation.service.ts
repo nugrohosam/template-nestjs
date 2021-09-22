@@ -11,6 +11,7 @@ import { TokenService } from './token/token.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { config } from 'src/config';
+import { PartyMemberService } from './members/party-member.service';
 
 @Injectable()
 export class PartyCalculationService {
@@ -24,6 +25,7 @@ export class PartyCalculationService {
         private readonly getUserService: GetUserService,
         private readonly getPartyMemberService: GetPartyMemberService,
         private readonly partyService: PartyService,
+        private readonly partyMemberService: PartyMemberService,
         private readonly tokenService: TokenService,
     ) {}
 
@@ -50,16 +52,17 @@ export class PartyCalculationService {
         return await this.partyMemberRepository.save(partyMember);
     }
 
-    async updatePartyMemberWeight(
-        partyMember: PartyMemberModel,
-    ): Promise<PartyMemberModel> {
-        const party = partyMember.party ?? (await partyMember.getParty);
+    async updatePartyMembersWeight(party: PartyModel): Promise<void> {
+        const partyMembers = await this.partyMemberRepository
+            .createQueryBuilder('partyMember')
+            .where('party_id = :partyId', { partyId: party.id })
+            .getMany();
 
-        partyMember.weight = partyMember.totalDeposit
-            .muln(10000)
-            .div(party.totalDeposit);
-
-        return this.partyMemberRepository.save(partyMember);
+        await Promise.all(
+            partyMembers.map(async (partyMember) =>
+                this.partyMemberService.updatePartyMemberWeight(partyMember),
+            ),
+        );
     }
 
     @Transactional()
@@ -71,7 +74,7 @@ export class PartyCalculationService {
         const token = await this.tokenService.getDefaultToken();
         await this.updatePartyTotalFund(party, amount);
         await this.updatePartyMemberTotalFund(partyMember, amount);
-        await this.updatePartyMemberWeight(partyMember);
+        await this.updatePartyMembersWeight(party);
         await this.partyService.storeToken(party, token);
     }
 
