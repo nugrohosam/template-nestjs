@@ -6,7 +6,6 @@ import { GetPartyService } from 'src/modules/parties/services/get-party.service'
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
 import { Injectable } from '@nestjs/common';
-import { SwapEvent, eventSignature } from 'src/contracts/SwapEvent.json';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
@@ -16,6 +15,7 @@ import { GetTransactionService } from 'src/modules/transactions/services/get-tra
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
 import { UserModel } from 'src/models/user.model';
 import { SwapFeeService } from '../services/swap/swap-fee.service';
+import { SwapEvent } from 'src/contracts/SwapEvent';
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
@@ -138,9 +138,9 @@ export class SwapQuoteApplication {
 
         let decodedLog;
         receipt.logs.some((log) => {
-            if (eventSignature == log.topics[0]) {
+            if (SwapEvent.signature == log.topics[0]) {
                 decodedLog = this.web3Service.decodeTopicLog(
-                    SwapEvent.inputs,
+                    SwapEvent.abi.inputs,
                     log.data,
                     log.topics.slice(1),
                 );

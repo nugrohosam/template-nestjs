@@ -3,8 +3,7 @@ import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { LeavePartyRequest } from '../requests/member/leave-party.request';
 import { PartyMemberService } from '../services/members/party-member.service';
-import { LeavePartyEvent } from 'src/contracts/LeavePartyEvent.json';
-import { AbiItem } from 'web3-utils';
+import { LeavePartyEvent } from 'src/contracts/LeavePartyEvent';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { PartyCalculationService } from '../services/party-calculation.service';
@@ -49,7 +48,7 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
             user.address,
-            LeavePartyEvent as AbiItem,
+            LeavePartyEvent.abi,
             { 0: user.address },
         );
 

@@ -8,9 +8,12 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { WithdrawEvent } from 'src/contracts/WithdrawEvent';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
+import { WSService } from 'src/modules/commons/providers/ws-service';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
+import { ILogParams } from 'src/modules/parties/types/logData';
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
 import { DepositApplication } from '../applications/deposit.application';
 import { MyPartiesApplication } from '../applications/my-parties.application';
@@ -29,7 +32,15 @@ export class MePartiesController {
 
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
-    ) {}
+        private readonly wsService: WSService,
+    ) {
+        this.wsService.registerHandler(
+            WithdrawEvent.signature,
+            async (data: ILogParams) => {
+                console.log(data);
+            },
+        );
+    }
 
     @Get()
     async index(
