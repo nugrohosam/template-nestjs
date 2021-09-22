@@ -62,12 +62,6 @@ export class PartyService {
         return await this.partyRepository.save(party);
     }
 
-    async decreaseTotalMember({ id }: PartyModel, by = 1): Promise<void> {
-        await this.partyRepository.update(id, {
-            totalMember: () => `total_member - ${by}`,
-        });
-    }
-
     async delete(party: PartyModel): Promise<void> {
         await this.partyRepository.delete(party);
     }

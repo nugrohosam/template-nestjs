@@ -79,7 +79,6 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         );
 
         await this.partyMemberService.delete(partyMember, true);
-        await this.partyService.decreaseTotalMember(party);
     }
 
     async revert(partyMember: PartyMemberModel): Promise<void> {
