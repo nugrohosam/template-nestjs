@@ -18,7 +18,6 @@ export interface IParty {
     totalDeposit?: string | BN;
     minDeposit?: string | BN;
     maxDeposit?: string | BN;
-    totalMember?: number;
     distribution: DistributionTypeEnum;
     distributionDate?: Date;
     signature?: string;
