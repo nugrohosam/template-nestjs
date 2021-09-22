@@ -64,7 +64,6 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
             creatorId: creator.id,
             ownerId: creator.id,
             totalDeposit: new BN(0),
-            totalMember: 0,
         });
 
         const platformSignature =

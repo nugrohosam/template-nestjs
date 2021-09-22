@@ -80,9 +80,6 @@ export class PartyModel implements IParty {
     })
     totalDeposit?: BN;
 
-    @Column('int', { name: 'total_member', nullable: true })
-    totalMember?: number;
-
     @Column('enum', { enum: DistributionTypeEnum })
     distribution: DistributionTypeEnum;
 
@@ -156,4 +153,16 @@ export class PartyModel implements IParty {
         insert: false,
     })
     joinRequestStatus?: JoinRequestStatusEnum;
+
+    @Column({
+        type: 'int',
+        select: false,
+        update: false,
+        insert: false,
+        transformer: {
+            to: (value) => +value,
+            from: (value) => +value,
+        },
+    })
+    totalMember?: number;
 }
