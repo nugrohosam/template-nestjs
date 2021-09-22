@@ -78,4 +78,16 @@ export class PartyMemberService {
         console.log('message[leave-party]: ' + message);
         return message;
     }
+
+    async updatePartyMemberWeight(
+        partyMember: PartyMemberModel,
+    ): Promise<PartyMemberModel> {
+        const party = partyMember.party ?? (await partyMember.getParty);
+
+        partyMember.weight = partyMember.totalDeposit
+            .muln(100 * 10 ** 4)
+            .div(party.totalDeposit);
+
+        return this.partyMemberRepository.save(partyMember);
+    }
 }
