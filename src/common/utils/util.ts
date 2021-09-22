@@ -85,4 +85,15 @@ export class Utils {
 
         return nearestTime;
     }
+
+    /**
+     * Find the diffirence in days between 2 dates
+     * @param date1
+     * @param date2
+     * @returns {number}
+     */
+    static diffInDays(date1: Date, date2: Date): number {
+        const timeDiff = date1.getTime() - date2.getTime();
+        return timeDiff / (1000 * 60 * 60 * 24);
+    }
 }

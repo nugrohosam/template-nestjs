@@ -92,8 +92,9 @@ export class PartyCalculationService {
             party.id,
         );
 
-        const withdrawAmount = amount.muln(-1);
+        const withdrawAmount = amount.neg();
         await this.updatePartyTotalFund(party, withdrawAmount);
         await this.updatePartyMemberTotalFund(partyMember, withdrawAmount);
+        await this.updatePartyMembersWeight(party);
     }
 }

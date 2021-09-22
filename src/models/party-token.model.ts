@@ -16,7 +16,12 @@ export class PartyTokenModel implements IPartyToken {
     @Column('uuid', { name: 'party_id' })
     partyId: string;
 
-    @Column('varchar')
+    @Column('varchar', {
+        transformer: {
+            to: (value: string) => value,
+            from: (value: string) => value.toLowerCase(),
+        },
+    })
     symbol: string;
 
     @Column('varchar')
