@@ -45,4 +45,18 @@ export class GetPartyMemberService {
 
         return partyMember;
     }
+
+    async getByUserAndPartyAddress(
+        userAddress: string,
+        partyAddress: string,
+    ): Promise<PartyMemberModel> {
+        const partyMember = await this.getBaseQuery()
+            .where('party.address = :partyAddress', { partyAddress })
+            .andWhere('member.address = :userAddress', { userAddress })
+            .getOne();
+
+        if (!partyMember) throw new NotFoundException('Party member not found');
+
+        return partyMember;
+    }
 }

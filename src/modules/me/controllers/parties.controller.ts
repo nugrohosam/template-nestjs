@@ -36,8 +36,8 @@ export class MePartiesController {
     ) {
         this.wsService.registerHandler(
             WithdrawEvent.signature,
-            async (data: ILogParams) => {
-                console.log(data);
+            async (logParams: ILogParams) => {
+                await this.withdrawApplication.sync(logParams);
             },
         );
     }

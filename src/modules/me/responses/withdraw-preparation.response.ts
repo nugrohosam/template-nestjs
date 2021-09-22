@@ -6,4 +6,5 @@ export class WithdrawPreparationResponse {
     weight: BN;
     tokens: PartyTokenResponse[];
     swaps: ISwap0xResponse[];
+    distributionPass: number;
 }
