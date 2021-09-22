@@ -20,6 +20,7 @@ import {
 } from 'src/infrastructure/applications/onchain.application';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { PartyCalculationService } from '../services/party-calculation.service';
+import BN from 'bn.js';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
@@ -59,8 +60,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             partyId: party.id,
             memberId: user.id,
             initialFund: request.initialDeposit,
-            totalFund: request.initialDeposit,
-            totalDeposit: request.initialDeposit,
+            totalFund: new BN(0),
+            totalDeposit: new BN(0),
             signature: request.joinSignature,
         });
 
