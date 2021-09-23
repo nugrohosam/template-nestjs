@@ -16,9 +16,14 @@ import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction'
 import { UserModel } from 'src/models/user.model';
 import { SwapFeeService } from '../services/swap/swap-fee.service';
 import { SwapEvent } from 'src/contracts/SwapEvent';
+import { Repository } from 'typeorm';
+import { SwapTransactionModel } from 'src/models/swap-transaction.model';
+import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
+        @InjectRepository(SwapTransactionModel)
+        private readonly swapTransactionRepository: Repository<SwapTransactionModel>,
         private readonly web3Service: Web3Service,
         private readonly swapSignatureService: SwapSignatureSerivce,
         private readonly swapQuoteService: SwapQuoteService,
@@ -168,6 +173,15 @@ export class SwapQuoteApplication {
         this.partyService.storeToken(partyAddress, token);
         // Update transaction status to success
         this.transactionService.updateTxHashStatus(log.transactionHash, true);
+
+        const swapTransaction = this.swapTransactionRepository.create({
+            buy_amount: swapEventData.buyAmount,
+            sell_amount: swapEventData.sellAmount,
+            token_from: swapEventData.sellTokenAddress,
+            token_target: swapEventData.buyTokenAddress,
+            transactionHash: log.transactionHash,
+        });
+        this.swapTransactionRepository.save(swapTransaction);
         // Process sync data, save new token value to party token
     }
 }
