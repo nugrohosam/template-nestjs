@@ -75,6 +75,60 @@ export class TransactionService {
         return transaction;
     }
 
+    async storeWithdrawTransaction(
+        userAddress: string,
+        partyAddress: string,
+        amount: BN,
+        cut: BN,
+        penalty: BN,
+        signature: string,
+        transactionHash: string,
+    ): Promise<TransactionModel> {
+        const baseToken = await this.tokenService.getDefaultToken();
+
+        const withdrawTransaction = this.store({
+            addressFrom: partyAddress,
+            addressTo: userAddress,
+            type: TransactionTypeEnum.Withdraw,
+            currencyId: baseToken.id,
+            amount: amount,
+            description: `Withdrawal by ${userAddress} from ${partyAddress} with amount ${amount.toString()}`,
+            signature: signature,
+            transactionHash: transactionHash,
+            transactionHashStatus: true,
+        });
+        const penaltyTransaction = this.store({
+            addressFrom: userAddress,
+            addressTo: config.platform.address,
+            type: TransactionTypeEnum.Charge,
+            currencyId: baseToken.id,
+            amount: penalty,
+            description: `Penalty of withdrawal by ${userAddress} from ${partyAddress} with amount ${amount.toString()}`,
+            signature: signature,
+            transactionHash: transactionHash,
+            transactionHashStatus: true,
+        });
+        const cutTransaction = this.store({
+            addressFrom: userAddress,
+            addressTo: config.platform.address,
+            type: TransactionTypeEnum.Charge,
+            currencyId: baseToken.id,
+            amount: cut,
+            description: `Cut of withdrawal by ${userAddress} from ${partyAddress} with amount ${amount.toString()}`,
+            signature: signature,
+            transactionHash: transactionHash,
+            transactionHashStatus: true,
+        });
+
+        const [transaction] = await Promise.all([
+            withdrawTransaction,
+            penaltyTransaction,
+            cutTransaction,
+        ]);
+
+        return transaction;
+    }
+
     async updateTxHashStatus(
         txhash: string,
         status: boolean,
