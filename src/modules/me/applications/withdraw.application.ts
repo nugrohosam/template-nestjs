@@ -16,6 +16,7 @@ import { ILogParams } from 'src/modules/parties/types/logData';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { Utils } from 'src/common/utils/util';
 import { BN } from 'bn.js';
+import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 
 @Injectable()
 export class WithdrawApplication {
@@ -71,13 +72,15 @@ export class WithdrawApplication {
                     .muln(request.percentage * 10 ** 4)
                     .divn(100 * 10 ** 4);
 
-                let swapResponse = null;
+                let swapResponse: ISwap0xResponse = null;
                 if (token.address !== defaultToken.address) {
-                    swapResponse = await this.swapQuoteService.getQuote(
-                        defaultToken.address,
-                        token.address,
-                        withdrawAmount.toString(),
-                    );
+                    swapResponse = (
+                        await this.swapQuoteService.getQuote(
+                            defaultToken.address,
+                            token.address,
+                            withdrawAmount.toString(),
+                        )
+                    ).data;
                 }
 
                 totalWithdrawAmount = totalWithdrawAmount.add(withdrawAmount);
@@ -86,7 +89,7 @@ export class WithdrawApplication {
                         ...token,
                         balance,
                     } as IPartyTokenBalance,
-                    swap: swapResponse?.data,
+                    swap: swapResponse,
                 };
             }),
         );
