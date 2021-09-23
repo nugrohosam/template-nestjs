@@ -19,6 +19,7 @@ import { PartyMemberModel } from './party-member.model';
 import { ProposalModel } from './proposal.model';
 import { UserModel } from './user.model';
 import { TransformBN } from 'src/common/utils/typeorm.util';
+import web3 from 'web3';
 
 @Entity({ name: 'parties' })
 export class PartyModel implements IParty {
@@ -29,8 +30,8 @@ export class PartyModel implements IParty {
         unique: true,
         nullable: true,
         transformer: {
-            to: (value?: string) => value?.toLowerCase(),
-            from: (value?: string) => value?.toLowerCase(),
+            to: (value?: string) => web3.utils.toChecksumAddress(value),
+            from: (value?: string) => web3.utils.toChecksumAddress(value),
         },
     })
     address?: string;
