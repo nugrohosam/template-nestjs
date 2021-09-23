@@ -24,6 +24,8 @@ export class MeService {
         userAddress: string;
         partyAddress: string;
         amount: BN;
+        cut: BN;
+        penalty: BN;
     }> {
         const receipt = await this.web3Service.getTransactionReceipt(
             log.transactionHash,
@@ -52,6 +54,8 @@ export class MeService {
             userAddress: decodedLog[0],
             partyAddress: decodedLog[1],
             amount: new BN(decodedLog[2]),
+            cut: new BN(decodedLog[3]),
+            penalty: new BN(decodedLog[4]),
         };
     }
 }
