@@ -50,6 +50,7 @@ import { IndexPartyGainApplication } from './applications/index-party-gain.appli
 import { PartyGainController } from './controllers/party-gain.controller';
 import { WSService } from '../commons/providers/ws-service';
 import { SwapFeeService } from './services/swap/swap-fee.service';
+import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 @Module({
     imports: [
         HttpModule,
@@ -68,6 +69,7 @@ import { SwapFeeService } from './services/swap/swap-fee.service';
             TransactionModel,
             PartyTokenModel,
             PartyGainModel,
+            SwapTransactionModel,
         ]),
     ],
     controllers: [
