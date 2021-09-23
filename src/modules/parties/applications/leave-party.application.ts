@@ -3,15 +3,14 @@ import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { LeavePartyRequest } from '../requests/member/leave-party.request';
 import { PartyMemberService } from '../services/members/party-member.service';
-import { LeavePartyEvent } from 'src/contracts/LeavePartyEvent';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { PartyCalculationService } from '../services/party-calculation.service';
-import { PartyService } from '../services/party.service';
 import { OnchainParalelApplication } from 'src/infrastructure/applications/onchain.application';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { GetPartyService } from '../services/get-party.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
+import { PartyContract } from 'src/contracts/Party';
 
 @Injectable()
 export class LeavePartyApplication extends OnchainParalelApplication {
@@ -20,7 +19,6 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
-        private readonly partyService: PartyService,
         private readonly getPartyService: GetPartyService,
         private readonly getUserService: GetUserService,
     ) {
@@ -48,7 +46,7 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
             user.address,
-            LeavePartyEvent.abi,
+            PartyContract.getEventAbi(PartyContract.LeavePartyEvent),
             { 0: user.address },
         );
 
