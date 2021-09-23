@@ -15,6 +15,7 @@ import { IPartyTokenBalance } from 'src/entities/party-token.entity';
 import { ILogParams } from 'src/modules/parties/types/logData';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { Utils } from 'src/common/utils/util';
+import { BN } from 'bn.js';
 
 @Injectable()
 export class WithdrawApplication {
@@ -50,25 +51,28 @@ export class WithdrawApplication {
             ),
         );
 
-        const weight = partyMember.weight;
+        const weight = partyMember.weight; // in wei percentage
         const tokens = await this.partyTokenRepository
             .createQueryBuilder('partyToken')
             .where('party_id = :partyId', { partyId: party.id })
             .getMany();
 
+        let totalWithdrawAmount = new BN(0); // in base token wei
         const defaultToken = await this.tokenService.getDefaultToken();
-
         const results = await Promise.all(
             tokens.map(async (token) => {
                 const balance = await this.tokenService.getTokenBalance(
                     party.address,
                     token.address,
                 );
+                const withdrawAmount = balance
+                    .mul(weight)
+                    .divn(100 * 10 ** 4)
+                    .muln(request.percentage * 10 ** 4)
+                    .divn(100 * 10 ** 4);
 
                 let swapResponse = null;
                 if (token.address !== defaultToken.address) {
-                    const withdrawAmount = balance.mul(weight).divn(1000);
-
                     swapResponse = await this.swapQuoteService.getQuote(
                         defaultToken.address,
                         token.address,
@@ -76,6 +80,7 @@ export class WithdrawApplication {
                     );
                 }
 
+                totalWithdrawAmount = totalWithdrawAmount.add(withdrawAmount);
                 return {
                     tokens: {
                         ...token,
@@ -94,12 +99,15 @@ export class WithdrawApplication {
         );
 
         return {
-            weight,
+            weight: weight.toString(),
+            amount: totalWithdrawAmount.toString(),
             tokens: results.map((result) => result.tokens),
             swaps: results
                 .filter((result) => !!!result)
                 .map((result) => result.swap),
-            distributionPass: Utils.diffInDays(nextDistribution, new Date()),
+            distributionPass: Math.ceil(
+                Utils.diffInDays(nextDistribution, new Date()),
+            ),
         };
     }
 
