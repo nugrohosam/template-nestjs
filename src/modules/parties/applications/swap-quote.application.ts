@@ -15,7 +15,7 @@ import { GetTransactionService } from 'src/modules/transactions/services/get-tra
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
 import { UserModel } from 'src/models/user.model';
 import { SwapFeeService } from '../services/swap/swap-fee.service';
-import { SwapEvent } from 'src/contracts/SwapEvent';
+import { PartyContract } from 'src/contracts/Party';
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
@@ -138,9 +138,12 @@ export class SwapQuoteApplication {
 
         let decodedLog;
         receipt.logs.some((log) => {
-            if (SwapEvent.signature == log.topics[0]) {
+            if (
+                PartyContract.getEventSignature(PartyContract.Qoute0xSwap) ==
+                log.topics[0]
+            ) {
                 decodedLog = this.web3Service.decodeTopicLog(
-                    SwapEvent.abi.inputs,
+                    PartyContract.getEventAbi(PartyContract.Qoute0xSwap).inputs,
                     log.data,
                     log.topics.slice(1),
                 );

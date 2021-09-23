@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import BN from 'bn.js';
-import { WithdrawEvent } from 'src/contracts/WithdrawEvent';
+import { PartyContract } from 'src/contracts/Party';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { ILogParams } from 'src/modules/parties/types/logData';
 
@@ -31,9 +31,13 @@ export class MeService {
 
         let decodedLog: { [key: string]: string };
         receipt.logs.some((receiptLog) => {
-            if (WithdrawEvent.signature == receiptLog.topics[0]) {
+            if (
+                PartyContract.getEventSignature(PartyContract.WithdrawEvent) ==
+                receiptLog.topics[0]
+            ) {
                 decodedLog = this.web3Service.decodeTopicLog(
-                    WithdrawEvent.abi.inputs,
+                    PartyContract.getEventAbi(PartyContract.WithdrawEvent)
+                        .inputs,
                     receiptLog.data,
                     receiptLog.topics.slice(1),
                 );
