@@ -15,7 +15,7 @@ import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { ILogParams } from '../types/logData';
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
-import { SwapEvent } from 'src/contracts/SwapEvent';
+import { PartyContract } from 'src/contracts/Party';
 
 @Controller('parties/:partyId/swap')
 export class SwapController {
@@ -25,7 +25,7 @@ export class SwapController {
         private readonly wsService: WSService,
     ) {
         this.wsService.registerHandler(
-            SwapEvent.signature,
+            PartyContract.getEventSignature(PartyContract.Qoute0xSwap),
             async (data: ILogParams) => {
                 await this.swapQuoteApplication.buySync(data);
             },

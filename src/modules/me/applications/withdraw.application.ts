@@ -17,6 +17,7 @@ import { PartyCalculationService } from 'src/modules/parties/services/party-calc
 import { Utils } from 'src/common/utils/util';
 import { BN } from 'bn.js';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
+import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 
 @Injectable()
 export class WithdrawApplication {
@@ -31,6 +32,7 @@ export class WithdrawApplication {
         private readonly tokenService: TokenService,
         private readonly swapQuoteService: SwapQuoteService,
         private readonly partyCalculationService: PartyCalculationService,
+        private readonly transactionService: TransactionService,
     ) {}
 
     async prepare(
@@ -100,6 +102,16 @@ export class WithdrawApplication {
                 ? new Date(party.distributionDate).getDay()
                 : 1,
         );
+        const distributionPass = Math.ceil(
+            Utils.diffInDays(nextDistribution, new Date()),
+        );
+
+        const platformSignature =
+            await this.meService.generateWithdrawPlatformSignature(
+                party.address,
+                totalWithdrawAmount,
+                distributionPass,
+            );
 
         return {
             weight: weight.toString(),
@@ -108,15 +120,29 @@ export class WithdrawApplication {
             swaps: results
                 .filter((result) => !!!result)
                 .map((result) => result.swap),
-            distributionPass: Math.ceil(
-                Utils.diffInDays(nextDistribution, new Date()),
-            ),
+            distributionPass,
+            platformSignature,
         };
     }
 
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress, amount } =
+        const { userAddress, partyAddress, amount, cut, penalty } =
             await this.meService.decodeWithdrawEventData(logParams);
+
+        // dummy signature for fill transaction data only. not depend on anything.
+        const signature = this.meService.generateWithdrawSignature(
+            partyAddress,
+            amount.toNumber(),
+        );
+        await this.transactionService.storeWithdrawTransaction(
+            userAddress,
+            partyAddress,
+            amount,
+            cut,
+            penalty,
+            signature,
+            logParams.result.transactionHash,
+        );
 
         await this.partyCalculationService.withdraw(
             partyAddress,

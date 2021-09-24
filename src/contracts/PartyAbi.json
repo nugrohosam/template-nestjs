@@ -1,0 +1,1006 @@
+[
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "minDeposit",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxDeposit",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct Party.RangeDepth",
+                "name": "inputRangeDep",
+                "type": "tuple"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "idParty",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "ownerId",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "userAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "platform_Address",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "typeP",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "partyName",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isPublic",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct Party.PartyInfo",
+                "name": "inputPartyInformation",
+                "type": "tuple"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "r",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "s",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "v",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct Party.Sig",
+                "name": "inputPlatformRSV",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "proposalId",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "address[]",
+                "name": "payers",
+                "type": "address[]"
+            }
+        ],
+        "name": "ApprovePayerEvent",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            }
+        ],
+        "name": "ClosePartyEvent",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "caller",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "partyName",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "partyId",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "ownerId",
+                "type": "string"
+            }
+        ],
+        "name": "CreateEvent",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "proposalId",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "partyId",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "userAddress",
+                "type": "address"
+            }
+        ],
+        "name": "CreateProposalEvent",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "caller",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "cut",
+                "type": "uint256"
+            }
+        ],
+        "name": "DepositEvent",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "caller",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "joinPartyId",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "userId",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "cut",
+                "type": "uint256"
+            }
+        ],
+        "name": "JoinEvent",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "userAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "weight",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            }
+        ],
+        "name": "LeavePartyEvent",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "contract IERC20",
+                "name": "sellTokenAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "contract IERC20",
+                "name": "buyTokenAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "spender",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "swapTarget",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "transactionType",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "sellAmount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "buyAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "Qoute0xSwap",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "caller",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "cut",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "penalty",
+                "type": "uint256"
+            }
+        ],
+        "name": "WithdrawEvent",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "balance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "balanceParty",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "weightAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "weightPercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct Party.Weight[]",
+                "name": "weightArray",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "buyTokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "sellTokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address payable",
+                        "name": "swapTarget",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "swapCallData",
+                        "type": "bytes"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sellAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "buyAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "r",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes32",
+                                "name": "s",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "v",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct Party.Sig",
+                        "name": "inputApproveRSV",
+                        "type": "tuple"
+                    }
+                ],
+                "internalType": "struct Party.Swap[]",
+                "name": "tokenData",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "r",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "s",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "v",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct Party.Sig",
+                "name": "closePartyRSV",
+                "type": "tuple"
+            }
+        ],
+        "name": "closeParty",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "partyId",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "proposalId",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "recipient",
+                "type": "address"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "r",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "s",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "v",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct Party.Sig",
+                "name": "inputCreateProposalRSV",
+                "type": "tuple"
+            }
+        ],
+        "name": "createProposal",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "deposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "sellTokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "contract IERC20",
+                "name": "buyTokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "spender",
+                "type": "address"
+            },
+            {
+                "internalType": "address payable",
+                "name": "swapTarget",
+                "type": "address"
+            },
+            {
+                "internalType": "bytes",
+                "name": "swapCallData",
+                "type": "bytes"
+            },
+            {
+                "internalType": "uint256",
+                "name": "sellAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "buyAmount",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "r",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "s",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "v",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct Party.Sig",
+                "name": "inputApproveRSV",
+                "type": "tuple"
+            }
+        ],
+        "name": "fillQuote",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getPartyBalance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "r",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "s",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "v",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct Party.Sig",
+                "name": "inputJoinPartyPlatformRSV",
+                "type": "tuple"
+            },
+            {
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "userId",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "joinPartyId",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "joinParty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "quittingMember",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "addressWeight",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "buyTokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "sellTokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address payable",
+                        "name": "swapTarget",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "swapCallData",
+                        "type": "bytes"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sellAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "buyAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "r",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes32",
+                                "name": "s",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "v",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct Party.Sig",
+                        "name": "inputApproveRSV",
+                        "type": "tuple"
+                    }
+                ],
+                "internalType": "struct Party.Swap[]",
+                "name": "tokenData",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "r",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "s",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "v",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct Party.Sig",
+                "name": "leavePartyRSV",
+                "type": "tuple"
+            }
+        ],
+        "name": "leaveParty",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "memberList",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "rangeDEP",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "minDeposit",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxDeposit",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "name": "registeredProposal",
+        "outputs": [
+            {
+                "internalType": "address payable",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "weight",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "n",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "buyTokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "sellTokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address payable",
+                        "name": "swapTarget",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "swapCallData",
+                        "type": "bytes"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sellAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "buyAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "r",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes32",
+                                "name": "s",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "v",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct Party.Sig",
+                        "name": "inputApproveRSV",
+                        "type": "tuple"
+                    }
+                ],
+                "internalType": "struct Party.Swap[]",
+                "name": "tokenData",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "r",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "s",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "v",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct Party.Sig",
+                "name": "withdrawRSV",
+                "type": "tuple"
+            }
+        ],
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    }
+]

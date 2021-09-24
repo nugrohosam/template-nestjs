@@ -21,7 +21,6 @@ import { CreatePartyRequest } from '../requests/create-party.request';
 import { UpdateDeployedPartyDataRequest } from '../requests/update-transaction-hash.request';
 import { PartyService } from '../services/party.service';
 import { GetPartyService } from '../services/get-party.service';
-import { CreatePartyEvent } from 'src/contracts/CreatePartyEvent';
 import { RevertCreatePartyRequest } from '../requests/revert-create-party.request';
 import {
     OnchainSeriesApplication,
@@ -30,6 +29,7 @@ import {
 import { PartyValidation } from '../services/party.validation';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { TokenService } from '../services/token/token.service';
+import { PartyContract } from 'src/contracts/Party';
 
 @Injectable()
 export class CreatePartyApplication extends OnchainSeriesApplication {
@@ -96,7 +96,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         await this.web3Service.validateTransaction(
             request.transactionHash,
             creator.address,
-            CreatePartyEvent.abi,
+            PartyContract.getEventAbi(PartyContract.CreateEvent),
             { 2: party.id },
         );
 

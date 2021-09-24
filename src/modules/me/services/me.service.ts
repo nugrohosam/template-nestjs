@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import BN from 'bn.js';
-import { WithdrawEvent } from 'src/contracts/WithdrawEvent';
+import { PartyContract } from 'src/contracts/Party';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { ILogParams } from 'src/modules/parties/types/logData';
 
@@ -20,10 +20,27 @@ export class MeService {
         return message;
     }
 
+    async generateWithdrawPlatformSignature(
+        partyAddress: string,
+        amount: BN,
+        distributionPass: number,
+    ): Promise<string> {
+        const message = this.web3Service.soliditySha3([
+            { t: 'address', v: partyAddress },
+            { t: 'uint256', v: amount.toString() },
+            { t: 'uint256', v: distributionPass },
+        ]);
+        // TODO: need to removed after testing
+        console.log('message[platform-withdraw]: ' + message);
+        return await this.web3Service.sign(message);
+    }
+
     async decodeWithdrawEventData({ result: log }: ILogParams): Promise<{
         userAddress: string;
         partyAddress: string;
         amount: BN;
+        cut: BN;
+        penalty: BN;
     }> {
         const receipt = await this.web3Service.getTransactionReceipt(
             log.transactionHash,
@@ -31,9 +48,13 @@ export class MeService {
 
         let decodedLog: { [key: string]: string };
         receipt.logs.some((receiptLog) => {
-            if (WithdrawEvent.signature == receiptLog.topics[0]) {
+            if (
+                PartyContract.getEventSignature(PartyContract.WithdrawEvent) ==
+                receiptLog.topics[0]
+            ) {
                 decodedLog = this.web3Service.decodeTopicLog(
-                    WithdrawEvent.abi.inputs,
+                    PartyContract.getEventAbi(PartyContract.WithdrawEvent)
+                        .inputs,
                     receiptLog.data,
                     receiptLog.topics.slice(1),
                 );
@@ -48,6 +69,8 @@ export class MeService {
             userAddress: decodedLog[0],
             partyAddress: decodedLog[1],
             amount: new BN(decodedLog[2]),
+            cut: new BN(decodedLog[3]),
+            penalty: new BN(decodedLog[4]),
         };
     }
 }
