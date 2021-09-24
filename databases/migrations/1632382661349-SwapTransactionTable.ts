@@ -13,6 +13,7 @@ export class SwapTransactionTable1632382661349 implements MigrationInterface {
                         isGenerated: true,
                         generationStrategy: 'uuid',
                     },
+                    { name: 'party_id', type: 'varchar(36)' },
                     { name: 'token_from', type: 'varchar' },
                     { name: 'token_target', type: 'varchar' },
                     { name: 'buy_amount', type: 'bigint' },
@@ -34,6 +35,15 @@ export class SwapTransactionTable1632382661349 implements MigrationInterface {
                         isNullable: true,
                         default: 'current_timestamp()',
                         onUpdate: 'current_timestamp()',
+                    },
+                ],
+                foreignKeys: [
+                    {
+                        name: 'swap_transaction_party_id_parties_id_foreign',
+                        columnNames: ['party_id'],
+                        referencedColumnNames: ['id'],
+                        referencedTableName: 'parties',
+                        onDelete: 'cascade',
                     },
                 ],
             }),

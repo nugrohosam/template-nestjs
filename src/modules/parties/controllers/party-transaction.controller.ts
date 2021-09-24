@@ -1,5 +1,6 @@
 import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { SwapTransactionResponse } from 'src/modules/transactions/responses/swap-transaction.response';
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
 import { IndexPartyTransactionApplication } from '../applications/index-party-transaction.application';
 import { IndexPartyTransactionRequest } from '../requests/transaction/index-party-transaction.request';
@@ -29,6 +30,29 @@ export class PartyTransactionController {
 
         return {
             message: "Success fetch party's transactions",
+            data: response,
+            meta,
+        };
+    }
+
+    @Get('swaps')
+    async swaps(
+        @Param('partyId') partyId: string,
+        @Query() query: IndexPartyTransactionRequest,
+    ): Promise<IApiResponse<SwapTransactionResponse[]>> {
+        const party = await this.getPartyService.getById(partyId);
+        const { data, meta } =
+            await this.indexPartyTransactionApplication.getSwapTransactions(
+                party,
+                query,
+            );
+
+        const response = data.map((item) => {
+            return SwapTransactionResponse.mapFromSwapTransactionModel(item);
+        });
+
+        return {
+            message: "Success fetch party's swap transactions",
             data: response,
             meta,
         };
