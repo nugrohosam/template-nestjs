@@ -10,7 +10,6 @@ import { PartyService } from './party.service';
 import { TokenService } from './token/token.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { config } from 'src/config';
 import { PartyMemberService } from './members/party-member.service';
 
 @Injectable()
@@ -28,12 +27,6 @@ export class PartyCalculationService {
         private readonly partyMemberService: PartyMemberService,
         private readonly tokenService: TokenService,
     ) {}
-
-    getChargeAmount(amount: BN): BN {
-        return amount
-            .mul(new BN(config.fee.platformFee))
-            .div(new BN(config.fee.maxFeePercentage));
-    }
 
     async updatePartyTotalFund(
         party: PartyModel,

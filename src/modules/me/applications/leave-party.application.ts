@@ -12,6 +12,7 @@ import { LeavePreparationResponse } from '../responses/leave-preparation.respons
 import { TokenService } from 'src/modules/parties/services/token/token.service';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
+import { config } from 'src/config';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -56,7 +57,9 @@ export class LeavePartyApplication {
                     party.address,
                     token.address,
                 );
-                const withdrawAmount = balance.mul(weight).divn(100 * 10 ** 4);
+                const withdrawAmount = balance
+                    .mul(weight)
+                    .divn(100 * config.calculation.percentageWei);
 
                 let swapResponse: ISwap0xResponse = null;
                 if (token.address !== defaultToken.address) {

@@ -1,5 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import BN from 'bn.js';
+import { config } from 'src/config';
 import { IPartyMember } from 'src/entities/party-member.entity';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -98,7 +99,7 @@ export class PartyMemberService {
         const party = partyMember.party ?? (await partyMember.getParty);
 
         partyMember.weight = partyMember.totalDeposit
-            .muln(100 * 10 ** 4)
+            .muln(100 * config.calculation.percentageWei)
             .div(party.totalDeposit);
 
         return this.partyMemberRepository.save(partyMember);
