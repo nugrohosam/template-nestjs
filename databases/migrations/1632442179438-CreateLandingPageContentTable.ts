@@ -6,7 +6,7 @@ export class CreateLandingPageContentTable1632442179438
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: 'landing_page_contens',
+                name: 'landing_page_contents',
                 columns: [
                     {
                         name: 'id',
@@ -49,6 +49,6 @@ export class CreateLandingPageContentTable1632442179438
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable('landing_page_contens');
+        await queryRunner.dropTable('landing_page_contents');
     }
 }
