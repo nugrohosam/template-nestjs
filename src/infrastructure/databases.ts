@@ -9,6 +9,7 @@ import { PartyModel } from 'src/models/party.model';
 import { ProposalDistributionModel } from 'src/models/proposal-distribution.model';
 import { ProposalVoteModel } from 'src/models/proposal-vote.model';
 import { ProposalModel } from 'src/models/proposal.model';
+import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { UserModel } from 'src/models/user.model';
 import { ConnectionOptions, createConnection } from 'typeorm';
@@ -33,6 +34,7 @@ export const connectionOption: ConnectionOptions = {
         ProposalVoteModel,
         ProposalDistributionModel,
         GeckoCoinModel,
+        SwapTransactionModel,
     ],
     synchronize: false,
     logging: config.nodeEnv === 'local',
