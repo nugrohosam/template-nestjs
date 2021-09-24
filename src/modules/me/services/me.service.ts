@@ -20,6 +20,21 @@ export class MeService {
         return message;
     }
 
+    async generateWithdrawPlatformSignature(
+        partyAddress: string,
+        amount: BN,
+        distributionPass: number,
+    ): Promise<string> {
+        const message = this.web3Service.soliditySha3([
+            { t: 'address', v: partyAddress },
+            { t: 'uint256', v: amount.toString() },
+            { t: 'uint256', v: distributionPass },
+        ]);
+        // TODO: need to removed after testing
+        console.log('message[platform-withdraw]: ' + message);
+        return await this.web3Service.sign(message);
+    }
+
     async decodeWithdrawEventData({ result: log }: ILogParams): Promise<{
         userAddress: string;
         partyAddress: string;
