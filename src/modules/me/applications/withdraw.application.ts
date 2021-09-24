@@ -102,6 +102,16 @@ export class WithdrawApplication {
                 ? new Date(party.distributionDate).getDay()
                 : 1,
         );
+        const distributionPass = Math.ceil(
+            Utils.diffInDays(nextDistribution, new Date()),
+        );
+
+        const platformSignature =
+            await this.meService.generateWithdrawPlatformSignature(
+                party.address,
+                totalWithdrawAmount,
+                distributionPass,
+            );
 
         return {
             weight: weight.toString(),
@@ -110,9 +120,8 @@ export class WithdrawApplication {
             swaps: results
                 .filter((result) => !!!result)
                 .map((result) => result.swap),
-            distributionPass: Math.ceil(
-                Utils.diffInDays(nextDistribution, new Date()),
-            ),
+            distributionPass,
+            platformSignature,
         };
     }
 
