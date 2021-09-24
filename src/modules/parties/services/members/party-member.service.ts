@@ -99,7 +99,7 @@ export class PartyMemberService {
         const party = partyMember.party ?? (await partyMember.getParty);
 
         partyMember.weight = partyMember.totalDeposit
-            .muln(100 * config.calculation.percentageWei)
+            .muln(config.calculation.maxPercentage)
             .div(party.totalDeposit);
 
         return this.partyMemberRepository.save(partyMember);

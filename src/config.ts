@@ -88,6 +88,11 @@ export const config = {
         percentageWei: +process.env.MAX_FEE_PERCENTAGE || 10000,
 
         /**
+         * 100% in percentageWei based on percentageWei value
+         */
+        maxPercentage: +process.env.MAX_FEE_PERCENTAGE || 1000000,
+
+        /**
          * used to charge each user transaction on platform
          * value must in percentage wei as defined in percentageWei
          */
