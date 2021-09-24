@@ -71,9 +71,9 @@ export class WithdrawApplication {
                 );
                 const withdrawAmount = balance
                     .mul(weight)
-                    .divn(100 * config.calculation.percentageWei)
+                    .divn(config.calculation.maxPercentage)
                     .muln(request.percentage * config.calculation.percentageWei)
-                    .divn(100 * config.calculation.percentageWei);
+                    .divn(config.calculation.maxPercentage);
 
                 let swapResponse: ISwap0xResponse = null;
                 if (token.address !== defaultToken.address) {

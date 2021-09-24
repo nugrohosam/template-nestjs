@@ -109,6 +109,6 @@ export class Utils {
 
         return bnAmount
             .muln(config.calculation.platformFee)
-            .divn(100 * config.calculation.percentageWei);
+            .divn(config.calculation.maxPercentage);
     }
 }
