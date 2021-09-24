@@ -49,6 +49,6 @@ export const config = {
     },
     fee: {
         platformFee: process.env.PLATFORM_FEE || 5,
-        maxFeePercentage: process.env.MAX_FEE_PERCENTAGE || 1000,
+        maxFeePercentage: process.env.MAX_FEE_PERCENTAGE || 1000000,
     },
 };

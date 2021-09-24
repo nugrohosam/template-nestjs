@@ -18,22 +18,10 @@ export class TransactionModel implements ITransaction {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
 
-    @Column('varchar', {
-        name: 'address_from',
-        transformer: {
-            to: (value: string) => value.toLowerCase(),
-            from: (value: string) => value.toLowerCase(),
-        },
-    })
+    @Column('varchar', { name: 'address_from' })
     addressFrom: string;
 
-    @Column('varchar', {
-        name: 'address_to',
-        transformer: {
-            to: (value: string) => value.toLowerCase(),
-            from: (value: string) => value.toLowerCase(),
-        },
-    })
+    @Column('varchar', { name: 'address_to' })
     addressTo: string;
 
     @Column('bigint', { transformer: TransformBN })
