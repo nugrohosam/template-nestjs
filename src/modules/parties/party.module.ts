@@ -132,6 +132,8 @@ import { SwapFeeService } from './services/swap/swap-fee.service';
     exports: [
         GetPartyService,
         GetPartyMemberService,
+
+        PartyMemberService,
         PartyCalculationService,
         TokenService,
         SwapQuoteService,
