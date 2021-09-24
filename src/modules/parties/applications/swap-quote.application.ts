@@ -14,10 +14,10 @@ import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
 import { UserModel } from 'src/models/user.model';
-import { SwapFeeService } from '../services/swap/swap-fee.service';
 import { PartyContract } from 'src/contracts/Party';
-import { Repository } from 'typeorm';
+import { Utils } from 'src/common/utils/util';
 import { SwapTransactionModel } from 'src/models/swap-transaction.model';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class SwapQuoteApplication {
@@ -32,7 +32,6 @@ export class SwapQuoteApplication {
         private readonly transactionService: TransactionService,
         private readonly getTransactionService: GetTransactionService,
         private readonly partyService: PartyService,
-        private readonly swapFeeService: SwapFeeService,
     ) {}
 
     @Transactional()
@@ -83,7 +82,7 @@ export class SwapQuoteApplication {
             addressTo: request.to,
             type: TransactionTypeEnum.Charge,
             currencyId: token.id,
-            amount: this.swapFeeService.getFee(request.sellAmount),
+            amount: Utils.getPlatformFee(request.sellAmount),
             description: `Charge Swap to buy token with address ${request.to}`,
             signature: request.signature,
             transactionHash: request.transactionHash,

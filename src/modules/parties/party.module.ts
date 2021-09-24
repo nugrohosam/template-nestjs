@@ -134,6 +134,8 @@ import { SwapTransactionModel } from 'src/models/swap-transaction.model';
     exports: [
         GetPartyService,
         GetPartyMemberService,
+
+        PartyMemberService,
         PartyCalculationService,
         TokenService,
         SwapQuoteService,

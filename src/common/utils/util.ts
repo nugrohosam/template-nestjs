@@ -1,5 +1,7 @@
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
+import BN from 'bn.js';
+import { config } from 'src/config';
 
 export class Utils {
     static md5(contents: string): string {
@@ -95,5 +97,18 @@ export class Utils {
     static diffInDays(date1: Date, date2: Date): number {
         const timeDiff = date1.getTime() - date2.getTime();
         return timeDiff / (1000 * 60 * 60 * 24);
+    }
+
+    /**
+     * Get platform fee from given amount
+     * @param {string | number | BN} amount
+     * @returns {BN}
+     */
+    static getPlatformFee(amount: string | number | BN): BN {
+        const bnAmount = new BN(amount);
+
+        return bnAmount
+            .muln(config.calculation.platformFee)
+            .divn(config.calculation.maxPercentage);
     }
 }

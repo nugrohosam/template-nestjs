@@ -18,6 +18,7 @@ import { Utils } from 'src/common/utils/util';
 import { BN } from 'bn.js';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
+import { config } from 'src/config';
 
 @Injectable()
 export class WithdrawApplication {
@@ -70,9 +71,9 @@ export class WithdrawApplication {
                 );
                 const withdrawAmount = balance
                     .mul(weight)
-                    .divn(100 * 10 ** 4)
-                    .muln(request.percentage * 10 ** 4)
-                    .divn(100 * 10 ** 4);
+                    .divn(config.calculation.maxPercentage)
+                    .muln(request.percentage * config.calculation.percentageWei)
+                    .divn(config.calculation.maxPercentage);
 
                 let swapResponse: ISwap0xResponse = null;
                 if (token.address !== defaultToken.address) {

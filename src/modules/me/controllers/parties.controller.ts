@@ -16,11 +16,14 @@ import { GetPartyService } from 'src/modules/parties/services/get-party.service'
 import { ILogParams } from 'src/modules/parties/types/logData';
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
 import { DepositApplication } from '../applications/deposit.application';
+import { LeavePartyApplication } from '../applications/leave-party.application';
 import { MyPartiesApplication } from '../applications/my-parties.application';
 import { WithdrawApplication } from '../applications/withdraw.application';
 import { DepositRequest } from '../requests/deposit.request';
 import { IndexMePartyRequest } from '../requests/index-party.request';
+import { LeavePartyRequest } from '../requests/leave.request';
 import { WithdrawRequest } from '../requests/withdraw.request';
+import { LeavePreparationResponse } from '../responses/leave-preparation.response';
 import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.response';
 
 @Controller('me/parties')
@@ -29,6 +32,7 @@ export class MePartiesController {
         private readonly myPartyApplication: MyPartiesApplication,
         private readonly depositApplication: DepositApplication,
         private readonly withdrawApplication: WithdrawApplication,
+        private readonly leavePartyApplication: LeavePartyApplication,
 
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
@@ -104,6 +108,25 @@ export class MePartiesController {
         return {
             message: 'Success get withdraw preparation data',
             data: withdrawPreparation,
+        };
+    }
+
+    @Post(':partyId/leave')
+    async leave(
+        @Headers('Signature') signature: string,
+        @Param('partyId') partyId: string,
+        @Body() request: LeavePartyRequest,
+    ): Promise<IApiResponse<LeavePreparationResponse>> {
+        const user = await this.getSignerService.get(signature);
+        const party = await this.getPartyService.getById(partyId);
+        const leavePreparation = await this.leavePartyApplication.prepare(
+            user,
+            party,
+            request,
+        );
+        return {
+            message: 'Success get leave prepareation data',
+            data: leavePreparation,
         };
     }
 }

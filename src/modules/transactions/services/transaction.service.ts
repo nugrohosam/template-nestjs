@@ -9,6 +9,7 @@ import { TokenService } from 'src/modules/parties/services/token/token.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { config } from 'src/config';
 import { Repository, UpdateResult } from 'typeorm';
+import { Utils } from 'src/common/utils/util';
 
 @Injectable()
 export class TransactionService {
@@ -58,8 +59,7 @@ export class TransactionService {
         });
 
         // store cut transaction for deposit
-        const chargeAmount =
-            this.partyCalculationService.getChargeAmount(amount);
+        const chargeAmount = Utils.getPlatformFee(amount);
         await this.store({
             addressFrom: member.address,
             addressTo: config.platform.address,

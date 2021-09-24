@@ -80,13 +80,26 @@ export class PartyMemberService {
         return message;
     }
 
+    async generateLeavePlatformSignature(
+        userAddress: string,
+        weight: BN,
+    ): Promise<string> {
+        const message = this.web3Service.soliditySha3([
+            { t: 'address', v: userAddress },
+            { t: 'uint256', v: weight.toString() },
+        ]);
+        // TODO: need to removed after testing
+        console.log('message[platform-join-party]: ' + message);
+        return await this.web3Service.sign(message);
+    }
+
     async updatePartyMemberWeight(
         partyMember: PartyMemberModel,
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
 
         partyMember.weight = partyMember.totalDeposit
-            .muln(parseInt(config.fee.maxFeePercentage.toString())) // REVIEW pakai constant dari config
+            .muln(config.calculation.maxPercentage)
             .div(party.totalDeposit);
 
         return this.partyMemberRepository.save(partyMember);

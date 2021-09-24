@@ -7,6 +7,7 @@ import { CommonModule } from '../commons/common.module';
 import { PartyModule } from '../parties/party.module';
 import { TransactionModule } from '../transactions/transaction.module';
 import { DepositApplication } from './applications/deposit.application';
+import { LeavePartyApplication } from './applications/leave-party.application';
 import { MyPartiesApplication } from './applications/my-parties.application';
 import { WithdrawApplication } from './applications/withdraw.application';
 import { MePartiesController } from './controllers/parties.controller';
@@ -25,6 +26,8 @@ import { MeService } from './services/me.service';
         MyPartiesApplication,
         DepositApplication,
         WithdrawApplication,
+        LeavePartyApplication,
+
         MeService,
     ],
 })
