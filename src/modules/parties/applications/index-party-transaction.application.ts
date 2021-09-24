@@ -28,7 +28,7 @@ export class IndexPartyTransactionApplication extends IndexApplication {
 
         query.where(
             new Brackets((qb) => {
-                qb.where('party_id = :partyId').orWhere(
+                qb.where('address_from = :partyAddress').orWhere(
                     'address_to = :partyAddress',
                     { partyAddress: party.address },
                 );
