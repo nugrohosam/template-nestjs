@@ -71,6 +71,7 @@ export const config = {
      */
     api: {
         zerox: process.env.API_0X_URL,
+        gecko: process.env.API_GECKO_URL,
     },
 
     /**

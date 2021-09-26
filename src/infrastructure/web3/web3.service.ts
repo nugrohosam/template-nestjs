@@ -29,7 +29,7 @@ export class Web3Service {
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    async getContractInstance(abi: AbiItem | AbiItem[], address: string) {
+    getContractInstance(abi: AbiItem | AbiItem[], address: string) {
         return new this.web3.eth.Contract(abi, address);
     }
 
