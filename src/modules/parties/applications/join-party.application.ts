@@ -20,7 +20,7 @@ import {
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { PartyCalculationService } from '../services/party-calculation.service';
 import BN from 'bn.js';
-import { PartyContract } from 'src/contracts/Party';
+import { PartyContract, PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
@@ -98,7 +98,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
             member.address,
-            PartyContract.getEventAbi(PartyContract.JoinEvent),
+            PartyContract.getEventAbi(PartyEvents.JoinEvent),
             { 2: partyMember.id },
         );
         // will ignore below process when transaction still false

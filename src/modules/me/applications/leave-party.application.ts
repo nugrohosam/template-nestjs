@@ -13,6 +13,10 @@ import { TokenService } from 'src/modules/parties/services/token/token.service';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { config } from 'src/config';
+import { ILogParams } from 'src/modules/parties/types/logData';
+import { MeService } from '../services/me.service';
+import { TransactionService } from 'src/modules/transactions/services/transaction.service';
+import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -26,6 +30,9 @@ export class LeavePartyApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly tokenService: TokenService,
         private readonly swapQuoteService: SwapQuoteService,
+        private readonly meService: MeService,
+        private readonly transactionService: TransactionService,
+        private readonly partyCalculationService: PartyCalculationService,
     ) {}
 
     async prepare(
@@ -87,5 +94,43 @@ export class LeavePartyApplication {
             swap: results,
             platformSignature: platformSignature,
         };
+    }
+
+    async sync(logParams: ILogParams): Promise<void> {
+        const { userAddress, partyAddress, amount, cut, penalty } =
+            await this.meService.decodeLeaveEventData(logParams);
+
+        let partyMember =
+            await this.getPartyMemberService.getByUserAndPartyAddress(
+                userAddress,
+                partyAddress,
+            );
+
+        partyMember = await this.partyMemberService.update(partyMember, {
+            leaveTransactionHash: logParams.result.transactionHash,
+        });
+
+        // dummy signature for fill transaction data only. not depend on anything.
+        const signature = this.meService.generateWithdrawSignature(
+            partyAddress,
+            amount.toNumber(),
+        );
+        await this.transactionService.storeWithdrawTransaction(
+            userAddress,
+            partyAddress,
+            amount,
+            cut,
+            penalty,
+            signature,
+            logParams.result.transactionHash,
+        );
+
+        await this.partyCalculationService.withdraw(
+            partyAddress,
+            userAddress,
+            amount,
+        );
+
+        await this.partyMemberService.delete(partyMember, true);
     }
 }

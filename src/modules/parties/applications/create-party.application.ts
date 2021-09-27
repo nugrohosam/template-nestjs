@@ -29,7 +29,7 @@ import {
 import { PartyValidation } from '../services/party.validation';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { TokenService } from '../services/token/token.service';
-import { PartyContract } from 'src/contracts/Party';
+import { PartyContract, PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class CreatePartyApplication extends OnchainSeriesApplication {
@@ -96,7 +96,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         await this.web3Service.validateTransaction(
             request.transactionHash,
             creator.address,
-            PartyContract.getEventAbi(PartyContract.CreateEvent),
+            PartyContract.getEventAbi(PartyEvents.CreateEvent),
             { 2: party.id },
         );
 
