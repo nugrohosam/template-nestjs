@@ -14,7 +14,7 @@ import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
 import { SwapQuoteTransactionRequest } from '../requests/swap-quote-transaction';
 import { UserModel } from 'src/models/user.model';
-import { PartyContract } from 'src/contracts/Party';
+import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import { Utils } from 'src/common/utils/util';
 import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { Repository } from 'typeorm';
@@ -143,11 +143,11 @@ export class SwapQuoteApplication {
         let decodedLog;
         receipt.logs.some((log) => {
             if (
-                PartyContract.getEventSignature(PartyContract.Qoute0xSwap) ==
+                PartyContract.getEventSignature(PartyEvents.Qoute0xSwap) ==
                 log.topics[0]
             ) {
                 decodedLog = this.web3Service.decodeTopicLog(
-                    PartyContract.getEventAbi(PartyContract.Qoute0xSwap).inputs,
+                    PartyContract.getEventAbi(PartyEvents.Qoute0xSwap).inputs,
                     log.data,
                     log.topics.slice(1),
                 );

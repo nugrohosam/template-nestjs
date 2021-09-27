@@ -3,17 +3,19 @@ import { AbiItem } from 'web3-utils';
 import { ContractEvent } from './Event';
 import PartyAbi from './PartyAbi.json';
 
-class Party {
-    readonly ApprovePayerEvent = 'ApprovePayerEvent';
-    readonly ClosePartyEvent = 'ClosePartyEvent';
-    readonly CreateEvent = 'CreateEvent';
-    readonly CreateProposalEvent = 'CreateProposalEvent';
-    readonly DepositEvent = 'DepositEvent';
-    readonly JoinEvent = 'JoinEvent';
-    readonly LeavePartyEvent = 'LeavePartyEvent';
-    readonly Qoute0xSwap = 'Qoute0xSwap';
-    readonly WithdrawEvent = 'WithdrawEvent';
+export enum PartyEvents {
+    ApprovePayerEvent = 'ApprovePayerEvent',
+    ClosePartyEvent = 'ClosePartyEvent',
+    CreateEvent = 'CreateEvent',
+    CreateProposalEvent = 'CreateProposalEvent',
+    DepositEvent = 'DepositEvent',
+    JoinEvent = 'JoinEvent',
+    LeavePartyEvent = 'LeavePartyEvent',
+    Qoute0xSwap = 'Qoute0xSwap',
+    WithdrawEvent = 'WithdrawEvent',
+}
 
+class Party {
     events: Array<ContractEvent>;
 
     constructor() {
@@ -23,7 +25,7 @@ class Party {
             .map((abi) => new ContractEvent(abi));
     }
 
-    getEvent(name: string): ContractEvent {
+    getEvent(name: PartyEvents): ContractEvent {
         const event =
             this.events.filter((event) => event.abi.name === name)[0] ??
             undefined;
@@ -36,12 +38,12 @@ class Party {
         return event;
     }
 
-    getEventAbi(name: string): AbiItem {
+    getEventAbi(name: PartyEvents): AbiItem {
         const event = this.getEvent(name);
         return event.abi;
     }
 
-    getEventSignature(name: string): string {
+    getEventSignature(name: PartyEvents): string {
         const event = this.getEvent(name);
         return event.signature;
     }
