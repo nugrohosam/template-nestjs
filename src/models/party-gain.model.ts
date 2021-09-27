@@ -17,9 +17,6 @@ export class PartyGainModel implements IPartyGain {
     @Column('uuid', { name: 'party_id' })
     partyId: string;
 
-    @Column('date')
-    date: Date;
-
     @Column('bigint')
     fund: BN;
 
