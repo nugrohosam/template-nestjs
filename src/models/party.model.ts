@@ -30,8 +30,10 @@ export class PartyModel implements IParty {
         unique: true,
         nullable: true,
         transformer: {
-            to: (value?: string) => web3.utils.toChecksumAddress(value),
-            from: (value?: string) => web3.utils.toChecksumAddress(value),
+            to: (value?: string) =>
+                value ? web3.utils.toChecksumAddress(value) : null,
+            from: (value?: string) =>
+                value ? web3.utils.toChecksumAddress(value) : null,
         },
     })
     address?: string;
