@@ -5,26 +5,32 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { PartyModel } from './party.model';
 
 @Entity({ name: 'swap_transactions' })
 export class SwapTransactionModel implements ISwapTransaction {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
 
+    @Column('uuid', { name: 'party_id' })
+    partyId: string;
+
     @Column('varchar', { name: 'token_from' })
-    token_from: string;
+    tokenFrom: string;
 
     @Column('varchar', { name: 'token_target' })
-    token_target: string;
+    tokenTarget: string;
 
     @Column('bigint', { transformer: TransformBN })
-    buy_amount: BN;
+    buyAmount: BN;
 
     @Column('bigint', { transformer: TransformBN })
-    sell_amount: BN;
+    sellAmount: BN;
 
     @Column('varchar', { name: 'transaction_hash' })
     transactionHash: string;
@@ -34,4 +40,8 @@ export class SwapTransactionModel implements ISwapTransaction {
 
     @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
+
+    @ManyToOne(() => PartyModel, (party) => party.swapTransaction)
+    @JoinColumn({ name: 'party_id' })
+    party?: PartyModel;
 }

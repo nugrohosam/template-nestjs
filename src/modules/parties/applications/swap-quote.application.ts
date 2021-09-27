@@ -177,10 +177,10 @@ export class SwapQuoteApplication {
         this.transactionService.updateTxHashStatus(log.transactionHash, true);
 
         const swapTransaction = this.swapTransactionRepository.create({
-            buy_amount: swapEventData.buyAmount,
-            sell_amount: swapEventData.sellAmount,
-            token_from: swapEventData.sellTokenAddress,
-            token_target: swapEventData.buyTokenAddress,
+            buyAmount: swapEventData.buyAmount,
+            sellAmount: swapEventData.sellAmount,
+            tokenFrom: swapEventData.sellTokenAddress,
+            tokenTarget: swapEventData.buyTokenAddress,
             transactionHash: log.transactionHash,
         });
         this.swapTransactionRepository.save(swapTransaction);

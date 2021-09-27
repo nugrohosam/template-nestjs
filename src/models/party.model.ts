@@ -20,6 +20,7 @@ import { ProposalModel } from './proposal.model';
 import { UserModel } from './user.model';
 import { TransformBN } from 'src/common/utils/typeorm.util';
 import web3 from 'web3';
+import { SwapTransactionModel } from './swap-transaction.model';
 
 @Entity({ name: 'parties' })
 export class PartyModel implements IParty {
@@ -117,6 +118,12 @@ export class PartyModel implements IParty {
 
     @OneToMany(() => PartyMemberModel, (partyMember) => partyMember.party)
     partyMembers?: PartyMemberModel;
+
+    @OneToMany(
+        () => SwapTransactionModel,
+        (swapTransaction) => swapTransaction.party,
+    )
+    swapTransaction?: SwapTransactionModel;
 
     @OneToMany(() => ProposalModel, (proposal) => proposal.party)
     proposals?: ProposalModel;
