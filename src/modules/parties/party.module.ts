@@ -54,7 +54,10 @@ import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { PartyGainService } from './services/party-gain/party-gain.service';
 import { GetTokenPriceService } from './services/token/get-token-price.service';
 import { GetTokenBalanceService } from './utils/get-token-balance.util';
+<<<<<<< HEAD
 import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.service';
+=======
+>>>>>>> party's announcements
 import { PartyAnnouncementController } from './controllers/party-announcement.controller';
 import { AnnouncementService } from './services/announcements/announcement.service';
 import { CreatePartyAnnouncementApplication } from './applications/create-party-announcement';
@@ -145,8 +148,11 @@ import { IndexPartyAnnouncementApplication } from './applications/index-party-an
         GetTokenPriceService,
         GetTokenBalanceService,
 
+<<<<<<< HEAD
         //Scheduler
         PartyGainSchedulerService,
+=======
+>>>>>>> party's announcements
         // Announcement
         AnnouncementService,
         CreatePartyAnnouncementApplication,
