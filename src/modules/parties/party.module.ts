@@ -54,6 +54,11 @@ import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { PartyGainService } from './services/party-gain/party-gain.service';
 import { GetTokenPriceService } from './services/token/get-token-price.service';
 import { GetTokenBalanceService } from './utils/get-token-balance.util';
+import { PartyAnnouncementController } from './controllers/party-announcement.controller';
+import { AnnouncementService } from './services/announcements/announcement.service';
+import { CreatePartyAnnouncementApplication } from './applications/create-party-announcement';
+import { AnnouncementModel } from 'src/models/announcement.model';
+import { IndexPartyAnnouncementApplication } from './applications/index-party-announcement.application ';
 @Module({
     imports: [
         HttpModule,
@@ -73,6 +78,7 @@ import { GetTokenBalanceService } from './utils/get-token-balance.util';
             PartyTokenModel,
             PartyGainModel,
             SwapTransactionModel,
+            AnnouncementModel,
         ]),
     ],
     controllers: [
@@ -84,6 +90,7 @@ import { GetTokenBalanceService } from './utils/get-token-balance.util';
         JoinRequestController,
         PartyTokenController,
         PartyGainController,
+        PartyAnnouncementController,
     ],
     providers: [
         // Party Porviders
@@ -136,6 +143,11 @@ import { GetTokenBalanceService } from './utils/get-token-balance.util';
         PartyGainService,
         GetTokenPriceService,
         GetTokenBalanceService,
+
+        // Announcement
+        AnnouncementService,
+        CreatePartyAnnouncementApplication,
+        IndexPartyAnnouncementApplication,
     ],
     exports: [
         GetPartyService,
