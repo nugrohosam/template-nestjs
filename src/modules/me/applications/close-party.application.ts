@@ -1,0 +1,107 @@
+import { UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { config } from 'src/config';
+import { Web3Service } from 'src/infrastructure/web3/web3.service';
+import { PartyTokenModel } from 'src/models/party-token.model';
+import { PartyModel } from 'src/models/party.model';
+import { UserModel } from 'src/models/user.model';
+import { GeneratePlatformSignature } from 'src/modules/commons/providers/generate-platform-signature.service';
+import { GenerateSignatureMessage } from 'src/modules/commons/providers/generate-signature-message.service';
+import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
+import { GetPartyMemberService } from 'src/modules/parties/services/members/get-party-member.service';
+import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
+import { TokenService } from 'src/modules/parties/services/token/token.service';
+import { Repository } from 'typeorm';
+import { LeavePartyRequest } from '../requests/leave.request';
+import {
+    ClosePreparationResponse,
+    ILeavedMember,
+} from '../responses/close-preparation.response';
+
+export class ClosePartyApplication {
+    constructor(
+        @InjectRepository(PartyTokenModel)
+        private readonly partyTokenRepository: Repository<PartyTokenModel>,
+
+        private readonly getPartyMemberService: GetPartyMemberService,
+
+        private readonly web3Service: Web3Service,
+        private readonly genSignatureMessage: GenerateSignatureMessage,
+        private readonly genPlatformSignature: GeneratePlatformSignature,
+        private readonly tokenService: TokenService,
+        private readonly swapQuoteService: SwapQuoteService,
+    ) {}
+
+    async prepare(
+        user: UserModel,
+        party: PartyModel,
+        { signature }: LeavePartyRequest,
+    ): Promise<ClosePreparationResponse> {
+        await this.web3Service.validateSignature(
+            signature,
+            user.address,
+            this.genSignatureMessage.closeParty(party),
+        );
+
+        if (party.ownerId !== user.id)
+            throw new UnauthorizedException(
+                'Only owner of the party can close party',
+            );
+
+        const partyMembers =
+            await this.getPartyMemberService.getPartyMembersOfParty(party.id);
+
+        // TODO: Need to make this on queue so will not be "beban" on the server
+        const result: ILeavedMember[] = await Promise.all(
+            partyMembers.map(async (partyMember) => {
+                const weight = partyMember.weight; // in wei percentage
+                const tokens = await this.partyTokenRepository
+                    .createQueryBuilder('partyToken')
+                    .where('party_id = :partyId', { partyId: party.id })
+                    .getMany();
+
+                const defaultToken = await this.tokenService.getDefaultToken();
+                const results = await Promise.all(
+                    tokens.map(async (token) => {
+                        const balance = await this.tokenService.getTokenBalance(
+                            party.address,
+                            token.address,
+                        );
+                        const withdrawAmount = balance
+                            .mul(weight)
+                            .divn(config.calculation.maxPercentage);
+
+                        let swapResponse: ISwap0xResponse = null;
+                        if (token.address !== defaultToken.address) {
+                            swapResponse = (
+                                await this.swapQuoteService.getQuote(
+                                    defaultToken.address,
+                                    token.address,
+                                    withdrawAmount.toString(),
+                                )
+                            ).data;
+                        }
+
+                        return swapResponse;
+                    }),
+                );
+
+                const user = await partyMember.getMember;
+                return {
+                    address: user.address,
+                    weight: weight.toString(),
+                    swap: results.filter((result) => result !== null),
+                };
+            }),
+        );
+
+        const platformSignature = await this.genPlatformSignature.closeParty(
+            user.address,
+        );
+
+        return {
+            leavedMembers: result,
+            platformSignature,
+        };
+    }
+}

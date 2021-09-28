@@ -59,4 +59,10 @@ export class GetPartyMemberService {
 
         return partyMember;
     }
+
+    async getPartyMembersOfParty(partyId: string): Promise<PartyMemberModel[]> {
+        return await this.getBaseQuery()
+            .where('party.id = :partyId', { partyId })
+            .getMany();
+    }
 }

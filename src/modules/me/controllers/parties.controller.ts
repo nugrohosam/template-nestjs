@@ -15,6 +15,7 @@ import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.re
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { ILogParams } from 'src/modules/parties/types/logData';
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
+import { ClosePartyApplication } from '../applications/close-party.application';
 import { DepositApplication } from '../applications/deposit.application';
 import { LeavePartyApplication } from '../applications/leave-party.application';
 import { MyPartiesApplication } from '../applications/my-parties.application';
@@ -23,6 +24,7 @@ import { DepositRequest } from '../requests/deposit.request';
 import { IndexMePartyRequest } from '../requests/index-party.request';
 import { LeavePartyRequest } from '../requests/leave.request';
 import { WithdrawRequest } from '../requests/withdraw.request';
+import { ClosePreparationResponse } from '../responses/close-preparation.response';
 import { LeavePreparationResponse } from '../responses/leave-preparation.response';
 import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.response';
 
@@ -33,6 +35,7 @@ export class MePartiesController {
         private readonly depositApplication: DepositApplication,
         private readonly withdrawApplication: WithdrawApplication,
         private readonly leavePartyApplication: LeavePartyApplication,
+        private readonly closePartyApplication: ClosePartyApplication,
 
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
@@ -133,6 +136,26 @@ export class MePartiesController {
         return {
             message: 'Success get leave prepareation data',
             data: leavePreparation,
+        };
+    }
+
+    @Post(':partyId/close')
+    async close(
+        @Headers('Signature') signature: string,
+        @Param('partyId') partyId: string,
+        @Body() request: LeavePartyRequest,
+    ): Promise<IApiResponse<ClosePreparationResponse>> {
+        const user = await this.getSignerService.get(signature);
+        const party = await this.getPartyService.getById(partyId);
+
+        const result = await this.closePartyApplication.prepare(
+            user,
+            party,
+            request,
+        );
+        return {
+            message: 'Success get close preparation data',
+            data: result,
         };
     }
 }
