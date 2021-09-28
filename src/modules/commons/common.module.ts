@@ -6,6 +6,8 @@ import { UserModel } from 'src/models/user.model';
 import { GeckoCoinController } from './controllers/gecko-coin.controller';
 import { UploadController } from './controllers/upload.controller';
 import { GeckoCoinService } from './providers/gecko-coin.service';
+import { GeneratePlatformSignature } from './providers/generate-platform-signature.service';
+import { GenerateSignatureMessage } from './providers/generate-signature-message.service';
 import { GetSignerService } from './providers/get-signer.service';
 import { WSService } from './providers/ws-service';
 
@@ -15,7 +17,19 @@ import { WSService } from './providers/ws-service';
         TypeOrmModule.forFeature([UserModel, GeckoCoinModel]),
     ],
     controllers: [UploadController, GeckoCoinController],
-    providers: [GetSignerService, WSService, GeckoCoinService],
-    exports: [GetSignerService, WSService, GeckoCoinService],
+    providers: [
+        GetSignerService,
+        WSService,
+        GeckoCoinService,
+        GeneratePlatformSignature,
+        GenerateSignatureMessage,
+    ],
+    exports: [
+        GetSignerService,
+        WSService,
+        GeckoCoinService,
+        GeneratePlatformSignature,
+        GenerateSignatureMessage,
+    ],
 })
 export class CommonModule {}

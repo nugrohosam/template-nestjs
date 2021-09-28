@@ -91,7 +91,7 @@ export class LeavePartyApplication {
 
         return {
             weight: weight.toString(),
-            swap: results,
+            swap: results.filter((result) => result !== null),
             platformSignature: platformSignature,
         };
     }

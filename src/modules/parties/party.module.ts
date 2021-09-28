@@ -141,6 +141,7 @@ import { GetTokenBalanceService } from './utils/get-token-balance.util';
         GetPartyService,
         GetPartyMemberService,
 
+        PartyService,
         PartyMemberService,
         PartyCalculationService,
         TokenService,

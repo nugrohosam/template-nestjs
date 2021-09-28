@@ -6,6 +6,7 @@ import { PartyModel } from 'src/models/party.model';
 import { CommonModule } from '../commons/common.module';
 import { PartyModule } from '../parties/party.module';
 import { TransactionModule } from '../transactions/transaction.module';
+import { ClosePartyApplication } from './applications/close-party.application';
 import { DepositApplication } from './applications/deposit.application';
 import { LeavePartyApplication } from './applications/leave-party.application';
 import { MyPartiesApplication } from './applications/my-parties.application';
@@ -27,6 +28,7 @@ import { MeService } from './services/me.service';
         DepositApplication,
         WithdrawApplication,
         LeavePartyApplication,
+        ClosePartyApplication,
 
         MeService,
     ],
