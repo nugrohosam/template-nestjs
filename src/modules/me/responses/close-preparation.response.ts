@@ -3,10 +3,10 @@ import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.respon
 export interface ILeavedMember {
     address: string;
     weight: string;
-    swap: ISwap0xResponse[];
 }
 
 export class ClosePreparationResponse {
     leavedMembers: ILeavedMember[];
+    swap: ISwap0xResponse[];
     platformSignature: string;
 }

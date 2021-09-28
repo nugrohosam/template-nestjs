@@ -1,6 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { config } from 'src/config';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyModel } from 'src/models/party.model';
@@ -58,47 +57,42 @@ export class ClosePartyApplication {
         const partyMembers =
             await this.getPartyMemberService.getPartyMembersOfParty(party.id);
 
-        // TODO: Need to make this on queue so will not be "beban" on the server
-        const result: ILeavedMember[] = await Promise.all(
+        const leavedMembers: ILeavedMember[] = await Promise.all(
             partyMembers.map(async (partyMember) => {
                 const weight = partyMember.weight; // in wei percentage
-                const tokens = await this.partyTokenRepository
-                    .createQueryBuilder('partyToken')
-                    .where('party_id = :partyId', { partyId: party.id })
-                    .getMany();
-
-                const defaultToken = await this.tokenService.getDefaultToken();
-                const results = await Promise.all(
-                    tokens.map(async (token) => {
-                        const balance = await this.tokenService.getTokenBalance(
-                            party.address,
-                            token.address,
-                        );
-                        const withdrawAmount = balance
-                            .mul(weight)
-                            .divn(config.calculation.maxPercentage);
-
-                        let swapResponse: ISwap0xResponse = null;
-                        if (token.address !== defaultToken.address) {
-                            swapResponse = (
-                                await this.swapQuoteService.getQuote(
-                                    defaultToken.address,
-                                    token.address,
-                                    withdrawAmount.toString(),
-                                )
-                            ).data;
-                        }
-
-                        return swapResponse;
-                    }),
-                );
 
                 const user = await partyMember.getMember;
                 return {
                     address: user.address,
                     weight: weight.toString(),
-                    swap: results.filter((result) => result !== null),
                 };
+            }),
+        );
+
+        const tokens = await this.partyTokenRepository
+            .createQueryBuilder('partyToken')
+            .where('party_id = :partyId', { partyId: party.id })
+            .getMany();
+        const defaultToken = await this.tokenService.getDefaultToken();
+        const swap = await Promise.all(
+            tokens.map(async (token) => {
+                const balance = await this.tokenService.getTokenBalance(
+                    party.address,
+                    token.address,
+                );
+
+                let swapResponse: ISwap0xResponse = null;
+                if (token.address !== defaultToken.address) {
+                    swapResponse = (
+                        await this.swapQuoteService.getQuote(
+                            defaultToken.address,
+                            token.address,
+                            balance.toString(),
+                        )
+                    ).data;
+                }
+
+                return swapResponse;
             }),
         );
 
@@ -107,7 +101,8 @@ export class ClosePartyApplication {
         );
 
         return {
-            leavedMembers: result,
+            leavedMembers,
+            swap,
             platformSignature,
         };
     }
