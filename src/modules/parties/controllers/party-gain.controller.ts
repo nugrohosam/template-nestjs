@@ -1,6 +1,5 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { IndexRequest } from 'src/common/request/index.request';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { IndexPartyGainApplication } from '../applications/index-party-gain.application';
 
@@ -11,12 +10,8 @@ export class PartyGainController {
     @Get()
     async index(
         @Param('partyId') partyId: string,
-        @Query() request: IndexRequest,
     ): Promise<IApiResponse<PartyGainModel[]>> {
-        const { data, meta } = await this.indexApplication.fetch(
-            partyId,
-            request,
-        );
-        return { message: 'Success get party gains', data, meta };
+        const data = await this.indexApplication.fetch(partyId);
+        return { message: 'Success get party gains', data };
     }
 }
