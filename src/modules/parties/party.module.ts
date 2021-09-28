@@ -55,6 +55,11 @@ import { PartyGainService } from './services/party-gain/party-gain.service';
 import { GetTokenPriceService } from './services/token/get-token-price.service';
 import { GetTokenBalanceService } from './utils/get-token-balance.util';
 import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.service';
+import { PartyAnnouncementController } from './controllers/party-announcement.controller';
+import { AnnouncementService } from './services/announcements/announcement.service';
+import { CreatePartyAnnouncementApplication } from './applications/create-party-announcement';
+import { AnnouncementModel } from 'src/models/announcement.model';
+import { IndexPartyAnnouncementApplication } from './applications/index-party-announcement.application ';
 @Module({
     imports: [
         HttpModule,
@@ -74,6 +79,7 @@ import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.serv
             PartyTokenModel,
             PartyGainModel,
             SwapTransactionModel,
+            AnnouncementModel,
         ]),
     ],
     controllers: [
@@ -85,6 +91,7 @@ import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.serv
         JoinRequestController,
         PartyTokenController,
         PartyGainController,
+        PartyAnnouncementController,
     ],
     providers: [
         // Party Porviders
@@ -140,6 +147,10 @@ import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.serv
 
         //Scheduler
         PartyGainSchedulerService,
+        // Announcement
+        AnnouncementService,
+        CreatePartyAnnouncementApplication,
+        IndexPartyAnnouncementApplication,
     ],
     exports: [
         GetPartyService,

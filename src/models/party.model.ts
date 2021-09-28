@@ -21,6 +21,7 @@ import { UserModel } from './user.model';
 import { TransformBN } from 'src/common/utils/typeorm.util';
 import web3 from 'web3';
 import { SwapTransactionModel } from './swap-transaction.model';
+import { AnnouncementModel } from './announcement.model';
 
 @Entity({ name: 'parties' })
 export class PartyModel implements IParty {
@@ -127,6 +128,9 @@ export class PartyModel implements IParty {
 
     @OneToMany(() => ProposalModel, (proposal) => proposal.party)
     proposals?: ProposalModel;
+
+    @OneToMany(() => AnnouncementModel, (notificaton) => notificaton.party)
+    notifications?: AnnouncementModel;
 
     // Computed Columns
 
