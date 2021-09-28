@@ -93,7 +93,6 @@ export class PartyService {
         const currentBalance = new BN(0); // TODO: need to get current party's total assets in base token
         const updatedPartyGain = this.partyGainRepository.create({
             partyId: party.id,
-            date: new Date(),
             fund: currentBalance,
             gain: previousGain.fund.sub(currentBalance),
         });

@@ -8,6 +8,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import BN from 'bn.js';
+import { TransformBN } from 'src/common/utils/typeorm.util';
 
 @Entity({ name: 'party_gains' })
 export class PartyGainModel implements IPartyGain {
@@ -31,4 +32,13 @@ export class PartyGainModel implements IPartyGain {
 
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
+
+    @Column({
+        type: 'bigint',
+        select: false,
+        update: false,
+        insert: false,
+        transformer: TransformBN,
+    })
+    lastFund?: BN;
 }
