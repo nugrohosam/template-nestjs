@@ -1,4 +1,5 @@
 import { config } from 'src/config';
+import { AnnouncementModel } from 'src/models/announcement.model';
 import { CurrencyModel } from 'src/models/currency.model';
 import { GeckoCoinModel } from 'src/models/gecko-coin.model';
 import { JoinRequestModel } from 'src/models/join-request.model';
@@ -35,6 +36,7 @@ export const connectionOption: ConnectionOptions = {
         ProposalDistributionModel,
         GeckoCoinModel,
         SwapTransactionModel,
+        AnnouncementModel,
     ],
     synchronize: false,
     logging: config.nodeEnv === 'local',
