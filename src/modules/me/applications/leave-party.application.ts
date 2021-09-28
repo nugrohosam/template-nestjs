@@ -97,7 +97,7 @@ export class LeavePartyApplication {
     }
 
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress, amount, cut, penalty } =
+        const { userAddress, partyAddress } =
             await this.meService.decodeLeaveEventData(logParams);
 
         let partyMember =
@@ -109,27 +109,6 @@ export class LeavePartyApplication {
         partyMember = await this.partyMemberService.update(partyMember, {
             leaveTransactionHash: logParams.result.transactionHash,
         });
-
-        // dummy signature for fill transaction data only. not depend on anything.
-        const signature = this.meService.generateWithdrawSignature(
-            partyAddress,
-            amount.toNumber(),
-        );
-        await this.transactionService.storeWithdrawTransaction(
-            userAddress,
-            partyAddress,
-            amount,
-            cut,
-            penalty,
-            signature,
-            logParams.result.transactionHash,
-        );
-
-        await this.partyCalculationService.withdraw(
-            partyAddress,
-            userAddress,
-            amount,
-        );
 
         await this.partyMemberService.delete(partyMember, true);
     }
