@@ -52,7 +52,7 @@ export class TokenService {
             tokenAddress,
         );
         const contractMethod =
-            tokenInstance.methods.name() as ContractSendMethod;
+            tokenInstance.methods.symbol() as ContractSendMethod;
         const symbol: string = await contractMethod.call();
         console.log('name token', symbol);
         const currency = this.repository.create({
