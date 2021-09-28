@@ -47,7 +47,7 @@ export class TokenService {
     }
 
     async registerToken(tokenAddress: string): Promise<CurrencyModel> {
-        const tokenInstance = await this.web3Service.getContractInstance(
+        const tokenInstance = this.web3Service.getContractInstance(
             Erc20AbiItem,
             tokenAddress,
         );
@@ -66,7 +66,7 @@ export class TokenService {
         ownerAddress: string,
         tokenAddress: string,
     ): Promise<BN> {
-        const erc20Contract = await this.web3Service.getContractInstance(
+        const erc20Contract = this.web3Service.getContractInstance(
             Erc20AbiItem,
             tokenAddress,
         );

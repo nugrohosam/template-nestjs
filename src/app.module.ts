@@ -11,7 +11,6 @@ import { MeModule } from './modules/me/me.module';
 import { PartyModule } from './modules/parties/party.module';
 import { TransactionModule } from './modules/transactions/transaction.module';
 import { UserModule } from './modules/users/user.module';
-
 @Module({
     imports: [
         TypeOrmModule.forRoot(connectionOption),
