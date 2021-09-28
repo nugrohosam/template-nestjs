@@ -177,6 +177,7 @@ export class SwapQuoteApplication {
         this.transactionService.updateTxHashStatus(log.transactionHash, true);
 
         const swapTransaction = this.swapTransactionRepository.create({
+            partyId: partyAddress.id,
             buyAmount: swapEventData.buyAmount,
             sellAmount: swapEventData.sellAmount,
             tokenFrom: swapEventData.sellTokenAddress,
