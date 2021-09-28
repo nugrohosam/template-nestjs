@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Get,
@@ -9,6 +10,7 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { config } from 'src/config';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
 import { CreatePartyApplication } from '../applications/create-party.application';
 import { IndexPartyApplication } from '../applications/index-party.application';
@@ -20,6 +22,7 @@ import { CreatePartyResponse } from '../responses/create-party.response';
 import { DetailPartyResponse } from '../responses/detail-party.response';
 import { IndexPartyResponse } from '../responses/index-party.response';
 import { GetPartyService } from '../services/get-party.service';
+import { PartyGainService } from '../services/party-gain/party-gain.service';
 
 @Controller('parties')
 export class PartyController {
@@ -28,6 +31,7 @@ export class PartyController {
         private readonly indexPartyApplication: IndexPartyApplication,
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
+        private readonly partyGainService: PartyGainService,
     ) {}
 
     @Post('/create')
@@ -96,6 +100,20 @@ export class PartyController {
         return {
             message: 'Success get party',
             data: DetailPartyResponse.mapFromPartyModel(party),
+        };
+    }
+
+    // For Manual Test
+    @Post('/party-gain-sync')
+    async partyGainSync(): Promise<IApiResponse<null>> {
+        if (config.nodeEnv == 'production' || config.nodeEnv == 'staging') {
+            throw new BadRequestException();
+        }
+        this.partyGainService.updatePartiesGain();
+
+        return {
+            message: 'Party Gain is working',
+            data: null,
         };
     }
 }

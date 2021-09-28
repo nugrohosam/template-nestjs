@@ -23,7 +23,7 @@ export class UpdateProfileService {
     async update(address: string, request: ProfileRequest): Promise<UserModel> {
         let user = await this.getUserService.getUserByAddress(address);
 
-        const message = this.generateSignatureMessage(user.id);
+        const message = this.generateSignatureMessage(user.id as string);
         // TODO: need to removed after testing
         console.log('message[update-profile]: ' + message);
         await this.web3Service.validateSignature(

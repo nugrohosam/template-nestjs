@@ -51,6 +51,9 @@ import { PartyGainController } from './controllers/party-gain.controller';
 import { WSService } from '../commons/providers/ws-service';
 import { SwapFeeService } from './services/swap/swap-fee.service';
 import { SwapTransactionModel } from 'src/models/swap-transaction.model';
+import { PartyGainService } from './services/party-gain/party-gain.service';
+import { GetTokenPriceService } from './services/token/get-token-price.service';
+import { GetTokenBalanceService } from './utils/get-token-balance.util';
 @Module({
     imports: [
         HttpModule,
@@ -130,6 +133,9 @@ import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 
         // Gain
         IndexPartyGainApplication,
+        PartyGainService,
+        GetTokenPriceService,
+        GetTokenBalanceService,
     ],
     exports: [
         GetPartyService,
