@@ -8,15 +8,19 @@ import { UserModel } from 'src/models/user.model';
 import { GeneratePlatformSignature } from 'src/modules/commons/providers/generate-platform-signature.service';
 import { GenerateSignatureMessage } from 'src/modules/commons/providers/generate-signature-message.service';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
+import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { GetPartyMemberService } from 'src/modules/parties/services/members/get-party-member.service';
+import { PartyService } from 'src/modules/parties/services/party.service';
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { TokenService } from 'src/modules/parties/services/token/token.service';
+import { ILogParams } from 'src/modules/parties/types/logData';
 import { Repository } from 'typeorm';
 import { LeavePartyRequest } from '../requests/leave.request';
 import {
     ClosePreparationResponse,
     ILeavedMember,
 } from '../responses/close-preparation.response';
+import { MeService } from '../services/me.service';
 
 export class ClosePartyApplication {
     constructor(
@@ -24,12 +28,15 @@ export class ClosePartyApplication {
         private readonly partyTokenRepository: Repository<PartyTokenModel>,
 
         private readonly getPartyMemberService: GetPartyMemberService,
+        private readonly getPartyServicce: GetPartyService,
 
         private readonly web3Service: Web3Service,
         private readonly genSignatureMessage: GenerateSignatureMessage,
         private readonly genPlatformSignature: GeneratePlatformSignature,
         private readonly tokenService: TokenService,
         private readonly swapQuoteService: SwapQuoteService,
+        private readonly meService: MeService,
+        private readonly partyService: PartyService,
     ) {}
 
     async prepare(
@@ -103,5 +110,17 @@ export class ClosePartyApplication {
             leavedMembers: result,
             platformSignature,
         };
+    }
+
+    async sync(logParams: ILogParams): Promise<void> {
+        const { partyAddress } = await this.meService.decodeCloseEventData(
+            logParams,
+        );
+
+        const party = await this.getPartyServicce.getByAddress(
+            partyAddress,
+            true,
+        );
+        await this.partyService.delete(party);
     }
 }

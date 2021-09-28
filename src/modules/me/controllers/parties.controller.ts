@@ -47,10 +47,18 @@ export class MePartiesController {
                 await this.withdrawApplication.sync(logParams);
             },
         );
+
         this.wsService.registerHandler(
             PartyContract.getEventSignature(PartyEvents.LeavePartyEvent),
             async (logParams: ILogParams) => {
                 await this.leavePartyApplication.sync(logParams);
+            },
+        );
+
+        this.wsService.registerHandler(
+            PartyContract.getEventSignature(PartyEvents.ClosePartyEvent),
+            async (logParams: ILogParams) => {
+                await this.closePartyApplication.sync(logParams);
             },
         );
     }

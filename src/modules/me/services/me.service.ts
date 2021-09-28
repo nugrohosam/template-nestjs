@@ -89,4 +89,23 @@ export class MeService {
         console.log(data);
         return data;
     }
+
+    async decodeCloseEventData({ result: log }: ILogParams): Promise<{
+        partyAddress: string;
+        ownerAddress: string;
+    }> {
+        const decodedLog = await this.web3Service.getDecodedLog(
+            log.transactionHash,
+            PartyEvents.ClosePartyEvent,
+        );
+
+        // TODO: need to test it direct through network. if fail then will change to the usual way like above.
+        const data = {
+            partyAddress: decodedLog.partyAddress,
+            ownerAddress: decodedLog.ownerAddress,
+        };
+        console.log('close party event data:');
+        console.log(data);
+        return data;
+    }
 }
