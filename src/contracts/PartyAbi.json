@@ -290,7 +290,19 @@
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "fee",
+                "name": "sent",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "cut",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "penalty",
                 "type": "uint256"
             }
         ],
@@ -383,12 +395,6 @@
                 "indexed": false,
                 "internalType": "uint256",
                 "name": "penalty",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "fee",
                 "type": "uint256"
             }
         ],
@@ -831,6 +837,11 @@
             {
                 "internalType": "uint256",
                 "name": "addressWeight",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "n",
                 "type": "uint256"
             },
             {
