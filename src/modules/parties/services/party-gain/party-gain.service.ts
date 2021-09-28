@@ -26,7 +26,6 @@ export class PartyGainService {
         const listParties = await this.partyRepository
             .createQueryBuilder('party')
             .orderBy('party.createdAt', 'DESC')
-            .limit(1)
             .getMany();
         const partyGainQuery =
             this.partyGainRepository.createQueryBuilder('partyGain');
