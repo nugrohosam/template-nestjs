@@ -1,7 +1,9 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { PartyGainModel } from 'src/models/party-gain.model';
-import { IndexPartyGainApplication } from '../applications/index-party-gain.application';
+import {
+    IndexPartyGainApplication,
+    IPartyGainCandleStickData,
+} from '../applications/index-party-gain.application';
 
 @Controller('parties/:partyId/gains')
 export class PartyGainController {
@@ -10,7 +12,7 @@ export class PartyGainController {
     @Get()
     async index(
         @Param('partyId') partyId: string,
-    ): Promise<IApiResponse<PartyGainModel[]>> {
+    ): Promise<IApiResponse<IPartyGainCandleStickData[]>> {
         const data = await this.indexApplication.fetch(partyId);
         return { message: 'Success get party gains', data };
     }

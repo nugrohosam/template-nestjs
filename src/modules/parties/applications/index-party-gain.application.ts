@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IndexApplication } from 'src/infrastructure/applications/index.application';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { Repository } from 'typeorm';
 
+export interface IPartyGainCandleStickData {
+    partyId: string;
+    dateTime: string;
+    maxFund: string;
+    minFund: string;
+    openFund: string;
+    lastFund: string;
+}
 @Injectable()
-export class IndexPartyGainApplication extends IndexApplication {
+export class IndexPartyGainApplication {
     constructor(
         @InjectRepository(PartyGainModel)
         private readonly repository: Repository<PartyGainModel>,
-    ) {
-        super();
-    }
-    async fetch(partyId: string): Promise<any> {
-        const data = await this.repository.query(
+    ) {}
+    async fetch(partyId: string): Promise<IPartyGainCandleStickData[]> {
+        const data: IPartyGainCandleStickData[] = await this.repository.query(
             `select pg.party_id partyID,
             DATE(pg.created_at) as dateTime,
             max(fund) maxFund,min(fund) minFund,
