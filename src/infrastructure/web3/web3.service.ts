@@ -4,6 +4,7 @@ import {
     UnprocessableEntityException,
 } from '@nestjs/common';
 import { config } from 'src/config';
+import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import Web3 from 'web3';
 import { Transaction, TransactionReceipt } from 'web3-core';
 import { AbiInput, AbiItem, Mixed } from 'web3-utils';
@@ -150,5 +151,36 @@ export class Web3Service {
         }
 
         return receipt.status;
+    }
+
+    /**
+     * Get decoded log event data from transaction hash
+     * based on given event name
+     * @param transactionHash
+     * @param eventName
+     */
+    async getDecodedLog(
+        transactionHash: string,
+        eventName: PartyEvents,
+    ): Promise<{ [key: string]: string } | undefined> {
+        const receipt = await this.getTransactionReceipt(transactionHash);
+
+        let decodedLog: { [key: string]: string };
+        receipt.logs.some((receiptLog) => {
+            if (
+                PartyContract.getEventSignature(eventName) ==
+                receiptLog.topics[0]
+            ) {
+                decodedLog = this.decodeTopicLog(
+                    PartyContract.getEventAbi(eventName).inputs,
+                    receiptLog.data,
+                    receiptLog.topics.slice(1),
+                );
+
+                return true;
+            }
+        });
+
+        return decodedLog;
     }
 }

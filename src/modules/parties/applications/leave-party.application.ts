@@ -10,7 +10,7 @@ import { OnchainParalelApplication } from 'src/infrastructure/applications/oncha
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { GetPartyService } from '../services/get-party.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
-import { PartyContract } from 'src/contracts/Party';
+import { PartyContract, PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class LeavePartyApplication extends OnchainParalelApplication {
@@ -46,7 +46,7 @@ export class LeavePartyApplication extends OnchainParalelApplication {
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
             user.address,
-            PartyContract.getEventAbi(PartyContract.LeavePartyEvent),
+            PartyContract.getEventAbi(PartyEvents.LeavePartyEvent),
             { 0: user.address },
         );
 

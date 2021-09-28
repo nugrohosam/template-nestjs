@@ -1,5 +1,5 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { PartyContract } from 'src/contracts/Party';
+import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import { OffchainApplication } from 'src/infrastructure/applications/offchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyModel } from 'src/models/party.model';
@@ -39,7 +39,7 @@ export class DepositApplication extends OffchainApplication {
         const transactionStatus = await this.web3Service.validateTransaction(
             request.transactionHash,
             user.address,
-            PartyContract.getEventAbi(PartyContract.DepositEvent),
+            PartyContract.getEventAbi(PartyEvents.DepositEvent),
             {
                 '0': user.address,
                 '1': party.address,
