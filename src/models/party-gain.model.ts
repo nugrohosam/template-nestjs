@@ -18,10 +18,10 @@ export class PartyGainModel implements IPartyGain {
     @Column('uuid', { name: 'party_id' })
     partyId: string;
 
-    @Column('bigint')
+    @Column('bigint', { transformer: TransformBN })
     fund: BN;
 
-    @Column('bigint')
+    @Column('bigint', { transformer: TransformBN })
     gain: BN;
 
     @CreateDateColumn({ name: 'created_at' })

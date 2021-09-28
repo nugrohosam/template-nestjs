@@ -26,6 +26,7 @@ export class PartyGainService {
         const listParties = await this.partyRepository
             .createQueryBuilder('party')
             .orderBy('party.createdAt', 'DESC')
+            .limit(1)
             .getMany();
         const partyGainQuery =
             this.partyGainRepository.createQueryBuilder('partyGain');
@@ -60,11 +61,18 @@ export class PartyGainService {
             const partyGain = partyLastGain.data?.[item.id as string];
             const lastFund = partyGain?.lastFund ?? new BN(0);
             const diff = new BN(partyTotalValue * 10 ** 6).sub(lastFund);
-            const gain = lastFund.eqn(0) ? 1 : diff.div(lastFund);
+            let gain = new BN(0);
+            if (lastFund.eqn(0) && diff.eqn(0)) {
+                gain.setn(0);
+            } else if (lastFund.eqn(0) && diff.gten(0)) {
+                gain.setn(1);
+            } else {
+                gain = diff.div(lastFund);
+            }
             const swapTransaction = this.partyGainRepository.create({
                 partyId: item.id,
                 fund: partyTotalValue,
-                gain,
+                gain: gain,
             });
             this.partyGainRepository.save(swapTransaction);
         });
