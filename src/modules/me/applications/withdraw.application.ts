@@ -75,7 +75,7 @@ export class WithdrawApplication {
                     .muln(request.percentage * config.calculation.percentageWei)
                     .divn(config.calculation.maxPercentage);
 
-                let swapResponse: ISwap0xResponse = null;
+                let swapResponse: ISwap0xResponse;
                 if (token.address !== defaultToken.address) {
                     swapResponse = (
                         await this.swapQuoteService.getQuote(
@@ -90,7 +90,7 @@ export class WithdrawApplication {
                 return {
                     tokens: {
                         ...token,
-                        balance,
+                        balance: balance.toString(),
                     } as IPartyTokenBalance,
                     swap: swapResponse,
                 };
@@ -119,8 +119,8 @@ export class WithdrawApplication {
             amount: totalWithdrawAmount.toString(),
             tokens: results.map((result) => result.tokens),
             swaps: results
-                .filter((result) => !!!result)
-                .map((result) => result.swap),
+                .map((result) => result.swap)
+                .filter((result) => result !== undefined),
             distributionPass,
             platformSignature,
         };
