@@ -633,31 +633,9 @@
                         "internalType": "uint256",
                         "name": "buyAmount",
                         "type": "uint256"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "r",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "bytes32",
-                                "name": "s",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "v",
-                                "type": "uint8"
-                            }
-                        ],
-                        "internalType": "struct Party.Sig",
-                        "name": "inputApproveRSV",
-                        "type": "tuple"
                     }
                 ],
-                "internalType": "struct Party.Swap[]",
+                "internalType": "struct Party.SwapWithoutRSV[]",
                 "name": "tokenData",
                 "type": "tuple[]"
             },
@@ -880,31 +858,9 @@
                         "internalType": "uint256",
                         "name": "buyAmount",
                         "type": "uint256"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "r",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "bytes32",
-                                "name": "s",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "v",
-                                "type": "uint8"
-                            }
-                        ],
-                        "internalType": "struct Party.Sig",
-                        "name": "inputApproveRSV",
-                        "type": "tuple"
                     }
                 ],
-                "internalType": "struct Party.Swap[]",
+                "internalType": "struct Party.SwapWithoutRSV[]",
                 "name": "tokenData",
                 "type": "tuple[]"
             },
@@ -992,31 +948,9 @@
                         "internalType": "uint256",
                         "name": "buyAmount",
                         "type": "uint256"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "r",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "bytes32",
-                                "name": "s",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "v",
-                                "type": "uint8"
-                            }
-                        ],
-                        "internalType": "struct Party.Sig",
-                        "name": "inputApproveRSV",
-                        "type": "tuple"
                     }
                 ],
-                "internalType": "struct Party.Swap[]",
+                "internalType": "struct Party.SwapWithoutRSV[]",
                 "name": "tokenData",
                 "type": "tuple[]"
             },
