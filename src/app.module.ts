@@ -11,6 +11,7 @@ import { MeModule } from './modules/me/me.module';
 import { PartyModule } from './modules/parties/party.module';
 import { TransactionModule } from './modules/transactions/transaction.module';
 import { UserModule } from './modules/users/user.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
     imports: [
         TypeOrmModule.forRoot(connectionOption),
@@ -20,6 +21,7 @@ import { UserModule } from './modules/users/user.module';
         TransactionModule,
         CommonModule,
         MeModule,
+        ScheduleModule.forRoot(),
     ],
     providers: [
         {
