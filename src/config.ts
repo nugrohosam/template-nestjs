@@ -99,4 +99,7 @@ export const config = {
          */
         platformFee: +process.env.PLATFORM_FEE || 5000,
     },
+    scheduler: {
+        partyGain: process.env.PARTY_GAIN_SCHEDULER === 'true' || true,
+    },
 };
