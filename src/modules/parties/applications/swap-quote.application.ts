@@ -5,7 +5,7 @@ import { SwapSignatureSerivce } from '../services/swap/swap-signature.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
@@ -111,11 +111,17 @@ export class SwapQuoteApplication {
             ),
         );
 
-        const quoteResponse = await this.swapQuoteService.getQuote(
-            request.buyToken,
-            request.sellToken,
-            request.sellAmount.toString(),
-        );
+        const { data: quoteResponse, err } =
+            await this.swapQuoteService.getQuote(
+                request.buyToken,
+                request.sellToken,
+                request.sellAmount.toString(),
+            );
+        if (err) {
+            throw new BadRequestException(
+                err.response.data.validationErrors[0].reason,
+            );
+        }
 
         const quote = quoteResponse.data;
         const platformSignature =

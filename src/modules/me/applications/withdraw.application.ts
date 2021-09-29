@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -77,13 +77,17 @@ export class WithdrawApplication {
 
                 let swapResponse: ISwap0xResponse;
                 if (token.address !== defaultToken.address) {
-                    swapResponse = (
-                        await this.swapQuoteService.getQuote(
-                            defaultToken.address,
-                            token.address,
-                            withdrawAmount.toString(),
-                        )
-                    ).data;
+                    const { data, err } = await this.swapQuoteService.getQuote(
+                        defaultToken.address,
+                        token.address,
+                        withdrawAmount.toString(),
+                    );
+                    if (err) {
+                        throw new BadRequestException(
+                            err.response.data.validationErrors[0].reason,
+                        );
+                    }
+                    swapResponse = data.data;
                 }
 
                 totalWithdrawAmount = totalWithdrawAmount.add(withdrawAmount);

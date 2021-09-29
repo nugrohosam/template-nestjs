@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -83,13 +83,17 @@ export class ClosePartyApplication {
 
                 let swapResponse: ISwap0xResponse = null;
                 if (token.address !== defaultToken.address) {
-                    swapResponse = (
-                        await this.swapQuoteService.getQuote(
-                            defaultToken.address,
-                            token.address,
-                            balance.toString(),
-                        )
-                    ).data;
+                    const { data, err } = await this.swapQuoteService.getQuote(
+                        defaultToken.address,
+                        token.address,
+                        balance.toString(),
+                    );
+                    if (err) {
+                        throw new BadRequestException(
+                            err.response.data.validationErrors[0].reason,
+                        );
+                    }
+                    swapResponse = data.data;
                 }
 
                 return swapResponse;
