@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { config } from 'src/config';
 import { PartyGainService } from '../services/party-gain/party-gain.service';
 
 @Injectable()
@@ -8,6 +9,9 @@ export class PartyGainSchedulerService {
     constructor(private readonly partyGainService: PartyGainService) {}
     @Cron('0 * * * * *')
     handlerTask() {
+        if (!config.scheduler.partyGain) {
+            return;
+        }
         this.logger.debug('------ PROCESSING PARTY_GAIN SERVICE');
         this.partyGainService.updatePartiesGain();
     }
