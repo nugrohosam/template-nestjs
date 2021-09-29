@@ -54,6 +54,7 @@ import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { PartyGainService } from './services/party-gain/party-gain.service';
 import { GetTokenPriceService } from './services/token/get-token-price.service';
 import { GetTokenBalanceService } from './utils/get-token-balance.util';
+import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.service';
 @Module({
     imports: [
         HttpModule,
@@ -136,6 +137,9 @@ import { GetTokenBalanceService } from './utils/get-token-balance.util';
         PartyGainService,
         GetTokenPriceService,
         GetTokenBalanceService,
+
+        //Scheduler
+        PartyGainSchedulerService,
     ],
     exports: [
         GetPartyService,
