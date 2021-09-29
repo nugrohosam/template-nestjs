@@ -38,7 +38,7 @@ export class PartyValidation {
         const party = this.partyRepository
             .createQueryBuilder('party')
             .where('id = :partyId', { partyId })
-            .andWhere('creator_id = :userId', { userId })
+            .andWhere('owner_id = :userId', { userId })
             .getOne();
 
         if (!party) throw new NotFoundException('Party not found.');
