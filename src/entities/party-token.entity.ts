@@ -1,5 +1,3 @@
-import BN from 'web3-eth-contract/node_modules/@types/bn.js';
-
 export interface IPartyToken {
     id: string;
     partyId: string;
@@ -11,5 +9,5 @@ export interface IPartyToken {
 }
 
 export interface IPartyTokenBalance extends IPartyToken {
-    balance: BN;
+    balance: string;
 }
