@@ -23,6 +23,18 @@ export interface ISwap0xResponse {
     allowanceTarget: string;
 }
 
+export interface ISwap0xError {
+    code: number;
+    reason: string;
+    validationErrors: [
+        {
+            field: string;
+            code: number;
+            reason: string;
+        },
+    ];
+}
+
 export class SwapQuoteResponse {
     data: ISwap0xResponse;
     platformSignature: string;
