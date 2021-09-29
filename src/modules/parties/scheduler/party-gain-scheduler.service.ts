@@ -7,7 +7,7 @@ import { PartyGainService } from '../services/party-gain/party-gain.service';
 export class PartyGainSchedulerService {
     private readonly logger = new Logger(PartyGainSchedulerService.name);
     constructor(private readonly partyGainService: PartyGainService) {}
-    @Cron('0 * * * * *')
+    @Cron('0 0 * * * *')
     handlerTask() {
         if (!config.scheduler.partyGain) {
             return;
