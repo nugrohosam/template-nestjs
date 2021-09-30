@@ -161,6 +161,12 @@ export class SwapQuoteApplication {
                 return true;
             }
         });
+
+        // TODO: need to remove this after debuging
+        console.log('=========== SWAP QUOTE EVENT DATA ===========');
+        console.log(decodedLog);
+        console.log('=============================================');
+
         const address = log.address;
         const swapEventData = {
             sellTokenAddress: decodedLog[0],
