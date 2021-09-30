@@ -60,6 +60,7 @@ export class SwapQuoteApplication {
         const transaction = await this.getTransactionService.getByTx(
             request.transactionHash,
             TransactionTypeEnum.Swap,
+            false,
         );
         if (transaction) {
             return 'Transaction has been created before';
