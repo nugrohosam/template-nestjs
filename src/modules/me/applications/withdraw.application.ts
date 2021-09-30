@@ -90,7 +90,9 @@ export class WithdrawApplication {
                     swapResponse = data.data;
                 }
 
-                totalWithdrawAmount = totalWithdrawAmount.add(withdrawAmount);
+                totalWithdrawAmount = totalWithdrawAmount.add(
+                    new BN(swapResponse?.buyAmount ?? 0),
+                );
                 return {
                     tokens: {
                         ...token,
