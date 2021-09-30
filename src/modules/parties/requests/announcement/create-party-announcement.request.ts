@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { IAnnouncement } from 'src/entities/announcement.entity';
 
@@ -19,4 +20,9 @@ export class CreateAnnouncementRequest implements IAnnouncement {
     @IsOptional()
     @IsString()
     link?: string;
+
+    @IsOptional()
+    @IsString()
+    @Expose({ name: 'image_url' })
+    imageUrl: string;
 }

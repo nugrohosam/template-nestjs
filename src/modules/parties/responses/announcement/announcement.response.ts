@@ -10,6 +10,7 @@ export class AnnouncementResponse
     title: string;
     body: string;
     link?: string;
+    imageUrl?: string;
 
     static mapFromAnnouncementModel(
         model: AnnouncementModel,
@@ -19,6 +20,7 @@ export class AnnouncementResponse
             title: model.title,
             body: model.body,
             link: model.link,
+            imageUrl: model.imageUrl,
             party: model.party
                 ? IndexPartyResponse.mapFromPartyModel(model.party)
                 : null,
