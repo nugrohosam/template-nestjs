@@ -17,6 +17,7 @@ import { ILogParams } from 'src/modules/parties/types/logData';
 import { MeService } from '../services/me.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
+import { Utils } from 'src/common/utils/util';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -87,6 +88,16 @@ export class LeavePartyApplication {
             }),
         );
 
+        const nextDistribution = Utils.dateOfNearestDay(
+            new Date(),
+            party.distributionDate
+                ? new Date(party.distributionDate).getDay()
+                : 1,
+        );
+        const distributionPass = Math.ceil(
+            Utils.diffInDays(nextDistribution, new Date()),
+        );
+
         const platformSignature =
             await this.partyMemberService.generateLeavePlatformSignature(
                 user.address,
@@ -96,6 +107,7 @@ export class LeavePartyApplication {
         return {
             weight: weight.toString(),
             swap: results.filter((result) => result !== null),
+            distributionPass,
             platformSignature: platformSignature,
         };
     }
