@@ -11,20 +11,30 @@ export class GetTransactionService {
         private readonly repository: Repository<TransactionModel>,
     ) {}
 
-    async getById(id: string): Promise<TransactionModel> {
+    async getById(id: string, isRequired = true): Promise<TransactionModel> {
         const transaction = await this.repository.findOne({ where: { id } });
-        if (!transaction) throw new NotFoundException('Transation not found');
+
+        if (isRequired)
+            if (!transaction)
+                throw new NotFoundException('Transation not found');
+
         return transaction;
     }
+
     async getByTx(
         transactionHash: string,
         type?: TransactionTypeEnum,
+        isRequired = true,
     ): Promise<TransactionModel> {
         const typeWhere = type ? { type } : {};
         const transaction = await this.repository.findOne({
             where: { transactionHash, ...typeWhere },
         });
-        if (!transaction) throw new NotFoundException('Transation not found');
+
+        if (isRequired)
+            if (!transaction)
+                throw new NotFoundException('Transation not found');
+
         return transaction;
     }
 }
