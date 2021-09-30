@@ -1,4 +1,8 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+    Injectable,
+    NotFoundException,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
@@ -28,6 +32,18 @@ export class PartyValidation {
             throw new UnprocessableEntityException(
                 `Party with name ${partyName} already exists. Please choose different name.`,
             );
+    }
+
+    async getOwnedParty(partyId: string, userId?: string): Promise<PartyModel> {
+        const party = this.partyRepository
+            .createQueryBuilder('party')
+            .where('id = :partyId', { partyId })
+            .andWhere('owner_id = :userId', { userId })
+            .getOne();
+
+        if (!party) throw new NotFoundException('Party not found.');
+
+        return party;
     }
 
     async validateAddressNotExists(address: string): Promise<void> {
