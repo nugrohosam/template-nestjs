@@ -5,7 +5,7 @@ export class WithdrawPreparationResponse {
     weight: string;
     amount: string;
     tokens: PartyTokenResponse[];
-    swaps: ISwap0xResponse[];
+    swap: ISwap0xResponse[];
     distributionPass: number;
     platformSignature: string;
 }

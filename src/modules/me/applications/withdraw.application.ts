@@ -124,7 +124,7 @@ export class WithdrawApplication {
             weight: weight.toString(),
             amount: totalWithdrawAmount.toString(),
             tokens: results.map((result) => result.tokens),
-            swaps: results
+            swap: results
                 .map((result) => result.swap)
                 .filter((result) => result !== undefined),
             distributionPass,
