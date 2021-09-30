@@ -8,7 +8,7 @@ import {
     Headers,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { WSService } from 'src/modules/commons/providers/ws-service';
+import { WSService } from 'src/modules/commons/providers/websocket.service';
 import { SwapQuoteApplication } from '../applications/swap-quote.application';
 import { SwapQuoteRequest } from '../requests/swap-quote.request';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';

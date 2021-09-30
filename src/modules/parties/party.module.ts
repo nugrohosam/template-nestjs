@@ -48,7 +48,7 @@ import { PartyTokenController } from './controllers/party-token.controller';
 import { IndexPartyTokenApplication } from './applications/index-party-token.application';
 import { IndexPartyGainApplication } from './applications/index-party-gain.application';
 import { PartyGainController } from './controllers/party-gain.controller';
-import { WSService } from '../commons/providers/ws-service';
+import { WSService } from '../commons/providers/websocket.service';
 import { SwapFeeService } from './services/swap/swap-fee.service';
 import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { PartyGainService } from './services/party-gain/party-gain.service';

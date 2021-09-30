@@ -10,7 +10,7 @@ import {
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
-import { WSService } from 'src/modules/commons/providers/ws-service';
+import { WSService } from 'src/modules/commons/providers/websocket.service';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { ILogParams } from 'src/modules/parties/types/logData';

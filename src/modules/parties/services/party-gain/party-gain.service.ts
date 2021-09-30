@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { BN } from 'bn.js';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyModel } from 'src/models/party.model';
-import { Connection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { GetTokenPriceService } from '../token/get-token-price.service';
 
 type MapPartyGain = Record<string, PartyGainModel>;
@@ -18,11 +18,9 @@ export class PartyGainService {
         private readonly partyRepository: Repository<PartyModel>,
         @InjectRepository(PartyGainModel)
         private readonly partyGainRepository: Repository<PartyGainModel>,
-        @InjectConnection()
-        private connection: Connection,
     ) {}
 
-    async updatePartiesGain() {
+    async updatePartiesGain(): Promise<void> {
         const listParties = await this.partyRepository
             .createQueryBuilder('party')
             .orderBy('party.createdAt', 'DESC')
