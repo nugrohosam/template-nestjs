@@ -31,6 +31,11 @@ export class CreateAnnounementTable1632797792334 implements MigrationInterface {
                         isNullable: true,
                     },
                     {
+                        name: 'image_url',
+                        type: 'text',
+                        isNullable: true,
+                    },
+                    {
                         name: 'created_at',
                         type: 'timestamp',
                         default: 'current_timestamp()',

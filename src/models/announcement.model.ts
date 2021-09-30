@@ -26,6 +26,9 @@ export class AnnouncementModel implements IAnnouncement {
     @Column('varchar', { nullable: true })
     link?: string;
 
+    @Column('varchar', { nullable: true, name: 'image_url' })
+    imageUrl?: string;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
