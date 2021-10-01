@@ -75,10 +75,7 @@ export class WebsocketService {
         });
         this.ws.on('close', (code: number, reason: string): void => {
             Logger.warn(`Closed: ${reason} (${code})`, 'WebSocket');
-            Sentry.captureMessage(
-                `Websocket closed with number ${code}. Reason: ${reason}`,
-            );
-            Logger.log(`Closed: Restarting Service`, 'WebSocket');
+            Logger.log('Reinit server', 'WebSocket');
             this.init();
         });
         this.ws.on('pong', (data: Buffer) => {
@@ -110,6 +107,7 @@ export class WebsocketService {
                 params: ['logs', { topics: [key] }],
             });
         });
+        this.ping();
     }
 
     @Cron(config.scheduler.wsPingCron)
@@ -118,5 +116,12 @@ export class WebsocketService {
         const message = `${topics.length} topics registered. current state is ${this.ws.readyState}`;
         Logger.log(`Ping: ${message}`, 'WebSocket');
         this.ws.ping(message);
+    }
+
+    @Cron(config.scheduler.wsInitCron)
+    refresh(): void {
+        if (this.ws.readyState === 1) {
+            this.ws.close(4001, 'Refreshing connection');
+        }
     }
 }
