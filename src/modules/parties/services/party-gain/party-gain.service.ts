@@ -68,6 +68,8 @@ export class PartyGainService {
         const partyGainQuery =
             this.partyGainRepository.createQueryBuilder('partyGain');
         const listPartyGain = await partyGainQuery
+            .select('SUM(fund)', 'DATE(created_at)')
+            .where('party_id = :partyId', { partyId: party.id })
             .groupBy('DATE(created_at)')
             .limit(7)
             .getMany();
