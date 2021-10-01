@@ -19,6 +19,7 @@ import { Utils } from 'src/common/utils/util';
 import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PartyGainService } from '../services/party-gain/party-gain.service';
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
@@ -32,6 +33,7 @@ export class SwapQuoteApplication {
         private readonly transactionService: TransactionService,
         private readonly getTransactionService: GetTransactionService,
         private readonly partyService: PartyService,
+        private readonly partyGainService: PartyGainService,
     ) {}
 
     @Transactional()
@@ -169,7 +171,7 @@ export class SwapQuoteApplication {
             sellAmount: decodedLog[5],
             buyAmount: decodedLog[6],
         };
-        const partyAddress = await this.getPartyService.getByAddress(address);
+        const party = await this.getPartyService.getByAddress(address);
         let token = await this.tokenService.getByAddress(
             swapEventData.buyTokenAddress,
         );
@@ -178,12 +180,12 @@ export class SwapQuoteApplication {
                 swapEventData.buyTokenAddress,
             );
         }
-        this.partyService.storeToken(partyAddress, token);
+        this.partyService.storeToken(party, token);
         // Update transaction status to success
         this.transactionService.updateTxHashStatus(log.transactionHash, true);
 
         const swapTransaction = this.swapTransactionRepository.create({
-            partyId: partyAddress.id,
+            partyId: party.id,
             buyAmount: swapEventData.buyAmount,
             sellAmount: swapEventData.sellAmount,
             tokenFrom: swapEventData.sellTokenAddress,
@@ -191,6 +193,7 @@ export class SwapQuoteApplication {
             transactionHash: log.transactionHash,
         });
         this.swapTransactionRepository.save(swapTransaction);
+        this.partyGainService.updatePartyGain(party);
         // Process sync data, save new token value to party token
     }
 }
