@@ -60,6 +60,7 @@ export class PartyGainService {
                 gain: gain,
             });
             this.partyGainRepository.save(swapTransaction);
+            this.updatePartyGain(item);
         });
     }
 
