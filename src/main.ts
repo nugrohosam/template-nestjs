@@ -6,6 +6,7 @@ import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,
 } from 'typeorm-transactional-cls-hooked';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
     // Sentry
@@ -24,6 +25,6 @@ async function bootstrap() {
     app.enableCors();
     const port: string = config.port;
     await app.listen(port);
-    console.log(`-------- SERVER IS RUNNING AT PORT ${port} --------`);
+    Logger.log(`Application running on port ${port}`, 'NestApplication');
 }
 bootstrap();

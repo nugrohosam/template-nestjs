@@ -48,17 +48,20 @@ import { PartyTokenController } from './controllers/party-token.controller';
 import { IndexPartyTokenApplication } from './applications/index-party-token.application';
 import { IndexPartyGainApplication } from './applications/index-party-gain.application';
 import { PartyGainController } from './controllers/party-gain.controller';
-import { WSService } from '../commons/providers/ws-service';
 import { SwapFeeService } from './services/swap/swap-fee.service';
 import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { PartyGainService } from './services/party-gain/party-gain.service';
 import { GetTokenPriceService } from './services/token/get-token-price.service';
 import { GetTokenBalanceService } from './utils/get-token-balance.util';
 import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.service';
+import { PartyAnnouncementController } from './controllers/party-announcement.controller';
+import { AnnouncementService } from './services/announcements/announcement.service';
+import { CreatePartyAnnouncementApplication } from './applications/create-party-announcement';
+import { AnnouncementModel } from 'src/models/announcement.model';
+import { IndexPartyAnnouncementApplication } from './applications/index-party-announcement.application';
 @Module({
     imports: [
         HttpModule,
-        WSService,
         Web3Module,
         UserModule,
         TransactionModule,
@@ -74,6 +77,7 @@ import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.serv
             PartyTokenModel,
             PartyGainModel,
             SwapTransactionModel,
+            AnnouncementModel,
         ]),
     ],
     controllers: [
@@ -85,6 +89,7 @@ import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.serv
         JoinRequestController,
         PartyTokenController,
         PartyGainController,
+        PartyAnnouncementController,
     ],
     providers: [
         // Party Porviders
@@ -140,6 +145,10 @@ import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.serv
 
         //Scheduler
         PartyGainSchedulerService,
+        // Announcement
+        AnnouncementService,
+        CreatePartyAnnouncementApplication,
+        IndexPartyAnnouncementApplication,
     ],
     exports: [
         GetPartyService,
@@ -151,6 +160,8 @@ import { PartyGainSchedulerService } from './scheduler/party-gain-scheduler.serv
         TokenService,
         SwapQuoteService,
         SwapSignatureSerivce,
+
+        SwapQuoteApplication,
     ],
 })
 export class PartyModule {}

@@ -62,6 +62,7 @@ export class SwapQuoteApplication {
         const transaction = await this.getTransactionService.getByTx(
             request.transactionHash,
             TransactionTypeEnum.Swap,
+            false,
         );
         if (transaction) {
             return 'Transaction has been created before';
@@ -142,7 +143,7 @@ export class SwapQuoteApplication {
         };
     }
 
-    async buySync(data: ILogParams) {
+    async buySync(data: ILogParams): Promise<void> {
         const log = data.result;
         const receipt = await this.web3Service.getTransactionReceipt(
             log.transactionHash,
@@ -163,6 +164,7 @@ export class SwapQuoteApplication {
                 return true;
             }
         });
+
         const address = log.address;
         const swapEventData = {
             sellTokenAddress: decodedLog[0],
@@ -180,9 +182,12 @@ export class SwapQuoteApplication {
                 swapEventData.buyTokenAddress,
             );
         }
-        this.partyService.storeToken(party, token);
+        await this.partyService.storeToken(party, token);
         // Update transaction status to success
-        this.transactionService.updateTxHashStatus(log.transactionHash, true);
+        await this.transactionService.updateTxHashStatus(
+            log.transactionHash,
+            true,
+        );
 
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,
@@ -192,8 +197,8 @@ export class SwapQuoteApplication {
             tokenTarget: swapEventData.buyTokenAddress,
             transactionHash: log.transactionHash,
         });
-        this.swapTransactionRepository.save(swapTransaction);
-        this.partyGainService.updatePartyGain(party);
+        await this.swapTransactionRepository.save(swapTransaction);
+        await this.partyGainService.updatePartyGain(party);
         // Process sync data, save new token value to party token
     }
 }

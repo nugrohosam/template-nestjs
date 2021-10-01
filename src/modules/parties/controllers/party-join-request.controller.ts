@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { IndexRequest } from 'src/common/request/index.request';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { IndexPartyJoinRequestApplication } from '../applications/index-party-join-request.application';
 import { RequestJoinPartyApplication } from '../applications/request-join-party.application';
 import { UpdateJoinRequestStatusApplication } from '../applications/update-join-request-status.application';
+import { IndexJoinRequestRequest } from '../requests/join-request/index-join-request.request';
 import { JoinRequestRequest } from '../requests/join-request/join-request.request';
 import { UpdateStatusJoinRequestRequest } from '../requests/join-request/update-status-join-request.request';
 import { JoinRequestResponse } from '../responses/join-request/join-request.response';
@@ -48,7 +48,7 @@ export class PartyJoinRequestController {
     @Get()
     async index(
         @Param('partyId') partyId: string,
-        @Query() query: IndexRequest,
+        @Query() query: IndexJoinRequestRequest,
     ): Promise<IApiResponse<JoinRequestResponse[]>> {
         const { data, meta } =
             await this.indexPartyJoinRequestApplication.fetch(partyId, query);
