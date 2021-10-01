@@ -9,7 +9,6 @@ import { GeckoCoinService } from './providers/gecko-coin.service';
 import { GeneratePlatformSignature } from './providers/generate-platform-signature.service';
 import { GenerateSignatureMessage } from './providers/generate-signature-message.service';
 import { GetSignerService } from './providers/get-signer.service';
-import { WSService } from './providers/websocket.service';
 
 @Module({
     imports: [
@@ -19,14 +18,12 @@ import { WSService } from './providers/websocket.service';
     controllers: [UploadController, GeckoCoinController],
     providers: [
         GetSignerService,
-        WSService,
         GeckoCoinService,
         GeneratePlatformSignature,
         GenerateSignatureMessage,
     ],
     exports: [
         GetSignerService,
-        WSService,
         GeckoCoinService,
         GeneratePlatformSignature,
         GenerateSignatureMessage,

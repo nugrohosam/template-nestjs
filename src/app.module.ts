@@ -12,6 +12,7 @@ import { PartyModule } from './modules/parties/party.module';
 import { TransactionModule } from './modules/transactions/transaction.module';
 import { UserModule } from './modules/users/user.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { WebsocketModule } from './infrastructure/websocket/websocket.module';
 @Module({
     imports: [
         TypeOrmModule.forRoot(connectionOption),
@@ -21,6 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         TransactionModule,
         CommonModule,
         MeModule,
+        WebsocketModule,
         ScheduleModule.forRoot(),
     ],
     providers: [
