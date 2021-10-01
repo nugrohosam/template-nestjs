@@ -23,6 +23,10 @@ import web3 from 'web3';
 import { SwapTransactionModel } from './swap-transaction.model';
 import { AnnouncementModel } from './announcement.model';
 
+export enum GainPeriod {
+    Per7Days = 'per7Days',
+}
+
 @Entity({ name: 'parties' })
 export class PartyModel implements IParty {
     @PrimaryGeneratedColumn('uuid')
@@ -90,6 +94,9 @@ export class PartyModel implements IParty {
 
     @Column('date', { name: 'distribution_date' })
     distributionDate: Date;
+
+    @Column('json')
+    gain: Record<GainPeriod, number>;
 
     @Column('varchar')
     signature: string;
@@ -179,4 +186,13 @@ export class PartyModel implements IParty {
         },
     })
     totalMember?: number;
+
+    @Column({
+        type: 'bigint',
+        select: false,
+        update: false,
+        insert: false,
+        transformer: TransformBN,
+    })
+    lastFund?: BN;
 }

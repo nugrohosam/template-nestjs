@@ -5,11 +5,6 @@ import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
 import { GetTokenPriceService } from '../token/get-token-price.service';
-
-type MapPartyGain = Record<string, PartyGainModel>;
-interface IPartyLastGain {
-    data?: MapPartyGain;
-}
 @Injectable()
 export class PartyGainService {
     constructor(
@@ -20,51 +15,44 @@ export class PartyGainService {
         private readonly partyGainRepository: Repository<PartyGainModel>,
     ) {}
 
-    async updatePartiesGain(): Promise<void> {
-        const listParties = await this.partyRepository
-            .createQueryBuilder('party')
-            .orderBy('party.createdAt', 'DESC')
-            .getMany();
-        const partyGainQuery =
-            this.partyGainRepository.createQueryBuilder('partyGain');
+    // Update Parties Gain, stored at party_gains table
+    // Historical Data
+    async updatePartiesGain() {
+        const listPartiesQuery =
+            this.partyRepository.createQueryBuilder('party');
 
-        const lastFund = partyGainQuery
+        const lastFund = listPartiesQuery
             .subQuery()
             .select('fund')
             .from(PartyGainModel, 'partyGainLastFund')
-            .where('partyGainLastFund.party_id = partyGain.party_id')
+            .where('partyGainLastFund.party_id = party.id')
             .orderBy('partyGainLastFund.created_at', 'DESC')
             .limit(1)
             .getSql();
 
-        partyGainQuery.addSelect(
+        listPartiesQuery.addSelect(
             `COALESCE(${lastFund},0)`,
             'partyGain_lastFund',
         );
-        const listPartyGain = await partyGainQuery.getMany();
+        const listParties = await listPartiesQuery
+            .orderBy('party.createdAt', 'DESC')
+            .getMany();
 
-        const partyLastGain: IPartyLastGain = { data: undefined };
-        listPartyGain.forEach((item) => {
-            if (!partyLastGain.data) {
-                partyLastGain.data = {};
-            }
-            partyLastGain.data[item.id] = item;
-        });
         listParties.forEach(async (item) => {
             const partyTotalValue =
                 await this.getTokenPriceService.getPartyTokenValue(item);
 
             // get party last gain
-            const partyGain = partyLastGain.data?.[item.id as string];
-            const lastFund = partyGain?.lastFund ?? new BN(0);
+            const lastFund = item?.lastFund ?? new BN(0);
             const diff = new BN(partyTotalValue * 10 ** 6).sub(lastFund);
-            let gain = new BN(0);
+            let gain = 0;
             if (lastFund.eqn(0) && diff.eqn(0)) {
-                gain.setn(0);
+                gain = 0;
             } else if (lastFund.eqn(0) && diff.gten(0)) {
-                gain.setn(1);
+                gain = 1;
             } else {
-                gain = diff.div(lastFund);
+                gain =
+                    parseInt(diff.toString()) / parseInt(lastFund.toString());
             }
             const swapTransaction = this.partyGainRepository.create({
                 partyId: item.id,
@@ -72,6 +60,26 @@ export class PartyGainService {
                 gain: gain,
             });
             this.partyGainRepository.save(swapTransaction);
+            this.updatePartyGain(item);
         });
+    }
+
+    async updatePartyGain(party: PartyModel) {
+        const partyGainQuery =
+            this.partyGainRepository.createQueryBuilder('partyGain');
+        const listPartyGain = await partyGainQuery
+            .select('SUM(fund)', 'DATE(created_at)')
+            .where('party_id = :partyId', { partyId: party.id })
+            .groupBy('DATE(created_at)')
+            .limit(7)
+            .getMany();
+        let totalGain = 0;
+        listPartyGain.forEach((item) => {
+            totalGain += item.gain;
+        });
+        party.gain = {
+            per7Days: parseInt(totalGain.toString()),
+        };
+        this.partyRepository.save(party);
     }
 }

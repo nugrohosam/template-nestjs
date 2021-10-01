@@ -58,7 +58,7 @@ import { PartyAnnouncementController } from './controllers/party-announcement.co
 import { AnnouncementService } from './services/announcements/announcement.service';
 import { CreatePartyAnnouncementApplication } from './applications/create-party-announcement';
 import { AnnouncementModel } from 'src/models/announcement.model';
-import { IndexPartyAnnouncementApplication } from './applications/index-party-announcement.application ';
+import { IndexPartyAnnouncementApplication } from './applications/index-party-announcement.application';
 @Module({
     imports: [
         HttpModule,
