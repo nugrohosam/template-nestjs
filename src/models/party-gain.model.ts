@@ -21,8 +21,8 @@ export class PartyGainModel implements IPartyGain {
     @Column('bigint', { transformer: TransformBN })
     fund: BN;
 
-    @Column('bigint', { transformer: TransformBN })
-    gain: BN;
+    @Column('double')
+    gain: number;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;

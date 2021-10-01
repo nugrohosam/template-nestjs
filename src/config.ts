@@ -86,7 +86,7 @@ export const config = {
          * 0.01%   = 0.0001   = 100
          * 0.0001% = 0.000001 = 1
          */
-        percentageWei: +process.env.MAX_FEE_PERCENTAGE || 10000,
+        percentageWei: +process.env.MAX_FEE_PERCENTAGE / 100 || 10000,
 
         /**
          * 100% in percentageWei based on percentageWei value

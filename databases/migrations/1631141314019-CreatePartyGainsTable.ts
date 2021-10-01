@@ -16,7 +16,7 @@ export class CreatePartyGainsTable1631141314019 implements MigrationInterface {
                     { name: 'party_id', type: 'varchar(36)' },
                     { name: 'date', type: 'date' },
                     { name: 'fund', type: 'bigint', default: 0 },
-                    { name: 'gain', type: 'bigint', default: 0 },
+                    { name: 'gain', type: 'double', default: 0 },
                     {
                         name: 'created_at',
                         type: 'timestamp',
