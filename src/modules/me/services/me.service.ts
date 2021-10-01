@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import BN from 'bn.js';
 import { PartyEvents } from 'src/contracts/Party';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
@@ -60,8 +60,8 @@ export class MeService {
             cut: new BN(decodedLog[3]),
             penalty: new BN(decodedLog[4]),
         };
-        console.log('withdraw event data:');
-        console.log(data);
+
+        Logger.debug(data, 'WithdrawEventData');
         return data;
     }
 
@@ -85,8 +85,8 @@ export class MeService {
             cut: new BN(decodedLog.cut),
             penalty: new BN(decodedLog.penalty),
         };
-        console.log('leave party event data:');
-        console.log(data);
+
+        Logger.debug(data, 'LeaveEventData');
         return data;
     }
 
@@ -104,8 +104,8 @@ export class MeService {
             partyAddress: decodedLog.partyAddress,
             ownerAddress: decodedLog.ownerAddress,
         };
-        console.log('close party event data:');
-        console.log(data);
+
+        Logger.debug(data, 'CloseEventData');
         return data;
     }
 }

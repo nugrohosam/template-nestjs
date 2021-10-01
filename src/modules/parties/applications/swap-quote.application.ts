@@ -5,7 +5,7 @@ import { SwapSignatureSerivce } from '../services/swap/swap-signature.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
@@ -163,11 +163,6 @@ export class SwapQuoteApplication {
             }
         });
 
-        // TODO: need to remove this after debuging
-        console.log('=========== SWAP QUOTE EVENT DATA ===========');
-        console.log(decodedLog);
-        console.log('=============================================');
-
         const address = log.address;
         const swapEventData = {
             sellTokenAddress: decodedLog[0],
@@ -176,6 +171,8 @@ export class SwapQuoteApplication {
             sellAmount: decodedLog[5],
             buyAmount: decodedLog[6],
         };
+        Logger.debug(swapEventData, 'SwapEventData');
+
         const partyAddress = await this.getPartyService.getByAddress(address);
         let token = await this.tokenService.getByAddress(
             swapEventData.buyTokenAddress,

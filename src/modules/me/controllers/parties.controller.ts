@@ -8,12 +8,9 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
-import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
-import { WSService } from 'src/modules/commons/providers/websocket.service';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
-import { ILogParams } from 'src/modules/parties/types/logData';
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
 import { ClosePartyApplication } from '../applications/close-party.application';
 import { DepositApplication } from '../applications/deposit.application';
@@ -39,29 +36,7 @@ export class MePartiesController {
 
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
-        private readonly wsService: WSService,
-    ) {
-        this.wsService.registerHandler(
-            PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
-            async (logParams: ILogParams) => {
-                await this.withdrawApplication.sync(logParams);
-            },
-        );
-
-        this.wsService.registerHandler(
-            PartyContract.getEventSignature(PartyEvents.LeavePartyEvent),
-            async (logParams: ILogParams) => {
-                await this.leavePartyApplication.sync(logParams);
-            },
-        );
-
-        this.wsService.registerHandler(
-            PartyContract.getEventSignature(PartyEvents.ClosePartyEvent),
-            async (logParams: ILogParams) => {
-                await this.closePartyApplication.sync(logParams);
-            },
-        );
-    }
+    ) {}
 
     @Get()
     async index(

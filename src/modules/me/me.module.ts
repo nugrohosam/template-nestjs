@@ -32,5 +32,10 @@ import { MeService } from './services/me.service';
 
         MeService,
     ],
+    exports: [
+        WithdrawApplication,
+        LeavePartyApplication,
+        ClosePartyApplication,
+    ],
 })
 export class MeModule {}
