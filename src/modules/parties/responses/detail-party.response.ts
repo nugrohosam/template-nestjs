@@ -22,6 +22,7 @@ export class DetailPartyResponse
     minDeposit: string;
     maxDeposit: string;
     totalDeposit: string;
+    totalFund: string;
     totalMember: number;
     distribution: DistributionTypeEnum;
     distributionDay: number;
@@ -52,6 +53,7 @@ export class DetailPartyResponse
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
             totalDeposit: party.totalDeposit.toString(),
+            totalFund: party.totalFund.toString(),
             totalMember: party.totalMember,
             distribution: party.distribution,
             distributionDay: party.distributionDate
