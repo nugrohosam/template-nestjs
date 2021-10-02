@@ -78,6 +78,7 @@ export const config = {
      * used for every calucation on application
      */
     calculation: {
+        usdDecimal: 100,
         /**
          * percentage wei is used for fixed percentage value until 2 precision
          * ex: 10 ** 4 or 10000

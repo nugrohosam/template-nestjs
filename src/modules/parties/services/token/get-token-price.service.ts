@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { Repository } from 'typeorm';
 import { GetTokenBalanceService } from '../../utils/get-token-balance.util';
+import { BN } from 'bn.js';
 
 export interface IFetchMarketsParams {
     vs_currency: string;
@@ -82,7 +83,13 @@ export class GetTokenPriceService {
             .toPromise();
     }
 
-    async getPartyTokenValue(party: PartyModel): Promise<number> {
+    async getPartyTokenValue(
+        party: PartyModel,
+        currency: { name: string; decimal: number } = {
+            name: 'usd',
+            decimal: config.calculation.usdDecimal,
+        },
+    ): Promise<string> {
         const partyTokens = await this.partyTokenRepository
             .createQueryBuilder('partyToken')
             .where('party_id = :partyId', { partyId: party.id })
@@ -92,20 +99,13 @@ export class GetTokenPriceService {
             return item.symbol;
         });
         if (!tokensSymbol.length) {
-            return 0;
+            return '0';
         }
         const coins = await this.geckoCoinService.getGeckoCoins(tokensSymbol);
-        if (!coins.length) return 0;
+        if (!coins.length) return '0';
         const ids = coins.map((coin) => coin.id).join(',');
-        console.log('tes', {
-            vs_currency: 'usd',
-            ids: ids,
-            page: 1,
-            per_page: 100,
-            price_change_percentage: '1h,24h,7d',
-        });
         const marketValue = await this.getMarketValue({
-            vs_currency: 'usd',
+            vs_currency: currency.name,
             ids: ids,
             page: 1,
             per_page: 100,
@@ -133,20 +133,22 @@ export class GetTokenPriceService {
         await Promise.all(promiseToken);
         // ---- normalizing data -----
         // -----------------------------
-        let totalFund = 0;
+        const totalFund = new BN(0);
         // iterate all coin from party which fetch before to calculate total value
         marketValue.data.forEach((item) => {
             const tokenValue = this.getTokenBalanceIn(
                 partyToken,
                 item.symbol,
-                item.current_price,
+                item.current_price * currency.decimal,
             );
-            totalFund += tokenValue;
+            totalFund.addn(tokenValue);
         });
-        return totalFund;
+        return totalFund.toString(); // big int detail 4 exponent
     }
 
-    // getTokenBalanceIn, get total value in fromWei format
+    // getTokenBalanceIn, get total value in ether value
+    // for example using usd currency
+    // 1 usd equal 100
     getTokenBalanceIn = (
         partyTokenBalance: ITokenBalanceParty,
         symbol: string,
