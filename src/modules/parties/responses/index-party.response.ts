@@ -17,6 +17,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     maxDeposit: string;
     totalMember: number;
     totalDeposit: string;
+    totalFund: string;
     distribution: DistributionTypeEnum;
     distributionDay: number;
     gain: Record<GainPeriod, number>;
@@ -37,6 +38,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
             totalDeposit: party.totalDeposit.toString(),
+            totalFund: party.totalFund.toString(),
             totalMember: party.totalMember,
             distribution: party.distribution,
             distributionDay: party.distributionDate
