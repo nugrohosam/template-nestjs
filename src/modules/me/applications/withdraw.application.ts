@@ -19,8 +19,6 @@ import { BN } from 'bn.js';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { config } from 'src/config';
-import { WS } from 'src/infrastructure/websocket/websocket.service';
-import { PartyContract, PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class WithdrawApplication {
@@ -123,14 +121,6 @@ export class WithdrawApplication {
                 totalWithdrawAmount,
                 distributionPass,
             );
-
-        WS.initWebSocketInstance(
-            party.address,
-            PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
-            async (logParams: ILogParams) => {
-                await this.sync(logParams);
-            },
-        );
 
         return {
             weight: weight.toString(),

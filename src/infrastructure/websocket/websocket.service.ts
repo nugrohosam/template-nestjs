@@ -8,14 +8,14 @@ interface IWebSocketInstance {
     address: string;
     topic: string;
     handler: (arg0: any) => Promise<void>;
+    timeout?: NodeJS.Timeout;
 }
 
 class WebSocketService {
-    private instances: IWebSocketInstance[];
-    private readonly PingInterval = 60000;
+    private instances: Record<string, IWebSocketInstance>;
 
     constructor() {
-        this.instances = [];
+        this.instances = {};
     }
 
     initWebSocketInstance(
@@ -23,22 +23,25 @@ class WebSocketService {
         topic: string,
         handler: (arg: any) => Promise<void>,
     ): void {
-        const instance = {
+        if (this.instances[`${address}_${topic}`]) {
+            if (this.instances[`${address}_${topic}`].timeout) {
+                clearTimeout(this.instances[`${address}_${topic}`].timeout);
+            }
+            return;
+        }
+
+        const instance: IWebSocketInstance = {
             ws: new WebSocket(config.web3.websocketProvider),
             address,
             topic,
             handler,
         };
+
         this.initWebSocketEvent(instance);
-        this.instances.push(instance);
     }
 
-    private initWebSocketEvent({
-        ws,
-        address,
-        topic,
-        handler,
-    }: IWebSocketInstance): void {
+    private initWebSocketEvent(instance: IWebSocketInstance): void {
+        const { ws, address, topic, handler } = instance;
         ws.on('open', () => {
             ws.send(
                 JSON.stringify({
@@ -50,10 +53,6 @@ class WebSocketService {
             );
             Logger.log(`Instance created`, 'WebSocket');
             Logger.log({ address, topic }, 'WebSocket');
-            setTimeout(
-                () => this.ping({ ws, address, topic, handler }),
-                this.PingInterval,
-            );
         });
 
         ws.on('message', (message) => {
@@ -67,7 +66,7 @@ class WebSocketService {
                         Sentry.captureMessage(err);
                     })
                     .finally(() => {
-                        ws.close();
+                        instance.timeout = setTimeout(() => ws.close(), 30000);
                     });
             }
         });
@@ -83,21 +82,11 @@ class WebSocketService {
                 `Server close on ${address} <- ${topic} - ${reason} (${code})`,
                 'WebSocket',
             );
+            delete this.instances[`${address}_${topic}`];
+            Logger.warn(`Instance ${address} <- ${topic} deleted`, 'WebSocket');
         });
 
-        ws.on('pong', (message) => {
-            Logger.log(message, 'WebSocket');
-        });
-    }
-
-    private ping({ ws, address, topic, handler }: IWebSocketInstance): void {
-        const message = `Ping ${address} <- ${topic}`;
-        ws.ping(message);
-        Logger.log(message, 'WebSocket');
-        setTimeout(
-            () => this.ping({ ws, address, topic, handler }),
-            this.PingInterval,
-        );
+        this.instances[`${address}_${topic}`] = instance;
     }
 }
 
