@@ -8,9 +8,12 @@ import {
     Query,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
+import { PartyContract, PartyEvents } from 'src/contracts/Party';
+import { WS } from 'src/infrastructure/websocket/websocket.service';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
+import { ILogParams } from 'src/modules/parties/types/logData';
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
 import { ClosePartyApplication } from '../applications/close-party.application';
 import { DepositApplication } from '../applications/deposit.application';
@@ -97,6 +100,14 @@ export class MePartiesController {
             request,
         );
 
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
+            async (logParams: ILogParams) => {
+                await this.withdrawApplication.sync(logParams);
+            },
+        );
+
         return {
             message: 'Success get withdraw preparation data',
             data: withdrawPreparation,
@@ -111,11 +122,21 @@ export class MePartiesController {
     ): Promise<IApiResponse<LeavePreparationResponse>> {
         const user = await this.getSignerService.get(signature);
         const party = await this.getPartyService.getById(partyId);
+
         const leavePreparation = await this.leavePartyApplication.prepare(
             user,
             party,
             request,
         );
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.LeavePartyEvent),
+            async (logParams: ILogParams) => {
+                await this.leavePartyApplication.sync(logParams);
+            },
+        );
+
         return {
             message: 'Success get leave prepareation data',
             data: leavePreparation,
@@ -136,6 +157,15 @@ export class MePartiesController {
             party,
             request,
         );
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.ClosePartyEvent),
+            async (logParams: ILogParams) => {
+                await this.closePartyApplication.sync(logParams);
+            },
+        );
+
         return {
             message: 'Success get close preparation data',
             data: result,
