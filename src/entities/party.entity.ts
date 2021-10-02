@@ -19,6 +19,7 @@ export interface IParty {
     isPublic: boolean;
     isFeatured?: boolean;
     totalDeposit?: string | BN;
+    totalFund?: string | BN;
     minDeposit?: string | BN;
     maxDeposit?: string | BN;
     distribution: DistributionTypeEnum;

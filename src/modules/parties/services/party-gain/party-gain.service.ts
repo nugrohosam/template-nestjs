@@ -44,7 +44,7 @@ export class PartyGainService {
 
             // get party last gain
             const lastFund = item?.lastFund ?? new BN(0);
-            const diff = new BN(partyTotalValue * 10 ** 6).sub(lastFund);
+            const diff = new BN(partyTotalValue).sub(lastFund);
             let gain = 0;
             if (lastFund.eqn(0) && diff.eqn(0)) {
                 gain = 0;
@@ -58,6 +58,10 @@ export class PartyGainService {
                 partyId: item.id,
                 fund: partyTotalValue,
                 gain: gain,
+            });
+            this.partyRepository.save({
+                ...item,
+                totalFund: partyTotalValue,
             });
             this.partyGainRepository.save(swapTransaction);
             this.updatePartyGain(item);

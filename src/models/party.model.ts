@@ -85,6 +85,13 @@ export class PartyModel implements IParty {
     })
     totalDeposit?: BN;
 
+    @Column('bigint', {
+        name: 'total_fund',
+        nullable: true,
+        transformer: TransformBN,
+    })
+    totalFund?: BN;
+
     @Column('enum', { enum: DistributionTypeEnum })
     distribution: DistributionTypeEnum;
 

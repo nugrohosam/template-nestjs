@@ -20,6 +20,7 @@ import { SwapTransactionModel } from 'src/models/swap-transaction.model';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartyGainService } from '../services/party-gain/party-gain.service';
+import { PartyFundService } from '../services/party-fund/party-fund.service';
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
@@ -34,6 +35,7 @@ export class SwapQuoteApplication {
         private readonly getTransactionService: GetTransactionService,
         private readonly partyService: PartyService,
         private readonly partyGainService: PartyGainService,
+        private readonly partyFundService: PartyFundService,
     ) {}
 
     @Transactional()
@@ -182,12 +184,9 @@ export class SwapQuoteApplication {
                 swapEventData.buyTokenAddress,
             );
         }
-        await this.partyService.storeToken(party, token);
+        this.partyService.storeToken(party, token);
         // Update transaction status to success
-        await this.transactionService.updateTxHashStatus(
-            log.transactionHash,
-            true,
-        );
+        this.transactionService.updateTxHashStatus(log.transactionHash, true);
 
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,
@@ -197,8 +196,8 @@ export class SwapQuoteApplication {
             tokenTarget: swapEventData.buyTokenAddress,
             transactionHash: log.transactionHash,
         });
-        await this.swapTransactionRepository.save(swapTransaction);
-        await this.partyGainService.updatePartyGain(party);
-        // Process sync data, save new token value to party token
+        this.swapTransactionRepository.save(swapTransaction);
+        this.partyGainService.updatePartyGain(party);
+        this.partyFundService.updatePartyFund(party);
     }
 }

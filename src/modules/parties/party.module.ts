@@ -59,6 +59,7 @@ import { AnnouncementService } from './services/announcements/announcement.servi
 import { CreatePartyAnnouncementApplication } from './applications/create-party-announcement';
 import { AnnouncementModel } from 'src/models/announcement.model';
 import { IndexPartyAnnouncementApplication } from './applications/index-party-announcement.application';
+import { PartyFundService } from './services/party-fund/party-fund.service';
 @Module({
     imports: [
         HttpModule,
@@ -142,6 +143,9 @@ import { IndexPartyAnnouncementApplication } from './applications/index-party-an
         PartyGainService,
         GetTokenPriceService,
         GetTokenBalanceService,
+
+        // Fnd
+        PartyFundService,
 
         //Scheduler
         PartyGainSchedulerService,
