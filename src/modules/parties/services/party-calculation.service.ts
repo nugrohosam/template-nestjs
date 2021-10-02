@@ -11,6 +11,7 @@ import { TokenService } from './token/token.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { PartyMemberService } from './members/party-member.service';
+import { PartyFundService } from './party-fund/party-fund.service';
 
 @Injectable()
 export class PartyCalculationService {
@@ -26,6 +27,7 @@ export class PartyCalculationService {
         private readonly partyService: PartyService,
         private readonly partyMemberService: PartyMemberService,
         private readonly tokenService: TokenService,
+        private readonly partyFundService: PartyFundService,
     ) {}
 
     async updatePartyTotalFund(
@@ -69,6 +71,7 @@ export class PartyCalculationService {
         await this.updatePartyMemberTotalFund(partyMember, amount);
         await this.updatePartyMembersWeight(party);
         await this.partyService.storeToken(party, token);
+        await this.partyFundService.updatePartyFund(party);
     }
 
     async withdraw(
@@ -89,5 +92,6 @@ export class PartyCalculationService {
         await this.updatePartyTotalFund(party, withdrawAmount);
         await this.updatePartyMemberTotalFund(partyMember, withdrawAmount);
         await this.updatePartyMembersWeight(party);
+        await this.partyFundService.updatePartyFund(party);
     }
 }
