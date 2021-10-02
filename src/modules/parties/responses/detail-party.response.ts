@@ -3,7 +3,7 @@ import {
     DistributionTypeEnum,
 } from 'src/common/enums/party.enum';
 import { Utils } from 'src/common/utils/util';
-import { IParty } from 'src/entities/party.entity';
+import { GainPeriod, IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 import { UserModel } from 'src/models/user.model';
 
@@ -25,6 +25,7 @@ export class DetailPartyResponse
     totalMember: number;
     distribution: DistributionTypeEnum;
     distributionDay: number;
+    gain: Record<GainPeriod, number>;
     nextDistribution: Date;
     creator: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;
     owner: Pick<UserModel, 'id' | 'firstname' | 'lastname' | 'imageUrl'>;
@@ -56,6 +57,7 @@ export class DetailPartyResponse
             distributionDay: party.distributionDate
                 ? new Date(party.distributionDate).getDay()
                 : 1,
+            gain: party.gain,
             nextDistribution: Utils.dateOfNearestDay(
                 new Date(),
                 party.distributionDate
