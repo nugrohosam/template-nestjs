@@ -11,7 +11,7 @@ import { BigIntMin } from 'src/common/rules/big-int-min.rule';
 import { IParty } from 'src/entities/party.entity';
 
 export class CreatePartyRequest
-    implements Omit<IParty, 'creatorId' | 'ownerId'>
+    implements Omit<IParty, 'creatorId' | 'ownerId' | 'gain'>
 {
     @IsNotEmpty()
     name: string;

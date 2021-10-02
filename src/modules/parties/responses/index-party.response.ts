@@ -3,7 +3,7 @@ import {
     DistributionTypeEnum,
 } from 'src/common/enums/party.enum';
 import { Utils } from 'src/common/utils/util';
-import { IParty } from 'src/entities/party.entity';
+import { GainPeriod, IParty } from 'src/entities/party.entity';
 import { PartyModel } from 'src/models/party.model';
 
 export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
@@ -19,6 +19,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     totalDeposit: string;
     distribution: DistributionTypeEnum;
     distributionDay: number;
+    gain: Record<GainPeriod, number>;
     ownerId: string;
     createdAt: Date;
     isActive: boolean;
@@ -41,6 +42,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             distributionDay: party.distributionDate
                 ? new Date(party.distributionDate).getDay()
                 : 1,
+            gain: party.gain,
             nextDistribution: Utils.dateOfNearestDay(
                 new Date(),
                 party.distributionDate

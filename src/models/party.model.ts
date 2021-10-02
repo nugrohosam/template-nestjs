@@ -4,7 +4,7 @@ import {
     JoinRequestStatusEnum,
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
-import { IParty } from 'src/entities/party.entity';
+import { GainPeriod, IParty } from 'src/entities/party.entity';
 import {
     Column,
     CreateDateColumn,
@@ -22,10 +22,6 @@ import { TransformBN } from 'src/common/utils/typeorm.util';
 import web3 from 'web3';
 import { SwapTransactionModel } from './swap-transaction.model';
 import { AnnouncementModel } from './announcement.model';
-
-export enum GainPeriod {
-    Per7Days = 'per7Days',
-}
 
 @Entity({ name: 'parties' })
 export class PartyModel implements IParty {
