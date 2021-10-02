@@ -4,6 +4,9 @@ import {
     PartyTypeEnum,
 } from 'src/common/enums/party.enum';
 
+export enum GainPeriod {
+    Per7Days = 'per7Days',
+}
 export interface IParty {
     id?: string;
     address?: string;
@@ -21,6 +24,7 @@ export interface IParty {
     maxDeposit?: string | BN;
     distribution: DistributionTypeEnum;
     distributionDate?: Date;
+    gain: Record<GainPeriod, number>;
     signature?: string;
     transactionHash?: string;
     createdAt?: Date;

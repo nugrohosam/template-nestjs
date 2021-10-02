@@ -1,127 +1,105 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Logger } from '@nestjs/common';
 import { config } from 'src/config';
 import WebSocket from 'ws';
 import * as Sentry from '@sentry/node';
-import { PartyContract, PartyEvents } from 'src/contracts/Party';
-import { WithdrawApplication } from 'src/modules/me/applications/withdraw.application';
-import { ILogParams } from 'src/modules/parties/types/logData';
-import { SwapQuoteApplication } from 'src/modules/parties/applications/swap-quote.application';
-import { ClosePartyApplication } from 'src/modules/me/applications/close-party.application';
-import { LeavePartyApplication } from 'src/modules/me/applications/leave-party.application';
 
-@Injectable()
-export class WebsocketService {
-    // wss://echo.websocket.org is a test websocket server
-    private ws: WebSocket;
-    private listEventHandler: Record<string, (arg0: any) => Promise<void>> = {};
+interface IWebSocketInstance {
+    ws: WebSocket;
+    address: string;
+    topic: string;
+    handler: (arg0: any) => Promise<void>;
+}
 
-    constructor(
-        private readonly swapApplication: SwapQuoteApplication,
-        private readonly withdrawApplication: WithdrawApplication,
-        private readonly leaveApplication: LeavePartyApplication,
-        private readonly closeApplication: ClosePartyApplication,
-    ) {
-        this.registerHandler(
-            PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
-            async (logParams: ILogParams) => {
-                await this.swapApplication.buySync(logParams);
-            },
-        );
+class WebSocketService {
+    private instances: IWebSocketInstance[];
+    private readonly PingInterval = 60000;
 
-        this.registerHandler(
-            PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
-            async (logParams: ILogParams) => {
-                await this.withdrawApplication.sync(logParams);
-            },
-        );
-
-        this.registerHandler(
-            PartyContract.getEventSignature(PartyEvents.LeavePartyEvent),
-            async (logParams: ILogParams) => {
-                await this.leaveApplication.sync(logParams);
-            },
-        );
-
-        this.registerHandler(
-            PartyContract.getEventSignature(PartyEvents.ClosePartyEvent),
-            async (logParams: ILogParams) => {
-                await this.closeApplication.sync(logParams);
-            },
-        );
-
-        this.init();
+    constructor() {
+        this.instances = [];
     }
 
-    registerHandler(
+    initWebSocketInstance(
+        address: string,
         topic: string,
-        handler: (arg0: any) => Promise<void>,
+        handler: (arg: any) => Promise<void>,
     ): void {
-        this.listEventHandler[topic] = handler;
+        const instance = {
+            ws: new WebSocket(config.web3.websocketProvider),
+            address,
+            topic,
+            handler,
+        };
+        this.initWebSocketEvent(instance);
+        this.instances.push(instance);
     }
 
-    init(): void {
-        this.ws = new WebSocket(config.web3.websocketProvider);
-
-        this.ws.on('message', (message) => {
-            this.onMessage(message);
+    private initWebSocketEvent({
+        ws,
+        address,
+        topic,
+        handler,
+    }: IWebSocketInstance): void {
+        ws.on('open', () => {
+            ws.send(
+                JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 1,
+                    method: 'eth_subscribe',
+                    params: ['logs', { address, topics: [topic] }],
+                }),
+            );
+            Logger.log(`Instance created`, 'WebSocket');
+            Logger.log({ address, topic }, 'WebSocket');
+            setTimeout(
+                () => this.ping({ ws, address, topic, handler }),
+                this.PingInterval,
+            );
         });
-        this.ws.on('error', (err) => {
+
+        ws.on('message', (message) => {
+            const obj = JSON.parse(message.toString());
+            if (obj.params) {
+                Logger.log(`Handling message on ${address} <- ${topic}`);
+                Logger.log(obj.params, 'WebSocket');
+                handler(obj.params)
+                    .catch((err) => {
+                        Logger.error(err);
+                        Sentry.captureMessage(err);
+                    })
+                    .finally(() => {
+                        ws.close();
+                    });
+            }
+        });
+
+        ws.on('error', (err) => {
+            Logger.warn(`Got an error on ${address} <- ${topic}`, 'WebSocket');
             Logger.error(err.message, err.stack, 'WebSocket');
             Sentry.captureException(err);
         });
-        this.ws.on('open', () => {
-            this.sendHandlers();
-        });
-        this.ws.on('close', (code: number, reason: string): void => {
-            Logger.warn(`Closed: ${reason} (${code})`, 'WebSocket');
-            Logger.log('Reinit server', 'WebSocket');
-            this.init();
-        });
-        this.ws.on('pong', (data: Buffer) => {
-            Logger.log('Pong: ' + data.toString(), 'WebSocket');
-        });
-    }
 
-    async onMessage(message: WebSocket.Data): Promise<void> {
-        const obj = JSON.parse(message.toString());
-        if (obj.params) {
-            await this.listEventHandler[obj.params.result.topics[0]](
-                obj.params,
+        ws.on('close', (code: number, reason: string): void => {
+            Logger.warn(
+                `Server close on ${address} <- ${topic} - ${reason} (${code})`,
+                'WebSocket',
             );
-        }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    send(data: Object): void {
-        this.ws.send(JSON.stringify(data));
-    }
-
-    sendHandlers(): void {
-        Object.keys(this.listEventHandler).forEach((key) => {
-            Logger.log(`Register Topic: ${key}`, 'WebSocket');
-            this.send({
-                jsonrpc: '2.0',
-                id: 1,
-                method: 'eth_subscribe',
-                params: ['logs', { topics: [key] }],
-            });
         });
-        this.ping();
+
+        ws.on('pong', (message) => {
+            Logger.log(message, 'WebSocket');
+        });
     }
 
-    @Cron(config.scheduler.wsPingCron)
-    ping(): void {
-        const topics = Object.keys(this.listEventHandler);
-        const message = `${topics.length} topics registered. current state is ${this.ws.readyState}`;
-        Logger.log(`Ping: ${message}`, 'WebSocket');
-        this.ws.ping(message);
-    }
-
-    @Cron(config.scheduler.wsInitCron)
-    refresh(): void {
-        if (this.ws.readyState === 1) {
-            this.ws.close(4001, 'Refreshing connection');
-        }
+    private ping({ ws, address, topic, handler }: IWebSocketInstance): void {
+        const message = `Ping ${address} <- ${topic}`;
+        ws.ping(message);
+        Logger.log(message, 'WebSocket');
+        setTimeout(
+            () => this.ping({ ws, address, topic, handler }),
+            this.PingInterval,
+        );
     }
 }
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const WS = new WebSocketService();

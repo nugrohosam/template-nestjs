@@ -103,7 +103,5 @@ export const config = {
 
     scheduler: {
         partyGain: process.env.PARTY_GAIN_SCHEDULER === 'true' || true,
-        wsInitCron: process.env.INIT_WEBSOCKET_CRON || '0 0,30 * * * *',
-        wsPingCron: process.env.INFURA_WEBSOCKET_PING_CRON || '0 */30 * * * *',
     },
 };
