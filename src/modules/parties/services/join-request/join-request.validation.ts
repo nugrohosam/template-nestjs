@@ -38,7 +38,7 @@ export class JoinRequestValidation {
             .createQueryBuilder('joinRequests')
             .where('user_id = :userId', { userId: user.id })
             .andWhere('party_id = :partyId', { partyId: party.id })
-            .andWhere('rejected_at IS NULL')
+            .andWhere('rejected_at is NULL')
             .getCount();
 
         if (joinRequestCount > 0)
