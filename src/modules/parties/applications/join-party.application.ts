@@ -86,7 +86,6 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         if (request.joinPartySignature !== partyMember.signature)
             throw new UnauthorizedException('Signature not valid');
 
-        // will ignore below process when party member already have success transaction hash
         if (partyMember.transactionHash) {
             const existingTransactionHash =
                 await this.web3Service.getTransactionReceipt(
@@ -95,14 +94,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             if (existingTransactionHash.status) return;
         }
 
-        const transactionStatus = await this.web3Service.validateTransaction(
-            request.transactionHash,
-            member.address,
-            PartyContract.getEventAbi(PartyEvents.JoinEvent),
-            { 2: partyMember.id },
-        );
-        // will ignore below process when transaction still false
-        if (!transactionStatus) return;
+        const txh = this.web3Service.getTransaction(request.transactionHash);
+        if (!txh) return partyMember;
 
         const transaction =
             await this.transactionService.storeDepositTransaction(
@@ -117,11 +110,22 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             depositTransactionId: transaction.id,
         });
 
+        const receipt = this.web3Service.getTransactionReceipt(
+            request.transactionHash,
+        );
+        if (!receipt) return partyMember;
+
+        await this.web3Service.validateTransaction(
+            request.transactionHash,
+            member.address,
+            PartyContract.getEventAbi(PartyEvents.JoinEvent),
+            { 2: partyMember.id },
+        );
+
         await this.partyCalculationService.deposit(
             partyMember,
             transaction.amount,
         );
-
         return partyMember;
     }
 
