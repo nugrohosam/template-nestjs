@@ -38,9 +38,16 @@ export class PartyGainService {
             .orderBy('party.createdAt', 'DESC')
             .getMany();
 
+        const marketValue = await this.getTokenPriceService.getAllMarketValue();
         listParties.forEach(async (item) => {
+            if (!item.address) {
+                return;
+            }
             const partyTotalValue =
-                await this.getTokenPriceService.getPartyTokenValue(item);
+                await this.getTokenPriceService.getPartyTokenValue(
+                    item,
+                    marketValue,
+                );
 
             // get party last gain
             const lastFund = item?.lastFund ?? new BN(0);
