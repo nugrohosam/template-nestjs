@@ -133,7 +133,7 @@ export class GetTokenPriceService {
         await Promise.all(promiseToken);
         // ---- normalizing data -----
         // -----------------------------
-        const totalFund = new BN(0);
+        let totalFund = new BN(0);
         // iterate all coin from party which fetch before to calculate total value
         marketValue.data.forEach((item) => {
             const tokenValue = this.getTokenBalanceIn(
@@ -141,7 +141,7 @@ export class GetTokenPriceService {
                 item.symbol,
                 item.current_price * currency.decimal,
             );
-            totalFund.addn(tokenValue);
+            totalFund = totalFund.addn(tokenValue);
         });
         return totalFund.toString(); // big int detail 4 exponent
     }
