@@ -81,7 +81,7 @@ export class TransactionService {
         amount: BN,
         cut: BN,
         penalty: BN,
-        signature: string,
+        signature: string | null,
         transactionHash: string,
     ): Promise<TransactionModel> {
         const baseToken = await this.tokenService.getDefaultToken();

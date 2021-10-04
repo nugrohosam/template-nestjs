@@ -37,7 +37,7 @@ export class TransactionModel implements ITransaction {
     description?: string;
 
     @Column('varchar')
-    signature: string;
+    signature?: string;
 
     @Column('varchar', { name: 'transaction_hash' })
     transactionHash: string;
