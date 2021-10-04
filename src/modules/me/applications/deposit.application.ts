@@ -41,9 +41,9 @@ export class DepositApplication extends OffchainApplication {
             user.address,
             PartyContract.getEventAbi(PartyEvents.DepositEvent),
             {
-                '0': user.address,
-                '1': party.address,
-                '2': request.amount.toString(),
+                0: user.address,
+                1: party.address,
+                2: request.amount.toString(),
             },
         );
         if (!transactionStatus)
