@@ -9,6 +9,7 @@ import { PartyTokenModel } from 'src/models/party-token.model';
 import { Repository } from 'typeorm';
 import { GetTokenBalanceService } from '../../utils/get-token-balance.util';
 import { BN } from 'bn.js';
+import { CurrencyModel } from 'src/models/currency.model';
 
 export interface IFetchMarketsParams {
     vs_currency: string;
@@ -26,6 +27,9 @@ export interface ITokenBalanceParty {
         balance: string;
         decimal: string;
     };
+}
+export interface IMarketValue {
+    [key: string]: IFetchMarketsResp;
 }
 
 export interface IFetchMarketsResp {
@@ -71,9 +75,11 @@ export class GetTokenPriceService {
         @InjectRepository(PartyTokenModel)
         private readonly partyTokenRepository: Repository<PartyTokenModel>,
         private readonly getTokenBalanceService: GetTokenBalanceService,
+        @InjectRepository(CurrencyModel)
+        private readonly currencyRepository: Repository<CurrencyModel>,
     ) {}
 
-    async getMarketValue(
+    async fetchMarketValue(
         params: IFetchMarketsParams,
     ): Promise<AxiosResponse<IFetchMarketsResp[]>> {
         return this.httpService
@@ -83,13 +89,55 @@ export class GetTokenPriceService {
             .toPromise();
     }
 
+    async getAllMarketValue(): Promise<IMarketValue | undefined> {
+        const listTokenParties = await this.currencyRepository
+            .createQueryBuilder('currency')
+            .getMany();
+        const listSymbol = listTokenParties.map((item) => item.symbol);
+        const marketValue = await this.getMarketValue(listSymbol);
+        if (!marketValue) throw new Error('Gecko Market value fetch error');
+        return marketValue;
+    }
+
+    async getMarketValue(
+        tokensSymbol: string[],
+        currency: { name: string; decimal: number } = {
+            name: 'usd',
+            decimal: config.calculation.usdDecimal,
+        },
+    ): Promise<IMarketValue | undefined> {
+        const coins = await this.geckoCoinService.getGeckoCoins(tokensSymbol);
+        if (!coins.length) return undefined;
+        const ids = coins.map((coin) => coin.id).join(',');
+        const marketValueResp: AxiosResponse<IFetchMarketsResp[]> =
+            await this.fetchMarketValue({
+                vs_currency: currency.name,
+                ids: ids,
+                page: 1,
+                per_page: 100,
+                price_change_percentage: '1h,24h,7d',
+            }).catch((error: AxiosError) => {
+                console.log('fetch gecko market', error);
+                return undefined;
+            });
+        const marketValue = {};
+        marketValueResp.data.forEach((item) => {
+            marketValue[item.symbol.toLowerCase()] = item;
+        });
+        return marketValue;
+    }
+
     async getPartyTokenValue(
         party: PartyModel,
+        marketValue: IMarketValue,
         currency: { name: string; decimal: number } = {
             name: 'usd',
             decimal: config.calculation.usdDecimal,
         },
     ): Promise<string> {
+        if (!party.address) {
+            return '0';
+        }
         const partyTokens = await this.partyTokenRepository
             .createQueryBuilder('partyToken')
             .where('party_id = :partyId', { partyId: party.id })
@@ -101,21 +149,6 @@ export class GetTokenPriceService {
         if (!tokensSymbol.length) {
             return '0';
         }
-        const coins = await this.geckoCoinService.getGeckoCoins(tokensSymbol);
-        if (!coins.length) return '0';
-        const ids = coins.map((coin) => coin.id).join(',');
-        const marketValue = await this.getMarketValue({
-            vs_currency: currency.name,
-            ids: ids,
-            page: 1,
-            per_page: 100,
-            price_change_percentage: '1h,24h,7d',
-        }).catch((err: AxiosError) => {
-            console.log(err.response);
-        });
-        if (!marketValue) {
-            return;
-        }
         const partyToken: ITokenBalanceParty = {};
         // set contract token data to token balance party
         const promiseToken = partyTokens.map(async (item) => {
@@ -123,7 +156,7 @@ export class GetTokenPriceService {
                 await this.getTokenBalanceService.getTokenBalance(
                     item.address,
                     item.symbol,
-                    party.address as string,
+                    party.address,
                 );
             return (partyToken[tokenBalance.name] = {
                 balance: tokenBalance.balance,
@@ -135,11 +168,11 @@ export class GetTokenPriceService {
         // -----------------------------
         let totalFund = new BN(0);
         // iterate all coin from party which fetch before to calculate total value
-        marketValue.data.forEach((item) => {
+        partyTokens.forEach((item) => {
             const tokenValue = this.getTokenBalanceIn(
                 partyToken,
                 item.symbol,
-                item.current_price * currency.decimal,
+                marketValue[item.symbol].current_price * currency.decimal,
             );
             totalFund = totalFund.addn(tokenValue);
         });
