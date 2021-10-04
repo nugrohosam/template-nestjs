@@ -64,6 +64,7 @@ class WebSocketService {
                     .catch((err) => {
                         Logger.error(err);
                         Sentry.captureMessage(err);
+                        this.deleteInstance(address, topic);
                     })
                     .finally(() => {
                         instance.timeout = setTimeout(() => ws.close(), 30000);
@@ -75,6 +76,7 @@ class WebSocketService {
             Logger.warn(`Got an error on ${address} <- ${topic}`, 'WebSocket');
             Logger.error(err.message, err.stack, 'WebSocket');
             Sentry.captureException(err);
+            this.deleteInstance(address, topic);
         });
 
         ws.on('close', (code: number, reason: string): void => {
@@ -82,11 +84,15 @@ class WebSocketService {
                 `Server close on ${address} <- ${topic} - ${reason} (${code})`,
                 'WebSocket',
             );
-            delete this.instances[`${address}_${topic}`];
-            Logger.warn(`Instance ${address} <- ${topic} deleted`, 'WebSocket');
+            this.deleteInstance(address, topic);
         });
 
         this.instances[`${address}_${topic}`] = instance;
+    }
+
+    deleteInstance(address: string, topic: string): void {
+        delete this.instances[`${address}_${topic}`];
+        Logger.warn(`Instance ${address} <- ${topic} deleted`, 'WebSocket');
     }
 
     startLogger(interval: number): void {
