@@ -144,7 +144,10 @@ export class Web3Service {
 
         for (const inputIndex in validations) {
             const identifier = decodedLog[inputIndex.toString()];
-            if (identifier !== validations[inputIndex])
+            if (
+                identifier.toLowerCase() !==
+                validations[inputIndex].toLowerCase()
+            )
                 throw new UnprocessableEntityException(
                     'Transaction not belongs to validator',
                 );
