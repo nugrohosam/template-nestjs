@@ -17,6 +17,8 @@ import { ILogParams } from 'src/modules/parties/types/logData';
 import { MeService } from '../services/me.service';
 import { Utils } from 'src/common/utils/util';
 import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
+import { TransactionService } from 'src/modules/transactions/services/transaction.service';
+import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -32,6 +34,8 @@ export class LeavePartyApplication {
         private readonly swapQuoteService: SwapQuoteService,
         private readonly meService: MeService,
         private readonly joinRequestService: JoinRequestService,
+        private readonly transactionService: TransactionService,
+        private readonly partyCalculationService: PartyCalculationService,
     ) {}
 
     async prepare(
@@ -111,7 +115,7 @@ export class LeavePartyApplication {
     }
 
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress } =
+        const { userAddress, partyAddress, amount, cut, penalty } =
             await this.meService.decodeLeaveEventData(logParams);
 
         let partyMember =
@@ -119,6 +123,22 @@ export class LeavePartyApplication {
                 userAddress,
                 partyAddress,
             );
+
+        await this.transactionService.storeWithdrawTransaction(
+            userAddress,
+            partyAddress,
+            amount,
+            cut,
+            penalty,
+            null,
+            logParams.result.transactionHash,
+        );
+
+        await this.partyCalculationService.withdraw(
+            partyAddress,
+            userAddress,
+            amount,
+        );
 
         partyMember = await this.partyMemberService.update(partyMember, {
             leaveTransactionHash: logParams.result.transactionHash,

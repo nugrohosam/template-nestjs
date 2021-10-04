@@ -11,6 +11,7 @@ import { IApiResponse } from 'src/common/interface/response.interface';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import { WS } from 'src/infrastructure/websocket/websocket.service';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
+import { SwapQuoteApplication } from 'src/modules/parties/applications/swap-quote.application';
 import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.response';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { ILogParams } from 'src/modules/parties/types/logData';
@@ -36,6 +37,7 @@ export class MePartiesController {
         private readonly withdrawApplication: WithdrawApplication,
         private readonly leavePartyApplication: LeavePartyApplication,
         private readonly closePartyApplication: ClosePartyApplication,
+        private readonly swapApplication: SwapQuoteApplication,
 
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
@@ -102,6 +104,14 @@ export class MePartiesController {
 
         WS.initWebSocketInstance(
             party.address,
+            PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
+            async (logParams: ILogParams) => {
+                await this.swapApplication.buySync(logParams);
+            },
+        );
+
+        WS.initWebSocketInstance(
+            party.address,
             PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
             async (logParams: ILogParams) => {
                 await this.withdrawApplication.sync(logParams);
@@ -131,6 +141,14 @@ export class MePartiesController {
 
         WS.initWebSocketInstance(
             party.address,
+            PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
+            async (logParams: ILogParams) => {
+                await this.swapApplication.buySync(logParams);
+            },
+        );
+
+        WS.initWebSocketInstance(
+            party.address,
             PartyContract.getEventSignature(PartyEvents.LeavePartyEvent),
             async (logParams: ILogParams) => {
                 await this.leavePartyApplication.sync(logParams);
@@ -156,6 +174,22 @@ export class MePartiesController {
             user,
             party,
             request,
+        );
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
+            async (logParams: ILogParams) => {
+                await this.swapApplication.buySync(logParams);
+            },
+        );
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.LeavePartyEvent),
+            async (logParams: ILogParams) => {
+                await this.leavePartyApplication.sync(logParams);
+            },
         );
 
         WS.initWebSocketInstance(

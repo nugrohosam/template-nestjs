@@ -138,18 +138,13 @@ export class WithdrawApplication {
         const { userAddress, partyAddress, amount, cut, penalty } =
             await this.meService.decodeWithdrawEventData(logParams);
 
-        // dummy signature for fill transaction data only. not depend on anything.
-        const signature = this.meService.generateWithdrawSignature(
-            partyAddress,
-            amount.toNumber(),
-        );
         await this.transactionService.storeWithdrawTransaction(
             userAddress,
             partyAddress,
             amount,
             cut,
             penalty,
-            signature,
+            null,
             logParams.result.transactionHash,
         );
 

@@ -35,7 +35,7 @@ export class CreateTransactionsTable1630570654030
                         ],
                     },
                     { name: 'description', type: 'text', isNullable: true },
-                    { name: 'signature', type: 'varchar' },
+                    { name: 'signature', type: 'varchar', isNullable: true },
                     {
                         name: 'transaction_hash',
                         type: 'varchar',
