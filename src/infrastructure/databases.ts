@@ -3,6 +3,7 @@ import { AnnouncementModel } from 'src/models/announcement.model';
 import { CurrencyModel } from 'src/models/currency.model';
 import { GeckoCoinModel } from 'src/models/gecko-coin.model';
 import { JoinRequestModel } from 'src/models/join-request.model';
+import { LandingPageContentModel } from 'src/models/landing-page-content.model';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -37,6 +38,7 @@ export const connectionOption: ConnectionOptions = {
         GeckoCoinModel,
         SwapTransactionModel,
         AnnouncementModel,
+        LandingPageContentModel,
     ],
     synchronize: false,
     logging: config.nodeEnv === 'local',
