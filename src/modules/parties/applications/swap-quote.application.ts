@@ -184,9 +184,7 @@ export class SwapQuoteApplication {
                 swapEventData.buyTokenAddress,
             );
         }
-        this.partyService.storeToken(party, token);
-        // Update transaction status to success
-        this.transactionService.updateTxHashStatus(log.transactionHash, true);
+        await this.partyService.storeToken(party, token);
 
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,
@@ -196,8 +194,15 @@ export class SwapQuoteApplication {
             tokenTarget: swapEventData.buyTokenAddress,
             transactionHash: log.transactionHash,
         });
-        this.swapTransactionRepository.save(swapTransaction);
-        this.partyGainService.updatePartyGain(party);
-        this.partyFundService.updatePartyFund(party);
+
+        await Promise.all([
+            this.transactionService.updateTxHashStatus(
+                log.transactionHash,
+                true,
+            ),
+            this.swapTransactionRepository.save(swapTransaction),
+            this.partyGainService.updatePartyGain(party),
+            this.partyFundService.updatePartyFund(party),
+        ]);
     }
 }
