@@ -19,6 +19,7 @@ import { BN } from 'bn.js';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { config } from 'src/config';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class WithdrawApplication {
@@ -134,6 +135,7 @@ export class WithdrawApplication {
         };
     }
 
+    @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
         const { userAddress, partyAddress, amount, cut, penalty } =
             await this.meService.decodeWithdrawEventData(logParams);
