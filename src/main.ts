@@ -7,6 +7,7 @@ import {
     patchTypeORMRepositoryWithBaseRepository,
 } from 'typeorm-transactional-cls-hooked';
 import { Logger } from '@nestjs/common';
+import { WS } from './infrastructure/websocket/websocket.service';
 
 async function bootstrap() {
     // Sentry
@@ -26,5 +27,6 @@ async function bootstrap() {
     const port: string = config.port;
     await app.listen(port);
     Logger.log(`Application running on port ${port}`, 'NestApplication');
+    WS.startLogger(300000);
 }
 bootstrap();

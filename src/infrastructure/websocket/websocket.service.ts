@@ -12,12 +12,10 @@ interface IWebSocketInstance {
 }
 
 class WebSocketService {
-    private readonly loggerInterval = 300000;
     private instances: Record<string, IWebSocketInstance>;
 
     constructor() {
         this.instances = {};
-        this.logger();
     }
 
     initWebSocketInstance(
@@ -91,12 +89,12 @@ class WebSocketService {
         this.instances[`${address}_${topic}`] = instance;
     }
 
-    private logger(): void {
+    startLogger(interval: number): void {
         Logger.log(
             `Current instance count: ${Object.keys(this.instances).length}`,
         );
         Logger.log(Object.keys(this.instances));
-        setTimeout(() => this.logger(), this.loggerInterval);
+        setTimeout(() => this.startLogger(interval), interval);
     }
 }
 
