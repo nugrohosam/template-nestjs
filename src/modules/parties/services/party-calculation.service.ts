@@ -74,6 +74,7 @@ export class PartyCalculationService {
         await this.partyFundService.updatePartyFund(party);
     }
 
+    @Transactional()
     async withdraw(
         partyAddress: string,
         memberAddress: string,
@@ -88,7 +89,7 @@ export class PartyCalculationService {
             party.id,
         );
 
-        const withdrawAmount = amount.neg();
+        const withdrawAmount = amount.muln(-1);
         await this.updatePartyTotalFund(party, withdrawAmount);
         await this.updatePartyMemberTotalFund(partyMember, withdrawAmount);
         await this.updatePartyMembersWeight(party);
