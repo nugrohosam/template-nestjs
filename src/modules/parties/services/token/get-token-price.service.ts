@@ -106,7 +106,12 @@ export class GetTokenPriceService {
             decimal: config.calculation.usdDecimal,
         },
     ): Promise<IMarketValue | undefined> {
-        const coins = await this.geckoCoinService.getGeckoCoins(tokensSymbol);
+        const lowerCaseTokenSymbol = tokensSymbol.map((item) =>
+            item.toLowerCase(),
+        );
+        const coins = await this.geckoCoinService.getGeckoCoins(
+            lowerCaseTokenSymbol,
+        );
         if (!coins.length) return undefined;
         const ids = coins.map((coin) => coin.id).join(',');
         const marketValueResp: AxiosResponse<IFetchMarketsResp[]> =
@@ -122,8 +127,9 @@ export class GetTokenPriceService {
             });
         const marketValue = {};
         marketValueResp.data.forEach((item) => {
-            marketValue[item.symbol.toLowerCase()] = item;
+            marketValue[item.symbol] = item;
         });
+        console.log('marketValue', marketValue);
         return marketValue;
     }
 
