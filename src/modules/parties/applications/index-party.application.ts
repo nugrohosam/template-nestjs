@@ -58,6 +58,7 @@ export class IndexPartyApplication extends IndexApplication {
             query.andWhere('name = :name', { name: request.name });
         }
 
+        query.andWhere('is_public = true');
         query.orderBy(
             request.sort ?? 'party.createdAt',
             request.order ?? 'DESC',
