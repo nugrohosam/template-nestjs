@@ -69,4 +69,8 @@ export class JoinRequestService {
             processedBy: processedBy.id,
         });
     }
+
+    async deleteJoinRequest(userId: string, partyId: string): Promise<void> {
+        await this.repository.delete({ userId, partyId });
+    }
 }
