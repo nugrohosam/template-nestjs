@@ -164,6 +164,7 @@ import { PartyFundService } from './services/party-fund/party-fund.service';
         TokenService,
         SwapQuoteService,
         SwapSignatureSerivce,
+        JoinRequestService,
 
         SwapQuoteApplication,
     ],
