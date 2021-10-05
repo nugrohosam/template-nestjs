@@ -3,8 +3,10 @@ import { ILandingPageContent } from 'src/entities/landing-page-content.entity';
 import {
     Column,
     CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'landing_page_contents' })
@@ -21,9 +23,9 @@ export class LandingPageContentModel implements ILandingPageContent {
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @CreateDateColumn({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @CreateDateColumn({ name: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 }

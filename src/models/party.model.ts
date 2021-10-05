@@ -8,11 +8,13 @@ import { GainPeriod, IParty } from 'src/entities/party.entity';
 import {
     Column,
     CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { JoinRequestModel } from './join-request.model';
 import { PartyMemberModel } from './party-member.model';
@@ -110,10 +112,10 @@ export class PartyModel implements IParty {
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @CreateDateColumn({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @CreateDateColumn({ name: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
     @ManyToOne(() => UserModel, (user) => user.ownedParties, { eager: true })

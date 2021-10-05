@@ -2,10 +2,12 @@ import { IAnnouncement } from 'src/entities/announcement.entity';
 import {
     Column,
     CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { PartyModel } from './party.model';
 
@@ -32,10 +34,10 @@ export class AnnouncementModel implements IAnnouncement {
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
-    @CreateDateColumn({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt?: Date;
 
-    @CreateDateColumn({ name: 'deleted_at' })
+    @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt?: Date;
 
     @ManyToOne(() => PartyModel, (party) => party.notifications, {
