@@ -13,6 +13,7 @@ interface IWebSocketInstance {
 
 class WebSocketService {
     private instances: Record<string, IWebSocketInstance>;
+    private readonly closeWsTimeout = 60000;
 
     constructor() {
         this.instances = {};
@@ -67,7 +68,10 @@ class WebSocketService {
                         this.deleteInstance(address, topic);
                     })
                     .finally(() => {
-                        instance.timeout = setTimeout(() => ws.close(), 30000);
+                        instance.timeout = setTimeout(
+                            () => ws.close(),
+                            this.closeWsTimeout,
+                        );
                     });
             }
         });
