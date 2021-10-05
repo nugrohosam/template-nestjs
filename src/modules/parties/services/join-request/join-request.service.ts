@@ -35,10 +35,22 @@ export class JoinRequestService {
     }
 
     async store(user: UserModel, party: PartyModel): Promise<JoinRequestModel> {
-        const joinRequest = this.repository.create({
-            userId: user.id,
-            partyId: party.id,
-        });
+        let joinRequest = await this.repository
+            .createQueryBuilder('joinRequest')
+            .where('user_id = :userId', { userId: user.id })
+            .andWhere('party_id = :partyId', { party: party.id })
+            .andWhere('accepted_at is null')
+            .getOne();
+
+        if (joinRequest) {
+            joinRequest.rejectedAt = null;
+        } else {
+            joinRequest = this.repository.create({
+                userId: user.id,
+                partyId: party.id,
+            });
+        }
+
         return await this.repository.save(joinRequest);
     }
 
