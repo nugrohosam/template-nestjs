@@ -81,7 +81,7 @@ export class MeService {
         const data = {
             partyAddress: decodedLog.partyAddress,
             userAddress: decodedLog.userAddress,
-            amount: new BN(decodedLog.amount),
+            amount: new BN(decodedLog.sent),
             cut: new BN(decodedLog.cut),
             penalty: new BN(decodedLog.penalty),
         };
