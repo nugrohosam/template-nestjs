@@ -61,8 +61,8 @@ export class PartyService {
         return await this.partyRepository.save(party);
     }
 
-    async delete(party: PartyModel): Promise<void> {
-        await this.partyRepository.delete(party);
+    async delete({ id }: PartyModel): Promise<void> {
+        await this.partyRepository.softDelete({ id });
     }
 
     async storeToken(

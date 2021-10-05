@@ -76,6 +76,7 @@ export class GetPartyService {
             );
         }
 
+        query.andWhere('deleted_at is null');
         return query;
     }
 
