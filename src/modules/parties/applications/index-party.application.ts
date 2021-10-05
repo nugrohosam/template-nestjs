@@ -59,6 +59,7 @@ export class IndexPartyApplication extends IndexApplication {
         }
 
         query.andWhere('is_public = true');
+        query.andWhere('deleted_at is null');
         query.orderBy(
             request.sort ?? 'party.createdAt',
             request.order ?? 'DESC',

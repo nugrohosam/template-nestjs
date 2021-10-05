@@ -130,7 +130,7 @@ export class MePartiesController {
         @Param('partyId') partyId: string,
         @Body() request: LeavePartyRequest,
     ): Promise<IApiResponse<LeavePreparationResponse>> {
-        const user = await this.getSignerService.get(signature);
+        const user = await this.getSignerService.get(signature, true);
         const party = await this.getPartyService.getById(partyId);
 
         const leavePreparation = await this.leavePartyApplication.prepare(
