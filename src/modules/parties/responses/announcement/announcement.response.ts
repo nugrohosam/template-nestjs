@@ -11,6 +11,7 @@ export class AnnouncementResponse
     body: string;
     link?: string;
     imageUrl?: string;
+    createdAt: Date;
 
     static mapFromAnnouncementModel(
         model: AnnouncementModel,
@@ -21,6 +22,7 @@ export class AnnouncementResponse
             body: model.body,
             link: model.link,
             imageUrl: model.imageUrl,
+            createdAt: model.createdAt,
             party: model.party
                 ? IndexPartyResponse.mapFromPartyModel(model.party)
                 : null,
