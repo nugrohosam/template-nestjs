@@ -38,7 +38,7 @@ export class JoinRequestService {
         let joinRequest = await this.repository
             .createQueryBuilder('joinRequest')
             .where('user_id = :userId', { userId: user.id })
-            .andWhere('party_id = :partyId', { party: party.id })
+            .andWhere('party_id = :partyId', { partyId: party.id })
             .andWhere('accepted_at is null')
             .getOne();
 
