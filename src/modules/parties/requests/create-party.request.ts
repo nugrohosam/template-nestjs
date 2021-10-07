@@ -1,6 +1,12 @@
 import BN from 'bn.js';
 import { Expose, Transform } from 'class-transformer';
-import { IsDate, IsEnum, IsEthereumAddress, IsNotEmpty } from 'class-validator';
+import {
+    IsDate,
+    IsEnum,
+    IsEthereumAddress,
+    IsNotEmpty,
+    IsOptional,
+} from 'class-validator';
 import {
     DistributionTypeEnum,
     PartyTypeEnum,
@@ -58,4 +64,8 @@ export class CreatePartyRequest
     @IsNotEmpty()
     @Expose({ name: 'member_signature' })
     memberSignature: string;
+
+    @IsOptional()
+    @Expose({ name: 'image_url' })
+    imageUrl?: string;
 }
