@@ -66,6 +66,8 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
             totalDeposit: new BN(0),
             gain: {
                 per7Days: 0,
+                per1Month: 0,
+                per1Year: 0,
             },
         });
 

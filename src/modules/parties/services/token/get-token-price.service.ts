@@ -129,7 +129,6 @@ export class GetTokenPriceService {
         marketValueResp.data.forEach((item) => {
             marketValue[item.symbol] = item;
         });
-        console.log('marketValue', marketValue);
         return marketValue;
     }
 
