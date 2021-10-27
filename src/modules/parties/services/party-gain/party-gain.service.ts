@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
@@ -8,16 +8,17 @@ import { GetTokenPriceService } from '../token/get-token-price.service';
 @Injectable()
 export class PartyGainService {
     constructor(
-        private readonly getTokenPriceService: GetTokenPriceService,
         @InjectRepository(PartyModel)
         private readonly partyRepository: Repository<PartyModel>,
         @InjectRepository(PartyGainModel)
         private readonly partyGainRepository: Repository<PartyGainModel>,
+
+        private readonly getTokenPriceService: GetTokenPriceService,
     ) {}
 
     // Update Parties Gain, stored at party_gains table
     // Historical Data
-    async updatePartiesGain() {
+    async updatePartiesGain(): Promise<void> {
         const listPartiesQuery =
             this.partyRepository.createQueryBuilder('party');
 
@@ -39,10 +40,10 @@ export class PartyGainService {
             .getMany();
 
         const marketValue = await this.getTokenPriceService.getAllMarketValue();
+
         listParties.forEach(async (item) => {
-            if (!item.address) {
-                return;
-            }
+            if (!item.address) return;
+
             const partyTotalValue =
                 await this.getTokenPriceService.getPartyTokenValue(
                     item,
@@ -51,46 +52,85 @@ export class PartyGainService {
 
             // get party last gain
             const lastFund = item?.lastFund ?? new BN(0);
-            const diff = new BN(partyTotalValue).sub(lastFund);
-            let gain = 0;
-            if (lastFund.eqn(0) && diff.eqn(0)) {
-                gain = 0;
-            } else if (lastFund.eqn(0) && diff.gten(0)) {
-                gain = 1;
-            } else {
-                gain =
-                    parseInt(diff.toString()) / parseInt(lastFund.toString());
-            }
+            const gain = this.calculateGainPercentage(
+                new BN(partyTotalValue),
+                lastFund,
+            );
+
             const swapTransaction = this.partyGainRepository.create({
                 partyId: item.id,
                 fund: partyTotalValue,
                 gain: gain,
             });
+
             this.partyRepository.save({
                 ...item,
                 totalFund: partyTotalValue,
             });
+
             this.partyGainRepository.save(swapTransaction);
             this.updatePartyGain(item);
         });
     }
 
-    async updatePartyGain(party: PartyModel) {
-        const partyGainQuery =
-            this.partyGainRepository.createQueryBuilder('partyGain');
-        const listPartyGain = await partyGainQuery
-            .select('SUM(fund)', 'DATE(created_at)')
+    async updatePartyGain(party: PartyModel): Promise<void> {
+        const currentGain = await this.partyGainRepository
+            .createQueryBuilder('partyGain')
             .where('party_id = :partyId', { partyId: party.id })
-            .groupBy('DATE(created_at)')
-            .limit(7)
-            .getMany();
-        let totalGain = 0;
-        listPartyGain.forEach((item) => {
-            totalGain += item.gain;
-        });
+            .orderBy('created_at', 'DESC')
+            .getOne();
+        const lastWeekGain = await this.partyGainRepository
+            .createQueryBuilder('partyGain')
+            .where('party_id = :partyId', { partyId: party.id })
+            .andWhere('date(created_at) = date(now()) + interval -1 week')
+            .orderBy('created_at', 'DESC')
+            .getOne();
+        const lastMonthGain = await this.partyGainRepository
+            .createQueryBuilder('partyGain')
+            .where('party_id = :partyId', { partyId: party.id })
+            .andWhere('date(created_at) = date(now()) + interval -1 month')
+            .orderBy('created_at', 'DESC')
+            .getOne();
+        const lastYearGain = await this.partyGainRepository
+            .createQueryBuilder('partyGain')
+            .where('party_id = :partyId', { partyId: party.id })
+            .andWhere('date(created_at) = date(now()) + interval -1 year')
+            .orderBy('created_at', 'DESC')
+            .getOne();
+
         party.gain = {
-            per7Days: parseInt(totalGain.toString()),
+            per7Days: this.calculateGainPercentage(
+                currentGain?.fund ?? new BN(0),
+                lastWeekGain?.fund ?? new BN(0),
+            ),
+            per1Month: this.calculateGainPercentage(
+                currentGain?.fund ?? new BN(0),
+                lastMonthGain?.fund ?? new BN(0),
+            ),
+            per1Year: this.calculateGainPercentage(
+                currentGain?.fund ?? new BN(0),
+                lastYearGain?.fund ?? new BN(0),
+            ),
         };
+
+        console.log({
+            party: {
+                id: party.id,
+                address: party.address,
+                gain: party.gain,
+            },
+        });
+
         this.partyRepository.save(party);
+    }
+
+    private calculateGainPercentage(currentFund: BN, lastFund: BN): number {
+        const diff = currentFund.sub(lastFund);
+
+        if (lastFund.isZero()) {
+            return diff.isNeg() ? -1 : 1;
+        }
+
+        return diff.toNumber() / lastFund.toNumber();
     }
 }
