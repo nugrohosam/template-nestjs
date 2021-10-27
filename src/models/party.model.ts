@@ -54,6 +54,9 @@ export class PartyModel implements IParty {
     @Column('varchar', { name: 'image_url', nullable: true })
     imageUrl?: string;
 
+    @Column('text', { nullable: true })
+    bio?: string;
+
     @Column('uuid', { name: 'creator_id', nullable: true })
     creatorId: string;
 

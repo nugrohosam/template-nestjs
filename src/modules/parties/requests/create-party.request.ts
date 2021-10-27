@@ -68,4 +68,7 @@ export class CreatePartyRequest
     @IsOptional()
     @Expose({ name: 'image_url' })
     imageUrl?: string;
+
+    @IsOptional()
+    bio?: string;
 }
