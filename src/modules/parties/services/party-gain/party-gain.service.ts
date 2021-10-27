@@ -52,12 +52,10 @@ export class PartyGainService {
 
             // get party last gain
             const lastFund = item?.lastFund ?? new BN(0);
-            const diff = new BN(partyTotalValue).sub(lastFund);
-            const gain = lastFund.isZero()
-                ? diff.isNeg()
-                    ? -1
-                    : 1
-                : diff.toNumber() / lastFund.toNumber();
+            const gain = this.calculateGainPercentage(
+                new BN(partyTotalValue),
+                lastFund,
+            );
 
             const swapTransaction = this.partyGainRepository.create({
                 partyId: item.id,
@@ -128,10 +126,11 @@ export class PartyGainService {
 
     private calculateGainPercentage(currentFund: BN, lastFund: BN): number {
         const diff = currentFund.sub(lastFund);
-        return lastFund.isZero()
-            ? diff.isNeg()
-                ? -1
-                : 1
-            : diff.toNumber() / lastFund.toNumber();
+
+        if (lastFund.isZero()) {
+            return diff.isNeg() ? -1 : 1;
+        }
+
+        return diff.toNumber() / lastFund.toNumber();
     }
 }
