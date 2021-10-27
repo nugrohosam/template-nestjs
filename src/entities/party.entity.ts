@@ -14,6 +14,7 @@ export interface IParty {
     type: PartyTypeEnum;
     purpose: string;
     imageUrl?: string;
+    bio?: string;
     creatorId: string;
     ownerId: string;
     isPublic: boolean;

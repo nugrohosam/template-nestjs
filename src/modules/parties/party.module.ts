@@ -60,6 +60,7 @@ import { CreatePartyAnnouncementApplication } from './applications/create-party-
 import { AnnouncementModel } from 'src/models/announcement.model';
 import { IndexPartyAnnouncementApplication } from './applications/index-party-announcement.application';
 import { PartyFundService } from './services/party-fund/party-fund.service';
+import { UpdatePartyApplication } from './applications/update-party.application';
 @Module({
     imports: [
         HttpModule,
@@ -96,6 +97,7 @@ import { PartyFundService } from './services/party-fund/party-fund.service';
         // Party Porviders
         CreatePartyApplication,
         IndexPartyApplication,
+        UpdatePartyApplication,
 
         PartyValidation,
         PartyService,

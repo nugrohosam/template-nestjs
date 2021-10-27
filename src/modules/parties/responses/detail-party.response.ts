@@ -18,6 +18,7 @@ export class DetailPartyResponse
     type: PartyTypeEnum;
     purpose: string;
     imageUrl: string;
+    bio: string;
     isPublic: boolean;
     minDeposit: string;
     maxDeposit: string;
@@ -49,6 +50,7 @@ export class DetailPartyResponse
             type: party.type,
             purpose: party.purpose,
             imageUrl: party.imageUrl,
+            bio: party.bio,
             isPublic: party.isPublic,
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),

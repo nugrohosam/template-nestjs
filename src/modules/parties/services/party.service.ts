@@ -31,6 +31,12 @@ export class PartyService {
         return message;
     }
 
+    generateUpdatePartySignatureMessage(partyId: string): string {
+        const message = `I want to update my party with id ${partyId}`;
+        console.log(`[update-party]: ${message}`);
+        return message;
+    }
+
     async generatePlatformSignature(
         party: PartyModel,
         creator: UserModel,
