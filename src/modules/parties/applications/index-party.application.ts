@@ -43,8 +43,8 @@ export class IndexPartyApplication extends IndexApplication {
         query.where(`${isActiveQuery} is not null`);
 
         if (request.search) {
-            query.andWhere('party.name like "%:search%"', {
-                search: request.search,
+            query.andWhere('party.name like :search', {
+                search: '%' + request.search + '%',
             });
         }
 
@@ -56,7 +56,7 @@ export class IndexPartyApplication extends IndexApplication {
 
         if (request.name) {
             // will filter the exac name of the party
-            query.andWhere('name = :name', { name: request.name });
+            query.andWhere('party.name = :name', { name: request.name });
         }
 
         query.andWhere('is_public = true');
@@ -77,7 +77,9 @@ export class IndexPartyApplication extends IndexApplication {
         query.take(request.perPage ?? 10);
         query.skip(this.countOffset(request));
 
+        console.log(query.getSql());
         const [data, count] = await query.getManyAndCount();
+        console.log({ data, count });
         return {
             data: data,
             meta: this.mapMeta(count, request),
