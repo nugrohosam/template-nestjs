@@ -68,6 +68,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
                 per7Days: 0,
                 per1Month: 0,
                 per1Year: 0,
+                lifeTime: 0,
             },
         });
 

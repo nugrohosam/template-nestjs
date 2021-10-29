@@ -97,6 +97,11 @@ export class PartyGainService {
             .andWhere('date(created_at) = date(now()) + interval -1 year')
             .orderBy('created_at', 'DESC')
             .getOne();
+        const veryFirstGain = await this.partyGainRepository
+            .createQueryBuilder('partyGain')
+            .where('party_id = :partyId', { partyId: party.id })
+            .orderBy('created_at', 'ASC')
+            .getOne();
 
         party.gain = {
             per7Days: this.calculateGainPercentage(
@@ -111,15 +116,11 @@ export class PartyGainService {
                 currentGain?.fund ?? new BN(0),
                 lastYearGain?.fund ?? new BN(0),
             ),
+            lifeTime: this.calculateGainPercentage(
+                currentGain?.fund ?? new BN(0),
+                veryFirstGain?.fund ?? new BN(0),
+            ),
         };
-
-        console.log({
-            party: {
-                id: party.id,
-                address: party.address,
-                gain: party.gain,
-            },
-        });
 
         this.partyRepository.save(party);
     }
@@ -131,6 +132,6 @@ export class PartyGainService {
             return diff.isNeg() ? -1 : 1;
         }
 
-        return diff.toNumber() / lastFund.toNumber();
+        return +(diff.toNumber() / lastFund.toNumber()).toFixed(6);
     }
 }
