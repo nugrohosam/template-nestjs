@@ -104,4 +104,19 @@ export class PartyMemberService {
 
         return this.partyMemberRepository.save(partyMember);
     }
+
+    async updatePartyMemberFund(
+        partyMember: PartyMemberModel,
+    ): Promise<PartyMemberModel> {
+        const party = partyMember.party ?? (await partyMember.getParty);
+        if (!partyMember.weight || partyMember.weight.isZero()) {
+            partyMember.totalFund = new BN(0);
+        } else {
+            partyMember.totalFund = party.totalFund
+                .mul(partyMember.weight)
+                .divn(1000000);
+        }
+
+        return this.partyMemberRepository.save(partyMember);
+    }
 }

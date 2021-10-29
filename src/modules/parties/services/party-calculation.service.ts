@@ -38,11 +38,10 @@ export class PartyCalculationService {
         return await this.partyRepository.save(party);
     }
 
-    async updatePartyMemberTotalFund(
+    async updatePartyMemberTotalDeposit(
         partyMember: PartyMemberModel,
         amount: BN,
     ): Promise<PartyMemberModel> {
-        partyMember.totalFund = partyMember.totalFund.add(amount);
         partyMember.totalDeposit = partyMember.totalDeposit.add(amount);
         return await this.partyMemberRepository.save(partyMember);
     }
@@ -68,7 +67,7 @@ export class PartyCalculationService {
 
         const token = await this.tokenService.getDefaultToken();
         await this.updatePartyTotalFund(party, amount);
-        await this.updatePartyMemberTotalFund(partyMember, amount);
+        await this.updatePartyMemberTotalDeposit(partyMember, amount);
         await this.updatePartyMembersWeight(party);
         await this.partyService.storeToken(party, token);
         await this.partyFundService.updatePartyFund(party);
@@ -91,7 +90,7 @@ export class PartyCalculationService {
 
         const withdrawAmount = amount.muln(-1);
         await this.updatePartyTotalFund(party, withdrawAmount);
-        await this.updatePartyMemberTotalFund(partyMember, withdrawAmount);
+        await this.updatePartyMemberTotalDeposit(partyMember, withdrawAmount);
         await this.updatePartyMembersWeight(party);
         await this.partyFundService.updatePartyFund(party);
     }
