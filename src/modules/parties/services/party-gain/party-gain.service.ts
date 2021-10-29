@@ -4,6 +4,7 @@ import BN from 'bn.js';
 import { PartyGainModel } from 'src/models/party-gain.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
+import { PartyFundService } from '../party-fund/party-fund.service';
 import { GetTokenPriceService } from '../token/get-token-price.service';
 @Injectable()
 export class PartyGainService {
@@ -14,6 +15,7 @@ export class PartyGainService {
         private readonly partyGainRepository: Repository<PartyGainModel>,
 
         private readonly getTokenPriceService: GetTokenPriceService,
+        private readonly partyFundService: PartyFundService,
     ) {}
 
     // Update Parties Gain, stored at party_gains table
@@ -63,10 +65,14 @@ export class PartyGainService {
                 gain: gain,
             });
 
-            this.partyRepository.save({
-                ...item,
-                totalFund: partyTotalValue,
-            });
+            this.partyRepository
+                .save({
+                    ...item,
+                    totalFund: partyTotalValue,
+                })
+                .then((updatedParty) => {
+                    this.partyFundService.updatePartyMembersFund(updatedParty);
+                });
 
             this.partyGainRepository.save(swapTransaction);
             this.updatePartyGain(item);
