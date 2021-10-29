@@ -9,7 +9,7 @@ export class PartyGainSchedulerService {
 
     constructor(private readonly partyGainService: PartyGainService) {}
 
-    @Cron('0 0 * * * *')
+    @Cron('0 */5 * * * *')
     handlerTask(): void {
         if (!config.scheduler.partyGain) return;
 

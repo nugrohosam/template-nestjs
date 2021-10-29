@@ -8,6 +8,7 @@ export enum GainPeriod {
     Per7Days = 'per7Days',
     Per1Month = 'per1Month',
     Per1Year = 'per1Year',
+    LifeTiem = 'lifeTime',
 }
 export interface IParty {
     id?: string;
