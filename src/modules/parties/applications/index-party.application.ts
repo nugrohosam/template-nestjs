@@ -1,5 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginateResponse } from 'src/common/interface/index.interface';
+import { GainPeriod } from 'src/entities/party.entity';
 import { IndexApplication } from 'src/infrastructure/applications/index.application';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
@@ -60,10 +61,19 @@ export class IndexPartyApplication extends IndexApplication {
 
         query.andWhere('is_public = true');
         query.andWhere('deleted_at is null');
+
+        // handle special case for sorting perties
+        if (request.sort === 'weeklyPerformance') {
+            request.sort = `json_extract(gain, '$.${GainPeriod.Per7Days}')`;
+        } else if (request.sort === 'lifeTimePerformance') {
+            request.sort = `json_extract(gain, '$.${GainPeriod.LifeTime}')`;
+        }
+
         query.orderBy(
             request.sort ?? 'party.createdAt',
             request.order ?? 'DESC',
         );
+
         query.take(request.perPage ?? 10);
         query.skip(this.countOffset(request));
 
