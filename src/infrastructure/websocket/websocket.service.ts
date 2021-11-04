@@ -52,6 +52,13 @@ class WebSocketService {
                     params: ['logs', { address, topics: [topic] }],
                 }),
             );
+
+            // each instance will only live for this.closeWsTimeout ms
+            instance.timeout = setTimeout(
+                () => ws.close(),
+                this.closeWsTimeout,
+            );
+
             Logger.log(`Instance created`, 'WebSocket');
             Logger.log({ address, topic }, 'WebSocket');
         });
@@ -68,6 +75,7 @@ class WebSocketService {
                         this.deleteInstance(address, topic);
                     })
                     .finally(() => {
+                        // reset instance life time fo this.closeWsTimeout ms
                         instance.timeout = setTimeout(
                             () => ws.close(),
                             this.closeWsTimeout,
