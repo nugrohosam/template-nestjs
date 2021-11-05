@@ -11,9 +11,11 @@ export class SwapTransactionResponse
     updatedAt?: Date;
     id: string;
     createdAt: Date;
+    userAddress: string;
 
     static mapFromSwapTransactionModel(
         transaction: SwapTransactionModel,
+        userAddress: string,
     ): SwapTransactionResponse {
         return {
             id: transaction.id,
@@ -22,6 +24,7 @@ export class SwapTransactionResponse
             buyAmount: transaction.buyAmount.toString(),
             sellAmount: transaction.sellAmount.toString(),
             createdAt: transaction.createdAt,
+            userAddress,
         };
     }
 }

@@ -47,8 +47,12 @@ export class PartyTransactionController {
                 query,
             );
 
+        const owner = party.owner;
         const response = data.map((item) => {
-            return SwapTransactionResponse.mapFromSwapTransactionModel(item);
+            return SwapTransactionResponse.mapFromSwapTransactionModel(
+                item,
+                owner.address,
+            );
         });
 
         return {
