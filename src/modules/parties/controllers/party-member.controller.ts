@@ -62,8 +62,6 @@ export class PartyMemberController {
         const user = await this.getSignerService.get(signature, true);
         const party = await this.getPartyService.getById(partyId);
 
-        console.log(user);
-        console.log(party);
         if (party.ownerId !== user.id)
             throw new UnauthorizedException(
                 'Only owner of the party can kick its members party',
