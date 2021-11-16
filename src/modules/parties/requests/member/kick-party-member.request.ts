@@ -4,6 +4,6 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class KickPartyMemberRequest {
     @IsNotEmpty()
     @IsString()
-    @Expose({ name: 'kick_signature' })
+    @Expose({ name: 'signature' })
     signature: string;
 }

@@ -80,8 +80,11 @@ export class PartyMemberService {
         return message;
     }
 
-    generateKickSignatureMessage(partyMember: PartyMemberModel): string {
-        const message = `I want to kick ${partyMember.memberId} from ${partyMember.partyId} party`;
+    generateKickSignatureMessage(
+        partyMember: PartyMemberModel,
+        party: PartyModel,
+    ): string {
+        const message = `I want to kick ${partyMember.memberId} from ${party.name} party`;
         // TODO: need to removed after testing
         console.log('message[kick-party-member]: ' + message);
         return message;
