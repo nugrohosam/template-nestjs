@@ -61,6 +61,8 @@ import { AnnouncementModel } from 'src/models/announcement.model';
 import { IndexPartyAnnouncementApplication } from './applications/index-party-announcement.application';
 import { PartyFundService } from './services/party-fund/party-fund.service';
 import { UpdatePartyApplication } from './applications/update-party.application';
+import { KickPartyMemberApplication } from './applications/kick-party-member.application';
+import { MeService } from '../me/services/me.service';
 @Module({
     imports: [
         HttpModule,
@@ -122,6 +124,7 @@ import { UpdatePartyApplication } from './applications/update-party.application'
         JoinPartyApplication,
         IndexPartyMemberApplication,
         LeavePartyApplication,
+        KickPartyMemberApplication,
 
         PartyMemberService,
         GetPartyMemberService,
@@ -155,6 +158,8 @@ import { UpdatePartyApplication } from './applications/update-party.application'
         AnnouncementService,
         CreatePartyAnnouncementApplication,
         IndexPartyAnnouncementApplication,
+
+        MeService,
     ],
     exports: [
         GetPartyService,

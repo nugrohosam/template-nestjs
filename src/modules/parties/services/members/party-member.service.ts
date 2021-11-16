@@ -80,6 +80,13 @@ export class PartyMemberService {
         return message;
     }
 
+    generateKickSignatureMessage(partyMember: PartyMemberModel): string {
+        const message = `I want to kick ${partyMember.memberId} from ${partyMember.partyId} party`;
+        // TODO: need to removed after testing
+        console.log('message[kick-party-member]: ' + message);
+        return message;
+    }
+
     async generateLeavePlatformSignature(
         userAddress: string,
         weight: BN,

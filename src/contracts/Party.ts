@@ -10,6 +10,7 @@ export enum PartyEvents {
     CreateProposalEvent = 'CreateProposalEvent',
     DepositEvent = 'DepositEvent',
     JoinEvent = 'JoinEvent',
+    KickPartyEvent = 'KickPartyEvent',
     LeavePartyEvent = 'LeavePartyEvent',
     Qoute0xSwap = 'Qoute0xSwap',
     WithdrawEvent = 'WithdrawEvent',

@@ -2,11 +2,13 @@ import {
     Body,
     Controller,
     Get,
+    Headers,
     Inject,
     Param,
     Post,
     Put,
     Query,
+    UnauthorizedException,
 } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { DeleteIncompleteDataRequest } from 'src/common/request/delete-incomplete-data.request';
@@ -21,6 +23,14 @@ import { JoinPartyApplication } from '../applications/join-party.application';
 import { GetPartyService } from '../services/get-party.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { IndexPartyMemberApplication } from '../applications/index-party-member.application';
+import { KickPreparationResponse } from '../responses/member/kick-preparation.response';
+import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
+import { KickPartyMemberApplication } from '../applications/kick-party-member.application';
+import { KickPartyMemberRequest } from '../requests/member/kick-party-member.request';
+import { WS } from 'src/infrastructure/websocket/websocket.service';
+import { PartyContract, PartyEvents } from 'src/contracts/Party';
+import { ILogParams } from '../types/logData';
+import { SwapQuoteApplication } from '../applications/swap-quote.application';
 import { LeavePartyApplication } from '../applications/leave-party.application';
 
 @Controller('parties/:partyId')
@@ -29,6 +39,8 @@ export class PartyMemberController {
         private readonly joinPartyApplication: JoinPartyApplication,
         private readonly indexPartyMemberApplication: IndexPartyMemberApplication,
         private readonly leavePartyApplication: LeavePartyApplication,
+        private readonly kickPartyMemberApplication: KickPartyMemberApplication,
+        private readonly swapApplication: SwapQuoteApplication,
 
         @Inject(GetPartyService)
         private readonly getPartyService: GetPartyService,
@@ -36,7 +48,52 @@ export class PartyMemberController {
         private readonly getUserService: GetUserService,
         @Inject(GetPartyMemberService)
         private readonly getPartyMemberService: GetPartyMemberService,
+
+        private readonly getSignerService: GetSignerService,
     ) {}
+
+    @Post('kick/:memberId')
+    async kick(
+        @Headers('Signature') signature: string,
+        @Param('partyId') partyId: string,
+        @Param('memberId') memberId: string,
+        @Body() request: KickPartyMemberRequest,
+    ): Promise<IApiResponse<KickPreparationResponse>> {
+        const user = await this.getSignerService.get(signature, true);
+        const party = await this.getPartyService.getById(partyId);
+
+        if (party.ownerId !== user.id)
+            throw new UnauthorizedException(
+                'Only owner of the party can kick its members party',
+            );
+        const kickPreparation = await this.kickPartyMemberApplication.prepare(
+            memberId,
+            user,
+            party,
+            request,
+        );
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
+            async (logParams: ILogParams) => {
+                await this.swapApplication.buySync(logParams);
+            },
+        );
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.KickPartyEvent),
+            async (logParams: ILogParams) => {
+                await this.kickPartyMemberApplication.sync(logParams);
+            },
+        );
+
+        return {
+            message: 'Success get leave prepareation data',
+            data: kickPreparation,
+        };
+    }
 
     @Post('join')
     async prepareJoinParty(
