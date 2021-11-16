@@ -197,18 +197,18 @@ export class SwapQuoteApplication {
             const partyToken = await this.partyService.getPartyTokenByAddress(
                 swapEventData.sellTokenAddress,
             );
-            console.log(partyToken); // TODO for debugging
+            console.log('party token => ', partyToken); // TODO for debugging
 
             const decimal = await this.tokenService.getTokenDecimal(
                 swapEventData.sellTokenAddress,
             );
-            console.log(decimal); // TODO for debugging
+            console.log('decimal => ', decimal); // TODO for debugging
 
             const marketValue = await this.tokenPrice.fetchMarketValue({
                 vs_currency: 'usd',
                 ids: partyToken.symbol,
             });
-            console.log(marketValue); // TODO for debugging
+            console.log('marketvalue => ', marketValue); // TODO for debugging
 
             usd = usd.addn(
                 marketValue[partyToken.symbol] / 10 ** Number(decimal),
@@ -218,7 +218,7 @@ export class SwapQuoteApplication {
                 swapEventData.sellAmount / 10 ** config.calculation.usdDecimal,
             );
         }
-        console.log(usd); // TODO for debugging
+        console.log('usd => ', usd); // TODO for debugging
 
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,
