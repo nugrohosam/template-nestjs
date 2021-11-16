@@ -21,6 +21,10 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartyGainService } from '../services/party-gain/party-gain.service';
 import { PartyFundService } from '../services/party-fund/party-fund.service';
+import { GetTokenPriceService } from '../services/token/get-token-price.service';
+import { config } from 'src/config';
+import { BN } from 'bn.js';
+
 @Injectable()
 export class SwapQuoteApplication {
     constructor(
@@ -36,6 +40,7 @@ export class SwapQuoteApplication {
         private readonly partyService: PartyService,
         private readonly partyGainService: PartyGainService,
         private readonly partyFundService: PartyFundService,
+        private readonly tokenPrice: GetTokenPriceService,
     ) {}
 
     @Transactional()
@@ -186,6 +191,35 @@ export class SwapQuoteApplication {
         }
         await this.partyService.storeToken(party, token);
 
+        let usd = new BN(0);
+        if (swapEventData.sellTokenAddress != config.defaultToken.address) {
+            // get symbol by address at party token
+            const partyToken = await this.partyService.getPartyTokenByAddress(
+                swapEventData.sellTokenAddress,
+            );
+            console.log(partyToken); // TODO for debugging
+
+            const decimal = await this.tokenService.getTokenDecimal(
+                swapEventData.sellTokenAddress,
+            );
+            console.log(decimal); // TODO for debugging
+
+            const marketValue = await this.tokenPrice.fetchMarketValue({
+                vs_currency: 'usd',
+                ids: partyToken.symbol,
+            });
+            console.log(marketValue); // TODO for debugging
+
+            usd = usd.addn(
+                marketValue[partyToken.symbol] / 10 ** Number(decimal),
+            );
+        } else {
+            usd = usd.addn(
+                swapEventData.sellAmount / 10 ** config.calculation.usdDecimal,
+            );
+        }
+        console.log(usd); // TODO for debugging
+
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,
             buyAmount: swapEventData.buyAmount,
@@ -193,6 +227,7 @@ export class SwapQuoteApplication {
             tokenFrom: swapEventData.sellTokenAddress,
             tokenTarget: swapEventData.buyTokenAddress,
             transactionHash: log.transactionHash,
+            usd: usd,
         });
 
         await Promise.all([

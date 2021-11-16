@@ -77,4 +77,15 @@ export class TokenService {
 
         return new BN(balance);
     }
+
+    async getTokenDecimal(tokenAddress: string): Promise<string> {
+        const erc20Contract = this.web3Service.getContractInstance(
+            Erc20AbiItem,
+            tokenAddress,
+        );
+
+        const decimal = await erc20Contract.methods.decimal().call();
+
+        return decimal;
+    }
 }
