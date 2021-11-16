@@ -50,6 +50,15 @@ export class UserModel implements IUser {
     @Column('varchar', { nullable: true })
     website?: string;
 
+    @Column('varchar', { nullable: true })
+    telegram?: string;
+
+    @Column('varchar', { nullable: true })
+    discord?: string;
+
+    @Column('varchar', { nullable: true })
+    referal?: string;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
