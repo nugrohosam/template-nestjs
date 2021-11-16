@@ -52,7 +52,10 @@ export class KickPartyMemberApplication {
         await this.web3Service.validateSignature(
             request.signature,
             user.address,
-            this.partyMemberService.generateKickSignatureMessage(partyMember),
+            this.partyMemberService.generateKickSignatureMessage(
+                partyMember,
+                party,
+            ),
         );
 
         const weight = partyMember.weight; // in wei percentage
