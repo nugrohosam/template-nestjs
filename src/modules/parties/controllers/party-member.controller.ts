@@ -83,7 +83,7 @@ export class PartyMemberController {
 
         WS.initWebSocketInstance(
             party.address,
-            PartyContract.getEventSignature(PartyEvents.LeavePartyEvent),
+            PartyContract.getEventSignature(PartyEvents.KickPartyEvent),
             async (logParams: ILogParams) => {
                 await this.kickPartyMemberApplication.sync(logParams);
             },
