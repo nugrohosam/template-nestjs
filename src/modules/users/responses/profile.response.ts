@@ -10,6 +10,9 @@ export class ProfileResponse implements Omit<IUser, 'address'> {
     imageUrl: string;
     about: string;
     website: string;
+    telegram: string;
+    discord: string;
+    referal: string;
 
     static mapFromUserModel(user: UserModel): ProfileResponse {
         return {
@@ -21,6 +24,9 @@ export class ProfileResponse implements Omit<IUser, 'address'> {
             imageUrl: user.imageUrl,
             about: user.about,
             website: user.website,
+            telegram: user.telegram,
+            discord: user.discord,
+            referal: user.referal,
         };
     }
 }
