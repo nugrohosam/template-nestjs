@@ -89,4 +89,8 @@ export class PartyService {
 
         return await this.partyTokenRepository.save(partyToken);
     }
+
+    async getPartyTokenByAddress(address: string): Promise<PartyTokenModel> {
+        return this.partyTokenRepository.findOne({ where: { address } });
+    }
 }

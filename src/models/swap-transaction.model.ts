@@ -32,6 +32,9 @@ export class SwapTransactionModel implements ISwapTransaction {
     @Column('bigint', { name: 'sell_amount', transformer: TransformBN })
     sellAmount: BN;
 
+    @Column('bigint', { name: 'usd', transformer: TransformBN })
+    usd: BN;
+
     @Column('varchar', { name: 'transaction_hash' })
     transactionHash: string;
 
