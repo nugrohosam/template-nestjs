@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { IUser } from 'src/entities/user.entity';
 
@@ -16,6 +17,7 @@ export class ProfileRequest implements Omit<IUser, 'address'> {
 
     @IsOptional()
     @IsString()
+    @Expose({ name: 'image_url' })
     imageUrl?: string;
 
     @IsOptional()

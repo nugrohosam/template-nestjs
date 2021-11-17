@@ -7,6 +7,7 @@ export class ProfileResponse implements Omit<IUser, 'address'> {
     address: string;
     firstname: string;
     lastname: string;
+    email: string;
     imageUrl: string;
     about: string;
     website: string;
@@ -21,6 +22,7 @@ export class ProfileResponse implements Omit<IUser, 'address'> {
             address: user.address,
             firstname: user.firstname,
             lastname: user.lastname,
+            email: user.email,
             imageUrl: user.imageUrl,
             about: user.about,
             website: user.website,
