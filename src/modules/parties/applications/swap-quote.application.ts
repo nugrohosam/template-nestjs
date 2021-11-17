@@ -204,14 +204,14 @@ export class SwapQuoteApplication {
             );
             console.log('decimal => ', decimal); // TODO for debugging
 
-            const marketValue = await this.tokenPrice.fetchMarketValue({
-                vs_currency: 'usd',
-                ids: partyToken.symbol,
-            });
+            const marketValue = await this.tokenPrice.getMarketValue([
+                partyToken.symbol,
+            ]);
             console.log('marketvalue => ', marketValue); // TODO for debugging
 
             usd = usd.addn(
-                marketValue[partyToken.symbol] / 10 ** Number(decimal),
+                marketValue[partyToken.symbol].current_price /
+                    10 ** Number(decimal),
             );
         } else {
             usd = usd.addn(
