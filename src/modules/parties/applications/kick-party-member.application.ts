@@ -19,6 +19,7 @@ import { JoinRequestService } from 'src/modules/parties/services/join-request/jo
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { UserModel } from 'src/models/user.model';
+import { GetUserService } from 'src/modules/users/services/get-user.service';
 
 @Injectable()
 export class KickPartyMemberApplication {
@@ -36,6 +37,7 @@ export class KickPartyMemberApplication {
         private readonly joinRequestService: JoinRequestService,
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
+        private readonly getUserService: GetUserService,
     ) {}
 
     async prepare(
@@ -104,9 +106,10 @@ export class KickPartyMemberApplication {
             Utils.diffInDays(nextDistribution, new Date()),
         );
 
+        const member = await this.getUserService.getUserById(memberId);
         const platformSignature =
             await this.partyMemberService.generateLeavePlatformSignature(
-                user.address,
+                member.address,
                 weight,
             );
 
