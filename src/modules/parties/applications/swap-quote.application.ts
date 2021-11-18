@@ -127,6 +127,8 @@ export class SwapQuoteApplication {
                 request.sellToken,
                 request.sellAmount.toString(),
             );
+        console.log('quote response data', quoteResponse);
+        console.log('quote response err', err);
         if (err) {
             throw new BadRequestException(
                 err.response.data.validationErrors[0].reason,
