@@ -73,8 +73,6 @@ export class PartyMemberController {
             request,
         );
 
-        console.log('PREPARATION => ', kickPreparation);
-
         WS.initWebSocketInstance(
             party.address,
             PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),

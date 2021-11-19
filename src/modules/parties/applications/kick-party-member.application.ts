@@ -13,7 +13,6 @@ import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.respon
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { config } from 'src/config';
 import { ILogParams } from 'src/modules/parties/types/logData';
-import { MeService } from '../../me/services/me.service';
 import { Utils } from 'src/common/utils/util';
 import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
@@ -35,7 +34,6 @@ export class KickPartyMemberApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly tokenService: TokenService,
         private readonly swapQuoteService: SwapQuoteService,
-        private readonly meService: MeService,
         private readonly joinRequestService: JoinRequestService,
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
@@ -124,7 +122,6 @@ export class KickPartyMemberApplication {
     }
 
     async sync(logParams: ILogParams): Promise<void> {
-        Logger.debug(logParams, 'starting sync kicking member');
         const { userAddress, partyAddress, amount, cut, penalty } =
             await this.decodeKickEventData(logParams);
 
