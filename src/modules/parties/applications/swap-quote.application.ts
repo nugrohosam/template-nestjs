@@ -242,5 +242,7 @@ export class SwapQuoteApplication {
             this.partyGainService.updatePartyGain(party),
             this.partyFundService.updatePartyFund(party),
         ]);
+
+        console.log('Qoute0xSwap => status done');
     }
 }
