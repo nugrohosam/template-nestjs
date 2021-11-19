@@ -151,8 +151,6 @@ export class KickPartyMemberApplication {
             leaveTransactionHash: logParams.result.transactionHash,
         });
 
-        console.log('Partymember =>', partyMember);
-
         await Promise.all([
             this.partyMemberService.delete(partyMember),
             this.joinRequestService.deleteJoinRequest(
@@ -160,7 +158,5 @@ export class KickPartyMemberApplication {
                 partyMember.partyId,
             ),
         ]);
-
-        console.log('KickPartyEvent => status done');
     }
 }
