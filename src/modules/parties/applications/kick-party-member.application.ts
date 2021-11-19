@@ -20,6 +20,8 @@ import { TransactionService } from 'src/modules/transactions/services/transactio
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { UserModel } from 'src/models/user.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
+import BN from 'bn.js';
+import { PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class KickPartyMemberApplication {
@@ -124,7 +126,7 @@ export class KickPartyMemberApplication {
     async sync(logParams: ILogParams): Promise<void> {
         Logger.debug(logParams, 'starting sync kicking member');
         const { userAddress, partyAddress, amount, cut, penalty } =
-            await this.meService.decodeLeaveEventData(logParams);
+            await this.decodeKickEventData(logParams);
 
         let partyMember =
             await this.getPartyMemberService.getByUserAndPartyAddress(
@@ -159,5 +161,30 @@ export class KickPartyMemberApplication {
                 partyMember.partyId,
             ),
         ]);
+    }
+
+    async decodeKickEventData({ result: log }: ILogParams): Promise<{
+        partyAddress: string;
+        userAddress: string;
+        amount: BN;
+        cut: BN;
+        penalty: BN;
+    }> {
+        const decodedLog = await this.web3Service.getDecodedLog(
+            log.transactionHash,
+            PartyEvents.KickPartyEvent,
+        );
+
+        // TODO: need to test it direct through network. if fail then will change to the usual way like above.
+        const data = {
+            partyAddress: decodedLog.partyAddress,
+            userAddress: decodedLog.userAddress,
+            amount: new BN(decodedLog.sent),
+            cut: new BN(decodedLog.cut),
+            penalty: new BN(decodedLog.penalty),
+        };
+
+        Logger.debug(data, 'KickEventData');
+        return data;
     }
 }
