@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -122,6 +122,7 @@ export class KickPartyMemberApplication {
     }
 
     async sync(logParams: ILogParams): Promise<void> {
+        Logger.debug(logParams, 'starting sync kicking member');
         const { userAddress, partyAddress, amount, cut, penalty } =
             await this.meService.decodeLeaveEventData(logParams);
 
