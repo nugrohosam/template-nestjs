@@ -83,6 +83,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
     ): Promise<PartyMemberModel> {
         const member = partyMember.member ?? (await partyMember.getMember);
 
+        console.log('MEMBER AT JOIN line 86 => ', member); // TODO: log
+
         if (request.joinPartySignature !== partyMember.signature)
             throw new UnauthorizedException('Signature not valid');
 
@@ -91,10 +93,15 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 await this.web3Service.getTransactionReceipt(
                     partyMember.transactionHash,
                 );
+            console.log(
+                'existingTransactionHash AT JOIN line 97 => ',
+                existingTransactionHash,
+            ); // TODO: log
             if (existingTransactionHash.status) return;
         }
 
         const txh = this.web3Service.getTransaction(request.transactionHash);
+        console.log('txh AT JOIN line 104 => ', txh); // TODO: log
         if (!txh) return partyMember;
 
         const transaction =
@@ -104,6 +111,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 request.joinPartySignature,
                 request.transactionHash,
             );
+        console.log('txh AT JOIN line 114 => ', txh); // TODO: log
 
         partyMember = await this.partyMemberService.update(partyMember, {
             transactionHash: request.transactionHash,
@@ -113,6 +121,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         const receipt = this.web3Service.getTransactionReceipt(
             request.transactionHash,
         );
+        console.log('receipt AT JOIN line 121 => ', txh); // TODO: log
         if (!receipt) return partyMember;
 
         await this.web3Service.validateTransaction(
@@ -121,6 +130,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             PartyContract.getEventAbi(PartyEvents.JoinEvent),
             { 2: partyMember.id },
         );
+
+        console.log('done validateTransaction web3 at LINE 127 => ', txh); // TODO: log
 
         await this.partyCalculationService.deposit(
             partyMember,

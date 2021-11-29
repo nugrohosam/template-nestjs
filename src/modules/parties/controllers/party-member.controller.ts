@@ -73,8 +73,6 @@ export class PartyMemberController {
             request,
         );
 
-        console.log('PREPARATION => ', kickPreparation);
-
         WS.initWebSocketInstance(
             party.address,
             PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
@@ -127,7 +125,9 @@ export class PartyMemberController {
         const partyMember = await this.getPartyMemberService.getById(
             partyMemberId,
         );
+        console.log('partyMember line 122=> ', partyMember); // TODO: log
         await this.joinPartyApplication.commit(partyMember, request);
+        console.log('DONE JOIN COMMIT', partyMember); // TODO: log
         return {
             message: 'Success update join party data',
             data: null,

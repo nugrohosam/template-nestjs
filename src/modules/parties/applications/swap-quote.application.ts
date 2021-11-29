@@ -5,7 +5,7 @@ import { SwapSignatureSerivce } from '../services/swap/swap-signature.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
@@ -159,6 +159,8 @@ export class SwapQuoteApplication {
             log.transactionHash,
         );
 
+        Logger.debug(data, 'ExecuteBuySync');
+
         let decodedLog;
         receipt.logs.some((log) => {
             if (
@@ -200,17 +202,15 @@ export class SwapQuoteApplication {
             const partyToken = await this.partyService.getPartyTokenByAddress(
                 swapEventData.sellTokenAddress,
             );
-            console.log('party token => ', partyToken); // TODO for debugging
-
+            Logger.debug(partyToken, 'PartyToken'); // TODO for debugging
             const decimal = await this.tokenService.getTokenDecimal(
                 swapEventData.sellTokenAddress,
             );
-            console.log('decimal => ', decimal); // TODO for debugging
-
+            Logger.debug(decimal, 'Decimal'); // TODO for debugging
             const marketValue = await this.tokenPrice.getMarketValue([
                 partyToken.symbol,
             ]);
-            console.log('marketvalue => ', marketValue); // TODO for debugging
+            Logger.debug(marketValue, 'MarketValue'); // TODO for debugging
 
             usd = usd.addn(
                 marketValue[partyToken.symbol].current_price /
@@ -221,7 +221,7 @@ export class SwapQuoteApplication {
                 swapEventData.sellAmount / 10 ** config.calculation.usdDecimal,
             );
         }
-        console.log('usd => ', usd); // TODO for debugging
+        Logger.debug(usd, 'usd'); // TODO for debugging
 
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,
