@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -13,14 +13,13 @@ import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.respon
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { config } from 'src/config';
 import { ILogParams } from 'src/modules/parties/types/logData';
+import { MeService } from '../../me/services/me.service';
 import { Utils } from 'src/common/utils/util';
 import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { UserModel } from 'src/models/user.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
-import BN from 'bn.js';
-import { PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class KickPartyMemberApplication {
@@ -34,6 +33,7 @@ export class KickPartyMemberApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly tokenService: TokenService,
         private readonly swapQuoteService: SwapQuoteService,
+        private readonly meService: MeService,
         private readonly joinRequestService: JoinRequestService,
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
@@ -123,14 +123,14 @@ export class KickPartyMemberApplication {
 
     async sync(logParams: ILogParams): Promise<void> {
         const { userAddress, partyAddress, amount, cut, penalty } =
-            await this.decodeKickEventData(logParams);
+            await this.meService.decodeLeaveEventData(logParams);
 
         let partyMember =
             await this.getPartyMemberService.getByUserAndPartyAddress(
                 userAddress,
                 partyAddress,
             );
-        Logger.debug(partyMember, 'PartyMemberData');
+
         await this.transactionService.storeWithdrawTransaction(
             userAddress,
             partyAddress,
@@ -150,7 +150,8 @@ export class KickPartyMemberApplication {
         partyMember = await this.partyMemberService.update(partyMember, {
             leaveTransactionHash: logParams.result.transactionHash,
         });
-        Logger.debug(partyMember, 'PartyMemberData2');
+
+        console.log('Partymember =>', partyMember);
 
         await Promise.all([
             this.partyMemberService.delete(partyMember),
@@ -159,31 +160,7 @@ export class KickPartyMemberApplication {
                 partyMember.partyId,
             ),
         ]);
-        Logger.debug('', 'PassedSync');
-    }
 
-    async decodeKickEventData({ result: log }: ILogParams): Promise<{
-        partyAddress: string;
-        userAddress: string;
-        amount: BN;
-        cut: BN;
-        penalty: BN;
-    }> {
-        const decodedLog = await this.web3Service.getDecodedLog(
-            log.transactionHash,
-            PartyEvents.KickPartyEvent,
-        );
-
-        // TODO: need to test it direct through network. if fail then will change to the usual way like above.
-        const data = {
-            partyAddress: decodedLog.partyAddress,
-            userAddress: decodedLog.userAddress,
-            amount: new BN(decodedLog.sent),
-            cut: new BN(decodedLog.cut),
-            penalty: new BN(decodedLog.penalty),
-        };
-
-        Logger.debug(data, 'KickEventData');
-        return data;
+        console.log('KickPartyEvent => status done');
     }
 }
