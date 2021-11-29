@@ -1,5 +1,6 @@
 import {
     Injectable,
+    Logger,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -24,6 +25,8 @@ import { PartyContract, PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
+    private readonly logger = new Logger(JoinPartyApplication.name);
+
     constructor(
         private readonly web3Service: Web3Service,
         private readonly partyMemberValidation: PartyMemberValidation,
@@ -83,7 +86,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
     ): Promise<PartyMemberModel> {
         const member = partyMember.member ?? (await partyMember.getMember);
 
-        console.log('MEMBER AT JOIN line 86 => ', member); // TODO: log
+        this.logger.debug(member, 'MEMBER AT JOIN line 86 => '); // TODO: log
 
         if (request.joinPartySignature !== partyMember.signature)
             throw new UnauthorizedException('Signature not valid');
@@ -93,15 +96,15 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 await this.web3Service.getTransactionReceipt(
                     partyMember.transactionHash,
                 );
-            console.log(
-                'existingTransactionHash AT JOIN line 97 => ',
+            this.logger.debug(
                 existingTransactionHash,
+                'existingTransactionHash AT JOIN line 97 => ',
             ); // TODO: log
             if (existingTransactionHash.status) return;
         }
 
         const txh = this.web3Service.getTransaction(request.transactionHash);
-        console.log('txh AT JOIN line 104 => ', txh); // TODO: log
+        this.logger.debug(txh, 'txh AT JOIN line 104 => '); // TODO: log
         if (!txh) return partyMember;
 
         const transaction =
@@ -111,7 +114,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 request.joinPartySignature,
                 request.transactionHash,
             );
-        console.log('txh AT JOIN line 114 => ', txh); // TODO: log
+        this.logger.debug(transaction, 'transaction AT JOIN line 114 => '); // TODO: log
 
         partyMember = await this.partyMemberService.update(partyMember, {
             transactionHash: request.transactionHash,
@@ -121,7 +124,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         const receipt = this.web3Service.getTransactionReceipt(
             request.transactionHash,
         );
-        console.log('receipt AT JOIN line 121 => ', txh); // TODO: log
+        this.logger.debug(receipt, 'receipt AT JOIN line 121 => '); // TODO: log
         if (!receipt) return partyMember;
 
         await this.web3Service.validateTransaction(
@@ -131,7 +134,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             { 2: partyMember.id },
         );
 
-        console.log('done validateTransaction web3 at LINE 127 => ', txh); // TODO: log
+        this.logger.debug('done validateTransaction web3 at LINE 127'); // TODO: log
 
         await this.partyCalculationService.deposit(
             partyMember,
