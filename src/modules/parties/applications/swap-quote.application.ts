@@ -197,7 +197,10 @@ export class SwapQuoteApplication {
         await this.partyService.storeToken(party, token);
 
         let usd = new BN(0);
-        if (swapEventData.sellTokenAddress != config.defaultToken.address) {
+        if (
+            swapEventData.sellTokenAddress.toLowerCase() !=
+            config.defaultToken.address.toLowerCase()
+        ) {
             // get symbol by address at party token
             const partyToken = await this.partyService.getPartyTokenByAddress(
                 swapEventData.sellTokenAddress,
