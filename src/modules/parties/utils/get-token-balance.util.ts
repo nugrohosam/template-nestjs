@@ -20,13 +20,13 @@ export class GetTokenBalanceService {
             Erc20AbiItem,
             addressToken,
         );
-        Logger.log(erc20Token, 'erc20Token => ');
+        Logger.debug(erc20Token, 'erc20Token => ');
         const balanceOf = erc20Token.methods.balanceOf(
             address,
         ) as ContractSendMethod;
-        Logger.log(balanceOf, 'balanceOf => ');
+        Logger.debug(balanceOf, 'balanceOf => ');
         const decimal = erc20Token.methods.decimals() as ContractSendMethod;
-        Logger.log(decimal, 'decimal => ');
+        Logger.debug(decimal, 'decimal => ');
         const result: [string, string] = await Promise.all([
             balanceOf.call(),
             decimal.call(),
