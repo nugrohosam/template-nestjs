@@ -9,6 +9,7 @@ export class AddSwapEnumTypeOnTransaction1638255850460
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.changeColumn(
             'transactions',
+            'type',
             new TableColumn({
                 name: 'type',
                 type: 'enum',
@@ -16,15 +17,7 @@ export class AddSwapEnumTypeOnTransaction1638255850460
                     TransactionTypeEnum.Deposit,
                     TransactionTypeEnum.Withdraw,
                     TransactionTypeEnum.Distribution,
-                ],
-            }),
-            new TableColumn({
-                name: 'type',
-                type: 'enum',
-                enum: [
-                    TransactionTypeEnum.Deposit,
-                    TransactionTypeEnum.Withdraw,
-                    TransactionTypeEnum.Distribution,
+                    TransactionTypeEnum.Charge,
                     TransactionTypeEnum.Swap,
                 ],
             }),
@@ -34,6 +27,7 @@ export class AddSwapEnumTypeOnTransaction1638255850460
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.changeColumn(
             'transactions',
+            'type',
             new TableColumn({
                 name: 'type',
                 type: 'enum',
@@ -41,16 +35,7 @@ export class AddSwapEnumTypeOnTransaction1638255850460
                     TransactionTypeEnum.Deposit,
                     TransactionTypeEnum.Withdraw,
                     TransactionTypeEnum.Distribution,
-                    TransactionTypeEnum.Swap,
-                ],
-            }),
-            new TableColumn({
-                name: 'type',
-                type: 'enum',
-                enum: [
-                    TransactionTypeEnum.Deposit,
-                    TransactionTypeEnum.Withdraw,
-                    TransactionTypeEnum.Distribution,
+                    TransactionTypeEnum.Charge,
                 ],
             }),
         );
