@@ -2,7 +2,7 @@ import web3 from 'web3';
 import { Erc20AbiItem } from 'src/contracts/ERC20';
 import { ContractSendMethod } from 'web3-eth-contract';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class GetTokenBalanceService {
@@ -17,24 +17,18 @@ export class GetTokenBalanceService {
         name: string;
     }> => {
         // TODO: for log
-        console.log('[addressToken]=>', addressToken);
-        console.log('[address]=>', address);
         const erc20Token = this.web3Service.getContractInstance(
             Erc20AbiItem,
             addressToken,
         );
-        Logger.debug(erc20Token, 'erc20Token => ');
         const balanceOf = erc20Token.methods.balanceOf(
             address,
         ) as ContractSendMethod;
-        Logger.debug(balanceOf, 'balanceOf => ');
         const decimal = erc20Token.methods.decimals() as ContractSendMethod;
-        Logger.debug(decimal, 'decimal => ');
         const result: [string, string] = await Promise.all([
             balanceOf.call(),
             decimal.call(),
         ]);
-        Logger.log(result, 'result => ');
         return {
             balance: result[0],
             decimal: result[1],
