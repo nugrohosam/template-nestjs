@@ -84,7 +84,7 @@ export class TokenService {
             tokenAddress,
         );
 
-        const decimal = await erc20Contract.methods.decimal().call();
+        const decimal = await erc20Contract.methods.decimals().call();
 
         return decimal;
     }
