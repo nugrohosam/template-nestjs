@@ -69,7 +69,7 @@ export class PartyMemberService {
         ]);
 
         // TODO: need to removed after testing
-        console.log('message[platform-join-party]: ' + message);
+        console.log('message[platform-join-party]=: ' + message);
         return await this.web3Service.sign(message);
     }
 
