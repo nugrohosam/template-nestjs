@@ -160,6 +160,7 @@ export class SwapQuoteApplication {
         );
 
         Logger.debug(data, 'ExecuteBuySync');
+        Logger.debug(receipt, 'Receipt =>');
 
         let decodedLog;
         receipt.logs.some((log) => {
