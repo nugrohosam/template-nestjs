@@ -22,8 +22,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PartyGainService } from '../services/party-gain/party-gain.service';
 import { PartyFundService } from '../services/party-fund/party-fund.service';
 import { GetTokenPriceService } from '../services/token/get-token-price.service';
-import { config } from 'src/config';
-import { BN } from 'bn.js';
+import { GetTokenBalanceService } from '../utils/get-token-balance.util';
 
 @Injectable()
 export class SwapQuoteApplication {
@@ -41,6 +40,7 @@ export class SwapQuoteApplication {
         private readonly partyGainService: PartyGainService,
         private readonly partyFundService: PartyFundService,
         private readonly tokenPrice: GetTokenPriceService,
+        private readonly tokenBalanceService: GetTokenBalanceService,
     ) {}
 
     @Transactional()
@@ -196,34 +196,24 @@ export class SwapQuoteApplication {
         }
         await this.partyService.storeToken(party, token);
 
-        let usd = new BN(0);
-        if (
-            swapEventData.sellTokenAddress.toLowerCase() !=
-            config.defaultToken.address.toLowerCase()
-        ) {
-            // get symbol by address at party token
-            const partyToken = await this.partyService.getPartyTokenByAddress(
-                swapEventData.sellTokenAddress,
-            );
-            Logger.debug(partyToken, 'PartyToken'); // TODO for debugging
-            const decimal = await this.tokenService.getTokenDecimal(
-                swapEventData.sellTokenAddress,
-            );
-            Logger.debug(decimal, 'Decimal'); // TODO for debugging
-            const marketValue = await this.tokenPrice.getMarketValue([
-                partyToken.symbol,
-            ]);
-            Logger.debug(marketValue, 'MarketValue'); // TODO for debugging
+        Logger.debug(swapEventData.sellAmount, 'sellAmount=>'); // TODO for debugging
+        // get symbol by address at party token
+        const partyToken = await this.partyService.getPartyTokenByAddress(
+            swapEventData.sellTokenAddress,
+        );
+        const decimal = await this.tokenService.getTokenDecimal(
+            swapEventData.sellTokenAddress,
+        );
+        Logger.debug(decimal, 'Decimal'); // TODO for debugging
+        const marketValue = await this.tokenPrice.getMarketValue([
+            partyToken.symbol,
+        ]);
+        Logger.debug(marketValue, 'MarketValue'); // TODO for debugging
 
-            usd = usd.addn(
-                marketValue[partyToken.symbol].current_price /
-                    10 ** Number(decimal),
-            );
-        } else {
-            usd = usd.addn(
-                swapEventData.sellAmount / 10 ** config.calculation.usdDecimal,
-            );
-        }
+        const usd = this.tokenBalanceService.formatFromWeiToken(
+            swapEventData.sellAmount,
+            Number(decimal),
+        );
         Logger.debug(usd, 'usd'); // TODO for debugging
 
         const swapTransaction = this.swapTransactionRepository.create({
