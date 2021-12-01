@@ -211,10 +211,11 @@ export class SwapQuoteApplication {
         ]);
         Logger.debug(marketValue, 'MarketValue'); // TODO for debugging
 
-        const usd = this.tokenBalanceService.formatFromWeiToken(
-            swapEventData.sellAmount,
-            Number(decimal),
-        );
+        const usd =
+            this.tokenBalanceService.formatFromWeiToken(
+                swapEventData.sellAmount,
+                Number(decimal),
+            ) * marketValue[partyToken.symbol].current_price;
         Logger.debug(usd, 'usd'); // TODO for debugging
 
         const swapTransaction = this.swapTransactionRepository.create({
