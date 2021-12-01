@@ -12,6 +12,8 @@ export class ChangeUsdTypeeOnSwapTransaction1638334188967
             new TableColumn({
                 name: 'usd',
                 type: 'decimal',
+                precision: 10,
+                scale: 6,
             }),
         );
     }
