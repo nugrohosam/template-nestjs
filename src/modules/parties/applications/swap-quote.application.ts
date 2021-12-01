@@ -227,6 +227,8 @@ export class SwapQuoteApplication {
             usd: usd,
         });
 
+        Logger.debug(swapTransaction, 'swapTransaction'); // TODO for debugging
+
         await Promise.all([
             this.transactionService.updateTxHashStatus(
                 log.transactionHash,
