@@ -1,4 +1,4 @@
-name: polpa-fe-nextjs Staging deployment
+name: polpa-backend Staging deployment
 on:
   push:
     branches: [staging, ci-cd-staging]
