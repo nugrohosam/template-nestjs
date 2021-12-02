@@ -94,7 +94,9 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             if (existingTransactionHash.status) return;
         }
 
-        const txh = this.web3Service.getTransaction(request.transactionHash);
+        const txh = await this.web3Service.getTransaction(
+            request.transactionHash,
+        );
         if (!txh) return partyMember;
 
         const transaction =
