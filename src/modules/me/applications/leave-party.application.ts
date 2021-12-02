@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -115,6 +115,7 @@ export class LeavePartyApplication {
     }
 
     async sync(logParams: ILogParams): Promise<void> {
+        Logger.debug('Leave Party Enter sync => ');
         const { userAddress, partyAddress, amount, cut, penalty } =
             await this.meService.decodeLeaveEventData(logParams);
 
@@ -151,5 +152,6 @@ export class LeavePartyApplication {
                 partyMember.partyId,
             ),
         ]);
+        Logger.debug('<= Leave Party End sync ');
     }
 }

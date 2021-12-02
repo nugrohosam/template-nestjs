@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { GetPartyService } from './get-party.service';
@@ -93,5 +93,6 @@ export class PartyCalculationService {
         await this.updatePartyMemberTotalDeposit(partyMember, withdrawAmount);
         await this.updatePartyMembersWeight(party);
         await this.partyFundService.updatePartyFund(party);
+        Logger.debug('LeaveWithdraw line 96');
     }
 }
