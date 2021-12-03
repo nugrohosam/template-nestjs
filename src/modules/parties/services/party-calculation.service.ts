@@ -93,6 +93,8 @@ export class PartyCalculationService {
             party.id,
         );
 
+        Logger.debug(partyMember.id, 'partyMemberId =>');
+
         const withdrawAmount = amount.muln(-1);
         await Promise.all([
             await this.updatePartyTotalFund(party, withdrawAmount),

@@ -1,4 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, Logger } from '@nestjs/common';
 import BN from 'bn.js';
 import { config } from 'src/config';
 import { IPartyMember } from 'src/entities/party-member.entity';
@@ -9,6 +10,7 @@ import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Repository } from 'typeorm';
 import { GetPartyService } from '../get-party.service';
 
+@Injectable()
 export class PartyMemberService {
     constructor(
         @InjectRepository(PartyMemberModel)
@@ -107,6 +109,8 @@ export class PartyMemberService {
         partyMember: PartyMemberModel,
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
+
+        Logger.debug(party.id, 'partyId =>');
 
         partyMember.weight = partyMember.totalDeposit
             .muln(config.calculation.maxPercentage)
