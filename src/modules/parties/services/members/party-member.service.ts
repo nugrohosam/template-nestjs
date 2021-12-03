@@ -116,7 +116,7 @@ export class PartyMemberService {
             .muln(config.calculation.maxPercentage)
             .div(party.totalDeposit);
 
-        return this.partyMemberRepository.save(partyMember);
+        return await this.partyMemberRepository.save(partyMember);
     }
 
     async updatePartyMemberFund(
