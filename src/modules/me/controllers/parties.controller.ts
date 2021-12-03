@@ -110,13 +110,14 @@ export class MePartiesController {
             },
         );
 
-        WS.initWebSocketInstance(
-            party.address,
-            PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
-            async (logParams: ILogParams) => {
-                await this.withdrawApplication.sync(logParams);
-            },
-        );
+        // TODO: NEED TO UNCOMMENT
+        // WS.initWebSocketInstance(
+        //     party.address,
+        //     PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
+        //     async (logParams: ILogParams) => {
+        //         await this.withdrawApplication.sync(logParams);
+        //     },
+        // );
 
         return {
             message: 'Success get withdraw preparation data',
