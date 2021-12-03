@@ -53,8 +53,11 @@ export class PartyCalculationService {
             .getMany();
 
         await Promise.all(
-            partyMembers.map(async (partyMember) =>
-                this.partyMemberService.updatePartyMemberWeight(partyMember),
+            partyMembers.map(
+                async (partyMember) =>
+                    await this.partyMemberService.updatePartyMemberWeight(
+                        partyMember,
+                    ),
             ),
         );
     }
