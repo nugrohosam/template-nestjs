@@ -102,22 +102,22 @@ export class MePartiesController {
             request,
         );
 
-        WS.initWebSocketInstance(
-            party.address,
-            PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
-            async (logParams: ILogParams) => {
-                await this.swapApplication.buySync(logParams);
-            },
-        );
-
         // TODO: NEED TO UNCOMMENT
         // WS.initWebSocketInstance(
         //     party.address,
-        //     PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
+        //     PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
         //     async (logParams: ILogParams) => {
-        //         await this.withdrawApplication.sync(logParams);
+        //         await this.swapApplication.buySync(logParams);
         //     },
         // );
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
+            async (logParams: ILogParams) => {
+                await this.withdrawApplication.sync(logParams);
+            },
+        );
 
         return {
             message: 'Success get withdraw preparation data',
