@@ -110,7 +110,7 @@ export class PartyMemberService {
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
 
-        Logger.debug(party.id, 'partyId =>');
+        Logger.debug(`update memberId ${partyMember.id} weight`);
 
         partyMember.weight = partyMember.totalDeposit
             .muln(config.calculation.maxPercentage)

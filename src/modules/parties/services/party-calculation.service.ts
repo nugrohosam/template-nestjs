@@ -34,6 +34,8 @@ export class PartyCalculationService {
         party: PartyModel,
         amount: BN,
     ): Promise<PartyModel> {
+        Logger.debug(`update partyId ${party.id} total fund`);
+
         party.totalDeposit = party.totalDeposit.add(amount);
         return await this.partyRepository.save(party);
     }
@@ -42,11 +44,15 @@ export class PartyCalculationService {
         partyMember: PartyMemberModel,
         amount: BN,
     ): Promise<PartyMemberModel> {
+        Logger.debug(`update memberId ${partyMember.id} total deposit`);
+
         partyMember.totalDeposit = partyMember.totalDeposit.add(amount);
         return await this.partyMemberRepository.save(partyMember);
     }
 
     async updatePartyMembersWeight(party: PartyModel): Promise<void> {
+        Logger.debug(`update member partyId ${party.id} weight`);
+
         const partyMembers = await this.partyMemberRepository
             .createQueryBuilder('partyMember')
             .where('party_id = :partyId', { partyId: party.id })
@@ -92,8 +98,6 @@ export class PartyCalculationService {
             member.id,
             party.id,
         );
-
-        Logger.debug(partyMember.id, 'partyMemberId =>');
 
         const withdrawAmount = amount.muln(-1);
         await Promise.all([
