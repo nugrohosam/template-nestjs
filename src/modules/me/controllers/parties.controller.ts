@@ -102,14 +102,13 @@ export class MePartiesController {
             request,
         );
 
-        // TODO: NEED TO UNCOMMENT
-        // WS.initWebSocketInstance(
-        //     party.address,
-        //     PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
-        //     async (logParams: ILogParams) => {
-        //         await this.swapApplication.buySync(logParams);
-        //     },
-        // );
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
+            async (logParams: ILogParams) => {
+                await this.swapApplication.buySync(logParams);
+            },
+        );
 
         WS.initWebSocketInstance(
             party.address,
