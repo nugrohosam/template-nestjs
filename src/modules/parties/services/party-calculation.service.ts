@@ -69,11 +69,13 @@ export class PartyCalculationService {
             (await this.getPartyService.getById(partyMember.partyId));
 
         const token = await this.tokenService.getDefaultToken();
-        await this.updatePartyTotalFund(party, amount);
-        await this.updatePartyMemberTotalDeposit(partyMember, amount);
-        await this.updatePartyMembersWeight(party);
-        await this.partyService.storeToken(party, token);
-        await this.partyFundService.updatePartyFund(party);
+        Promise.all([
+            await this.updatePartyTotalFund(party, amount),
+            await this.updatePartyMemberTotalDeposit(partyMember, amount),
+            await this.updatePartyMembersWeight(party),
+            await this.partyService.storeToken(party, token),
+            await this.partyFundService.updatePartyFund(party),
+        ]);
     }
 
     @Transactional()
@@ -92,10 +94,15 @@ export class PartyCalculationService {
         );
 
         const withdrawAmount = amount.muln(-1);
-        await this.updatePartyTotalFund(party, withdrawAmount);
-        await this.updatePartyMemberTotalDeposit(partyMember, withdrawAmount);
-        await this.updatePartyMembersWeight(party);
-        await this.partyFundService.updatePartyFund(party);
+        await Promise.all([
+            await this.updatePartyTotalFund(party, withdrawAmount),
+            await this.updatePartyMemberTotalDeposit(
+                partyMember,
+                withdrawAmount,
+            ),
+            await this.updatePartyMembersWeight(party),
+            await this.partyFundService.updatePartyFund(party),
+        ]);
         Logger.debug('LeaveWithdraw line 96');
     }
 }
