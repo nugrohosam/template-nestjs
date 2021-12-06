@@ -1,5 +1,4 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, Logger } from '@nestjs/common';
 import BN from 'bn.js';
 import { config } from 'src/config';
 import { IPartyMember } from 'src/entities/party-member.entity';
@@ -10,7 +9,6 @@ import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Repository } from 'typeorm';
 import { GetPartyService } from '../get-party.service';
 
-@Injectable()
 export class PartyMemberService {
     constructor(
         @InjectRepository(PartyMemberModel)
@@ -110,27 +108,38 @@ export class PartyMemberService {
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
 
-        Logger.debug(`update memberId ${partyMember.id} weight`);
-
-        partyMember.weight = partyMember.totalDeposit
+        const weight = partyMember.totalDeposit
             .muln(config.calculation.maxPercentage)
             .div(party.totalDeposit);
 
-        return await this.partyMemberRepository.save(partyMember);
+        await this.partyMemberRepository
+            .createQueryBuilder('partyMember')
+            .update(PartyMemberModel)
+            .set({ weight })
+            .where('id = :id', { id: partyMember.id })
+            .execute();
+
+        return partyMember;
     }
 
     async updatePartyMemberFund(
         partyMember: PartyMemberModel,
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
-        if (!partyMember.weight || partyMember.weight.isZero()) {
-            partyMember.totalFund = new BN(0);
-        } else {
-            partyMember.totalFund = party.totalFund
-                .mul(partyMember.weight)
-                .divn(1000000);
+
+        let totalFund = new BN(0);
+
+        if (partyMember.weight && !partyMember.weight.isZero()) {
+            totalFund = party.totalFund.mul(partyMember.weight).divn(1000000);
         }
 
-        return this.partyMemberRepository.save(partyMember);
+        await this.partyMemberRepository
+            .createQueryBuilder('partyMember')
+            .update(PartyMemberModel)
+            .set({ totalFund })
+            .where('id = :id', { id: partyMember.id })
+            .execute();
+
+        return partyMember;
     }
 }
