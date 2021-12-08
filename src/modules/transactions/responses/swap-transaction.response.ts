@@ -8,7 +8,7 @@ export class SwapTransactionResponse
     tokenTarget: string;
     buyAmount: string;
     sellAmount: string;
-    usd: string;
+    usd: number;
     updatedAt?: Date;
     id: string;
     createdAt: Date;
@@ -24,7 +24,7 @@ export class SwapTransactionResponse
             tokenTarget: transaction.tokenTarget,
             buyAmount: transaction.buyAmount.toString(),
             sellAmount: transaction.sellAmount.toString(),
-            usd: transaction.usd.toString(),
+            usd: transaction.usd,
             createdAt: transaction.createdAt,
             userAddress,
         };

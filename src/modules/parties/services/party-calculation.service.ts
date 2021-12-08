@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { GetPartyService } from './get-party.service';
@@ -35,6 +35,11 @@ export class PartyCalculationService {
         amount: BN,
     ): Promise<PartyModel> {
         party.totalDeposit = party.totalDeposit.add(amount);
+        Logger.debug(
+            party.totalDeposit,
+            `update partyId total fund: ${party.id} =>`,
+        );
+
         return await this.partyRepository.save(party);
     }
 
@@ -43,17 +48,24 @@ export class PartyCalculationService {
         amount: BN,
     ): Promise<PartyMemberModel> {
         partyMember.totalDeposit = partyMember.totalDeposit.add(amount);
+        Logger.debug(
+            partyMember.totalDeposit,
+            `update memberId total deposit: ${partyMember.id} =>`,
+        );
+
         return await this.partyMemberRepository.save(partyMember);
     }
 
     async updatePartyMembersWeight(party: PartyModel): Promise<void> {
+        Logger.debug(`update members partyId ${party.id} weight`);
+
         const partyMembers = await this.partyMemberRepository
             .createQueryBuilder('partyMember')
             .where('party_id = :partyId', { partyId: party.id })
             .getMany();
 
         await Promise.all(
-            partyMembers.map(async (partyMember) =>
+            partyMembers.map((partyMember) =>
                 this.partyMemberService.updatePartyMemberWeight(partyMember),
             ),
         );
@@ -66,11 +78,13 @@ export class PartyCalculationService {
             (await this.getPartyService.getById(partyMember.partyId));
 
         const token = await this.tokenService.getDefaultToken();
-        await this.updatePartyTotalFund(party, amount);
-        await this.updatePartyMemberTotalDeposit(partyMember, amount);
-        await this.updatePartyMembersWeight(party);
-        await this.partyService.storeToken(party, token);
-        await this.partyFundService.updatePartyFund(party);
+        Promise.all([
+            await this.updatePartyTotalFund(party, amount),
+            await this.updatePartyMemberTotalDeposit(partyMember, amount),
+            await this.updatePartyMembersWeight(party),
+            await this.partyService.storeToken(party, token),
+            await this.partyFundService.updatePartyFund(party),
+        ]);
     }
 
     @Transactional()
@@ -89,9 +103,15 @@ export class PartyCalculationService {
         );
 
         const withdrawAmount = amount.muln(-1);
-        await this.updatePartyTotalFund(party, withdrawAmount);
-        await this.updatePartyMemberTotalDeposit(partyMember, withdrawAmount);
-        await this.updatePartyMembersWeight(party);
-        await this.partyFundService.updatePartyFund(party);
+        await Promise.all([
+            await this.updatePartyTotalFund(party, withdrawAmount),
+            await this.updatePartyMemberTotalDeposit(
+                partyMember,
+                withdrawAmount,
+            ),
+            await this.updatePartyMembersWeight(party),
+            await this.partyFundService.updatePartyFund(party),
+        ]);
+        Logger.debug('LeaveWithdraw line 96');
     }
 }

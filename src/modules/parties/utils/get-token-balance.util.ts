@@ -16,6 +16,7 @@ export class GetTokenBalanceService {
         decimal: string;
         name: string;
     }> => {
+        // TODO: for log
         const erc20Token = this.web3Service.getContractInstance(
             Erc20AbiItem,
             addressToken,

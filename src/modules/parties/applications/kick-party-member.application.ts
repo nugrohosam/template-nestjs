@@ -130,7 +130,6 @@ export class KickPartyMemberApplication {
                 userAddress,
                 partyAddress,
             );
-        Logger.debug(partyMember, 'PartyMemberData');
         await this.transactionService.storeWithdrawTransaction(
             userAddress,
             partyAddress,
@@ -150,7 +149,6 @@ export class KickPartyMemberApplication {
         partyMember = await this.partyMemberService.update(partyMember, {
             leaveTransactionHash: logParams.result.transactionHash,
         });
-        Logger.debug(partyMember, 'PartyMemberData2');
 
         await Promise.all([
             this.partyMemberService.delete(partyMember),

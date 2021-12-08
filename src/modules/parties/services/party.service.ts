@@ -85,9 +85,10 @@ export class PartyService {
                 address: token.address,
                 symbol: token.symbol,
             });
+            return await this.partyTokenRepository.save(partyToken);
         }
 
-        return await this.partyTokenRepository.save(partyToken);
+        return partyToken;
     }
 
     async getPartyTokenByAddress(address: string): Promise<PartyTokenModel> {

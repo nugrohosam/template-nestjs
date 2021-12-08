@@ -125,6 +125,7 @@ export class PartyMemberController {
         const partyMember = await this.getPartyMemberService.getById(
             partyMemberId,
         );
+
         await this.joinPartyApplication.commit(partyMember, request);
         return {
             message: 'Success update join party data',

@@ -69,7 +69,7 @@ export class PartyMemberService {
         ]);
 
         // TODO: need to removed after testing
-        console.log('message[platform-join-party]: ' + message);
+        console.log('message[platform-join-party]=: ' + message);
         return await this.web3Service.sign(message);
     }
 
@@ -108,25 +108,38 @@ export class PartyMemberService {
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
 
-        partyMember.weight = partyMember.totalDeposit
+        const weight = partyMember.totalDeposit
             .muln(config.calculation.maxPercentage)
             .div(party.totalDeposit);
 
-        return this.partyMemberRepository.save(partyMember);
+        await this.partyMemberRepository
+            .createQueryBuilder('partyMember')
+            .update(PartyMemberModel)
+            .set({ weight })
+            .where('id = :id', { id: partyMember.id })
+            .execute();
+
+        return partyMember;
     }
 
     async updatePartyMemberFund(
         partyMember: PartyMemberModel,
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
-        if (!partyMember.weight || partyMember.weight.isZero()) {
-            partyMember.totalFund = new BN(0);
-        } else {
-            partyMember.totalFund = party.totalFund
-                .mul(partyMember.weight)
-                .divn(1000000);
+
+        let totalFund = new BN(0);
+
+        if (partyMember.weight && !partyMember.weight.isZero()) {
+            totalFund = party.totalFund.mul(partyMember.weight).divn(1000000);
         }
 
-        return this.partyMemberRepository.save(partyMember);
+        await this.partyMemberRepository
+            .createQueryBuilder('partyMember')
+            .update(PartyMemberModel)
+            .set({ totalFund })
+            .where('id = :id', { id: partyMember.id })
+            .execute();
+
+        return partyMember;
     }
 }
