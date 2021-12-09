@@ -21,6 +21,7 @@ export interface IParty {
     creatorId: string;
     ownerId: string;
     isPublic: boolean;
+    isClosed?: boolean;
     isFeatured?: boolean;
     totalDeposit?: string | BN;
     totalFund?: string | BN;

@@ -71,6 +71,11 @@ export class PartyService {
         await this.partyRepository.softDelete({ id });
     }
 
+    async close(party: PartyModel): Promise<PartyModel> {
+        party.isClosed = true;
+        return this.partyRepository.save(party);
+    }
+
     async storeToken(
         party: PartyModel,
         token: CurrencyModel,

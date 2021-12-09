@@ -120,6 +120,6 @@ export class ClosePartyApplication {
             partyAddress,
             true,
         );
-        await this.partyService.delete(party);
+        await this.partyService.close(party);
     }
 }
