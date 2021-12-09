@@ -54,6 +54,12 @@ export class IndexPartyApplication extends IndexApplication {
             });
         }
 
+        if (request.isClosed) {
+            query.andWhere('party.is_closed = :isClosed', {
+                isClosed: request.isClosed,
+            });
+        }
+
         if (request.name) {
             // will filter the exac name of the party
             query.andWhere('party.name = :name', { name: request.name });
