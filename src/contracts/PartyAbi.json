@@ -2,21 +2,14 @@
     {
         "inputs": [
             {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "minDeposit",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "maxDeposit",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct Party.RangeDepth",
-                "name": "inputRangeDep",
-                "type": "tuple"
+                "internalType": "uint256",
+                "name": "minDeposit",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxDeposit",
+                "type": "uint256"
             },
             {
                 "components": [
@@ -61,26 +54,19 @@
                 "type": "tuple"
             },
             {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "r",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "bytes32",
-                        "name": "s",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "v",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct Party.Sig",
-                "name": "inputPlatformRSV",
-                "type": "tuple"
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
             },
             {
                 "internalType": "contract IERC20",
@@ -270,12 +256,6 @@
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "n",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
                 "name": "penalty",
                 "type": "uint256"
             }
@@ -314,12 +294,6 @@
                 "indexed": false,
                 "internalType": "uint256",
                 "name": "cut",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "n",
                 "type": "uint256"
             },
             {
@@ -436,12 +410,6 @@
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "n",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
                 "name": "penalty",
                 "type": "uint256"
             }
@@ -450,14 +418,8 @@
         "type": "event"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "balance",
+        "inputs": [],
+        "name": "balanceParty",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -469,8 +431,27 @@
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "member",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
-        "name": "balanceParty",
+        "name": "memberCount",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -515,24 +496,6 @@
     },
     {
         "inputs": [],
-        "name": "rangeDEP",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "minDeposit",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "maxDeposit",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "renounceOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -549,25 +512,6 @@
         "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "weight",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -608,26 +552,19 @@
                 "type": "uint256"
             },
             {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "r",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "bytes32",
-                        "name": "s",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "v",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct Party.Sig",
-                "name": "inputApproveRSV",
-                "type": "tuple"
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
             }
         ],
         "name": "fillQuote",
@@ -695,26 +632,19 @@
                 "type": "tuple[]"
             },
             {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "r",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "bytes32",
-                        "name": "s",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "v",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct Party.Sig",
-                "name": "withdrawRSV",
-                "type": "tuple"
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
             }
         ],
         "name": "withdraw",
@@ -756,26 +686,19 @@
     {
         "inputs": [
             {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "r",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "bytes32",
-                        "name": "s",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "v",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct Party.Sig",
-                "name": "inputJoinPartyPlatformRSV",
-                "type": "tuple"
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
             },
             {
                 "internalType": "address",
@@ -863,26 +786,19 @@
                 "type": "tuple[]"
             },
             {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "r",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "bytes32",
-                        "name": "s",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "v",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct Party.Sig",
-                "name": "leavePartyRSV",
-                "type": "tuple"
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
             }
         ],
         "name": "leaveParty",
@@ -950,26 +866,19 @@
                 "type": "tuple[]"
             },
             {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "r",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "bytes32",
-                        "name": "s",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "v",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct Party.Sig",
-                "name": "leavePartyRSV",
-                "type": "tuple"
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
             }
         ],
         "name": "kickParty",
@@ -980,85 +889,19 @@
     {
         "inputs": [
             {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "weightAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "weightPercentage",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct Party.Weight[]",
-                "name": "weightArray",
-                "type": "tuple[]"
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
             },
             {
-                "components": [
-                    {
-                        "internalType": "contract IERC20",
-                        "name": "buyTokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "contract IERC20",
-                        "name": "sellTokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "spender",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address payable",
-                        "name": "swapTarget",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "bytes",
-                        "name": "swapCallData",
-                        "type": "bytes"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "sellAmount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "buyAmount",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct Party.SwapWithoutRSV[]",
-                "name": "tokenData",
-                "type": "tuple[]"
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
             },
             {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "r",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "bytes32",
-                        "name": "s",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "v",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct Party.Sig",
-                "name": "closePartyRSV",
-                "type": "tuple"
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
             }
         ],
         "name": "closeParty",
