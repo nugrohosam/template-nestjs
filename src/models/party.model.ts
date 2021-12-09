@@ -69,6 +69,9 @@ export class PartyModel implements IParty {
     @Column('boolean', { name: 'is_featured', nullable: true })
     isFeatured?: boolean;
 
+    @Column('boolean', { name: 'is_closed' })
+    isClosed?: boolean;
+
     @Column('bigint', {
         name: 'min_deposit',
         nullable: true,
