@@ -20,7 +20,8 @@ import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.respon
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { config } from 'src/config';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { LeavePartyApplication } from './leave-party.application';
+import { PartyMemberService } from 'src/modules/parties/services/members/party-member.service';
+import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
 
 @Injectable()
 export class WithdrawAllApplication {
@@ -36,7 +37,8 @@ export class WithdrawAllApplication {
         private readonly swapQuoteService: SwapQuoteService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly transactionService: TransactionService,
-        private readonly leavePartyApplication: LeavePartyApplication,
+        private readonly partyMemberService: PartyMemberService,
+        private readonly joinRequestService: JoinRequestService,
     ) {}
 
     async prepare(
@@ -160,6 +162,18 @@ export class WithdrawAllApplication {
         );
 
         // leaver party
-        await this.leavePartyApplication.sync(logParams);
+        const partyMember =
+            await this.getPartyMemberService.getByUserAndPartyAddress(
+                userAddress,
+                partyAddress,
+            );
+
+        await Promise.all([
+            this.partyMemberService.delete(partyMember),
+            this.joinRequestService.deleteJoinRequest(
+                partyMember.memberId,
+                partyMember.partyId,
+            ),
+        ]);
     }
 }
