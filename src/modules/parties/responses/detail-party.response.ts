@@ -20,6 +20,7 @@ export class DetailPartyResponse
     imageUrl: string;
     bio: string;
     isPublic: boolean;
+    isClosed: boolean;
     minDeposit: string;
     maxDeposit: string;
     totalDeposit: string;
@@ -52,6 +53,7 @@ export class DetailPartyResponse
             imageUrl: party.imageUrl,
             bio: party.bio,
             isPublic: party.isPublic,
+            isClosed: party.isClosed,
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
             totalDeposit: party.totalDeposit.toString(),

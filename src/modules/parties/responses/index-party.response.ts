@@ -14,6 +14,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
     bio: string | null;
     purpose: string;
     isPublic: boolean;
+    isClosed: boolean;
     minDeposit: string;
     maxDeposit: string;
     totalMember: number;
@@ -37,6 +38,7 @@ export class IndexPartyResponse implements Omit<IParty, 'creatorId'> {
             bio: party.bio,
             purpose: party.purpose,
             isPublic: party.isPublic,
+            isClosed: party.isClosed,
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
             totalDeposit: party.totalDeposit.toString(),

@@ -5,7 +5,7 @@ import { SwapSignatureSerivce } from '../services/swap/swap-signature.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
@@ -159,9 +159,6 @@ export class SwapQuoteApplication {
             log.transactionHash,
         );
 
-        Logger.debug(data, 'ExecuteBuySync');
-        Logger.debug(receipt, 'Receipt =>');
-
         let decodedLog;
         receipt.logs.some((log) => {
             if (
@@ -197,7 +194,6 @@ export class SwapQuoteApplication {
         }
         await this.partyService.storeToken(party, token);
 
-        Logger.debug(swapEventData.sellAmount, 'sellAmount=>'); // TODO for debugging
         // get symbol by address at party token
         const partyToken = await this.partyService.getPartyTokenByAddress(
             swapEventData.sellTokenAddress,
@@ -205,18 +201,15 @@ export class SwapQuoteApplication {
         const decimal = await this.tokenService.getTokenDecimal(
             swapEventData.sellTokenAddress,
         );
-        Logger.debug(decimal, 'Decimal'); // TODO for debugging
         const marketValue = await this.tokenPrice.getMarketValue([
             partyToken.symbol,
         ]);
-        Logger.debug(marketValue, 'MarketValue'); // TODO for debugging
 
         const usd =
             this.tokenBalanceService.formatFromWeiToken(
                 swapEventData.sellAmount,
                 Number(decimal),
             ) * marketValue[partyToken.symbol].current_price;
-        Logger.debug(usd, 'usd'); // TODO for debugging
 
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,
@@ -227,8 +220,6 @@ export class SwapQuoteApplication {
             transactionHash: log.transactionHash,
             usd: usd,
         });
-
-        Logger.debug(swapTransaction, 'swapTransaction'); // TODO for debugging
 
         await Promise.all([
             this.transactionService.updateTxHashStatus(

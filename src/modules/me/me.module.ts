@@ -10,6 +10,7 @@ import { ClosePartyApplication } from './applications/close-party.application';
 import { DepositApplication } from './applications/deposit.application';
 import { LeavePartyApplication } from './applications/leave-party.application';
 import { MyPartiesApplication } from './applications/my-parties.application';
+import { WithdrawAllApplication } from './applications/withdraw-all.application';
 import { WithdrawApplication } from './applications/withdraw.application';
 import { MePartiesController } from './controllers/parties.controller';
 import { MeService } from './services/me.service';
@@ -29,10 +30,13 @@ import { MeService } from './services/me.service';
         WithdrawApplication,
         LeavePartyApplication,
         ClosePartyApplication,
+        WithdrawApplication,
+        WithdrawAllApplication,
 
         MeService,
     ],
     exports: [
+        WithdrawAllApplication,
         WithdrawApplication,
         LeavePartyApplication,
         ClosePartyApplication,

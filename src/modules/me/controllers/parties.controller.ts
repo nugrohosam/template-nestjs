@@ -20,11 +20,15 @@ import { ClosePartyApplication } from '../applications/close-party.application';
 import { DepositApplication } from '../applications/deposit.application';
 import { LeavePartyApplication } from '../applications/leave-party.application';
 import { MyPartiesApplication } from '../applications/my-parties.application';
+import { WithdrawAllApplication } from '../applications/withdraw-all.application';
 import { WithdrawApplication } from '../applications/withdraw.application';
 import { DepositRequest } from '../requests/deposit.request';
 import { IndexMePartyRequest } from '../requests/index-party.request';
 import { LeavePartyRequest } from '../requests/leave.request';
-import { WithdrawRequest } from '../requests/withdraw.request';
+import {
+    WithdrawAllRequest,
+    WithdrawRequest,
+} from '../requests/withdraw.request';
 import { ClosePreparationResponse } from '../responses/close-preparation.response';
 import { LeavePreparationResponse } from '../responses/leave-preparation.response';
 import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.response';
@@ -35,6 +39,7 @@ export class MePartiesController {
         private readonly myPartyApplication: MyPartiesApplication,
         private readonly depositApplication: DepositApplication,
         private readonly withdrawApplication: WithdrawApplication,
+        private readonly withdrawAllApplication: WithdrawAllApplication,
         private readonly leavePartyApplication: LeavePartyApplication,
         private readonly closePartyApplication: ClosePartyApplication,
         private readonly swapApplication: SwapQuoteApplication,
@@ -121,6 +126,40 @@ export class MePartiesController {
         return {
             message: 'Success get withdraw preparation data',
             data: withdrawPreparation,
+        };
+    }
+
+    @Post(':partyId/withdraw-all')
+    async withdrawall(
+        @Headers('Signature') signature: string,
+        @Param('partyId') partyId: string,
+        @Body() request: WithdrawAllRequest,
+    ): Promise<IApiResponse<WithdrawPreparationResponse>> {
+        const user = await this.getSignerService.get(signature, true);
+        const party = await this.getPartyService.getById(partyId);
+
+        const withdrawAllPreparation =
+            await this.withdrawAllApplication.prepare(user, party, request);
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
+            async (logParams: ILogParams) => {
+                await this.swapApplication.buySync(logParams);
+            },
+        );
+
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
+            async (logParams: ILogParams) => {
+                await this.withdrawAllApplication.sync(logParams);
+            },
+        );
+
+        return {
+            message: 'Success get withdraw-all preparation data',
+            data: withdrawAllPreparation,
         };
     }
 
