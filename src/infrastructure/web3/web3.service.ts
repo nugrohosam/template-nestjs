@@ -167,7 +167,12 @@ export class Web3Service {
         transactionHash: string,
         eventName: PartyEvents,
     ): Promise<{ [key: string]: string } | undefined> {
-        const receipt = await this.getTransactionReceipt(transactionHash);
+        let receipt;
+        let trialGetReceipt = 0;
+        do {
+            receipt = await this.getTransactionReceipt(transactionHash);
+            trialGetReceipt++;
+        } while (!receipt && trialGetReceipt <= 3);
 
         let decodedLog: { [key: string]: string };
         receipt.logs.some((receiptLog) => {
