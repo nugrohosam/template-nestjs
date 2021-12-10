@@ -9,3 +9,9 @@ export class WithdrawRequest {
     @IsString()
     signature: string;
 }
+
+export class WithdrawAllRequest {
+    @IsNotEmpty()
+    @IsString()
+    signature: string;
+}

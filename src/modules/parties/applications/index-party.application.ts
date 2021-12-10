@@ -58,6 +58,8 @@ export class IndexPartyApplication extends IndexApplication {
             query.andWhere('party.is_closed = :isClosed', {
                 isClosed: request.isClosed,
             });
+        } else {
+            query.andWhere('party.is_closed = 0');
         }
 
         if (request.name) {
