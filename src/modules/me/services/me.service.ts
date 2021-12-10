@@ -24,6 +24,12 @@ export class MeService {
         return message;
     }
 
+    generateWithdrawAllSignature(partyName: string): string {
+        const message = `I want to withdraw all my money at ${partyName}`;
+        console.log(`message[withdraw-all]: ${message}`);
+        return message;
+    }
+
     async generateWithdrawPlatformSignature(
         partyAddress: string,
         amount: BN,
