@@ -12,6 +12,7 @@ import { ProposalDistributionModel } from 'src/models/proposal-distribution.mode
 import { ProposalVoteModel } from 'src/models/proposal-vote.model';
 import { ProposalModel } from 'src/models/proposal.model';
 import { SwapTransactionModel } from 'src/models/swap-transaction.model';
+import { TransactionSyncModel } from 'src/models/transaction-sync.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import { UserModel } from 'src/models/user.model';
 import { ConnectionOptions, createConnection } from 'typeorm';
@@ -39,6 +40,7 @@ export const connectionOption: ConnectionOptions = {
         SwapTransactionModel,
         AnnouncementModel,
         LandingPageContentModel,
+        TransactionSyncModel,
     ],
     synchronize: false,
     logging: config.nodeEnv === 'local',
