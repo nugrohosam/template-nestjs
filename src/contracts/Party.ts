@@ -14,6 +14,7 @@ export enum PartyEvents {
     LeavePartyEvent = 'LeavePartyEvent',
     Qoute0xSwap = 'Qoute0xSwap',
     WithdrawEvent = 'WithdrawEvent',
+    WithdrawAllEvent = 'WithdrawAllEvent',
 }
 
 class Party {
