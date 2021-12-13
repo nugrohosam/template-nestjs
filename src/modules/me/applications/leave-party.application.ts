@@ -120,7 +120,9 @@ export class LeavePartyApplication {
     async sync(logParams: ILogParams): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeLeaveEventData(logParams);
+                await this.meService.decodeLeaveEventData(
+                    logParams.result.transactionHash,
+                );
 
             let partyMember =
                 await this.getPartyMemberService.getByUserAndPartyAddress(
@@ -164,6 +166,50 @@ export class LeavePartyApplication {
                 isSync: false,
             });
             Logger.error('[LEAVE-PARTY-NOT-SYNC]', error);
+        }
+    }
+    async retrySync(transactionHash: string): Promise<void> {
+        try {
+            const { userAddress, partyAddress, amount, cut, penalty } =
+                await this.meService.decodeLeaveEventData(transactionHash);
+
+            let partyMember =
+                await this.getPartyMemberService.getByUserAndPartyAddress(
+                    userAddress,
+                    partyAddress,
+                );
+
+            await this.transactionService.storeWithdrawTransaction(
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                null,
+                transactionHash,
+            );
+
+            await this.partyCalculationService.withdraw(
+                partyAddress,
+                userAddress,
+                amount,
+            );
+
+            partyMember = await this.partyMemberService.update(partyMember, {
+                leaveTransactionHash: transactionHash,
+            });
+
+            await Promise.all([
+                this.partyMemberService.delete(partyMember),
+                this.joinRequestService.deleteJoinRequest(
+                    partyMember.memberId,
+                    partyMember.partyId,
+                ),
+            ]);
+            Logger.debug('<= Retry Leave Party End sync ');
+        } catch (error) {
+            // save to log for retrial
+            Logger.error('[RETRY-LEAVE-PARTY-NOT-SYNC]', error);
         }
     }
 }
