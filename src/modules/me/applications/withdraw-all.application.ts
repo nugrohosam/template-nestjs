@@ -121,7 +121,7 @@ export class WithdrawAllApplication {
     async sync(logParams: ILogParams): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeWithdrawEventData(
+                await this.meService.decodeLeaveEventData(
                     logParams.result.transactionHash,
                 );
 
@@ -174,7 +174,7 @@ export class WithdrawAllApplication {
     async retrySync(transactionHash: string): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeWithdrawEventData(transactionHash);
+                await this.meService.decodeLeaveEventData(transactionHash);
 
             let partyMember =
                 await this.getPartyMemberService.getByUserAndPartyAddress(

@@ -4,6 +4,12 @@ import { Repository, UpdateResult } from 'typeorm';
 import { TransactionSyncModel } from 'src/models/transaction-sync.model';
 import { ITransactionSync } from 'src/entities/transaction-sync.entity';
 
+export enum SyncEnumOptions {
+    All = 'All',
+    IsSync = 'IsSync',
+    IsNotSync = 'IsNotSync',
+}
+
 @Injectable()
 export class TransactionSyncService {
     constructor(
@@ -11,13 +17,24 @@ export class TransactionSyncService {
         private readonly repository: Repository<TransactionSyncModel>,
     ) {}
 
-    async get(isSync?: boolean): Promise<TransactionSyncModel[]> {
+    async get(
+        option: SyncEnumOptions = SyncEnumOptions.All,
+    ): Promise<TransactionSyncModel[]> {
         const query = this.repository.createQueryBuilder('trx');
 
-        if (isSync) {
-            query.where('trx.is_sync= :isSync', {
-                isSync,
-            });
+        switch (option) {
+            case SyncEnumOptions.IsSync:
+                query.where('trx.is_sync= :isSync', {
+                    isSync: true,
+                });
+                break;
+            case SyncEnumOptions.IsNotSync:
+                query.where('trx.is_sync= :isSync', {
+                    isSync: false,
+                });
+                break;
+            default:
+                break;
         }
         return query.getMany();
     }
