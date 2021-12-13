@@ -121,7 +121,7 @@ export class WithdrawAllApplication {
     async sync(logParams: ILogParams): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeWithdrawEventData(
+                await this.meService.decodeLeaveEventData(
                     logParams.result.transactionHash,
                 );
 
@@ -174,7 +174,7 @@ export class WithdrawAllApplication {
     async retrySync(transactionHash: string): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeWithdrawEventData(transactionHash);
+                await this.meService.decodeLeaveEventData(transactionHash);
 
             let partyMember =
                 await this.getPartyMemberService.getByUserAndPartyAddress(
@@ -209,10 +209,19 @@ export class WithdrawAllApplication {
                     partyMember.partyId,
                 ),
             ]);
+
+            await this.transactionSyncService.updateStatusSync(
+                transactionHash,
+                true,
+            );
+
             Logger.debug('<= Retry Withdraw-All End sync ');
         } catch (error) {
             // skip retry and will be delegated to next execution
-            Logger.error('[RETRY-WITHDRAW-ALL-NOT-SYNC]', error);
+            Logger.error(
+                `[RETRY-WITHDRAW-ALL-NOT-SYNC] => ${transactionHash} || error =>`,
+                error,
+            );
         }
     }
 }

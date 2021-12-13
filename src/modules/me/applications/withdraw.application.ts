@@ -200,7 +200,10 @@ export class WithdrawApplication {
             );
         } catch (error) {
             // skip retry and will be delegated to next execution
-            Logger.error('[RETRY-WITHDRAW-NOT-SYNC]', error);
+            Logger.error(
+                `[RETRY-WITHDRAW-NOT-SYNC]  => ${transactionHash} || error =>`,
+                error,
+            );
         }
     }
 }
