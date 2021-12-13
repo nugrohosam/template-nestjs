@@ -3,6 +3,7 @@ import {
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
+import { Utils } from 'src/common/utils/util';
 import { config } from 'src/config';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import Web3 from 'web3';
@@ -170,9 +171,14 @@ export class Web3Service {
         let receipt;
         let trialGetReceipt = 0;
         do {
+            await Utils.takeDelay(2000);
             receipt = await this.getTransactionReceipt(transactionHash);
             trialGetReceipt++;
-        } while (!receipt && trialGetReceipt <= 3);
+        } while (!receipt && trialGetReceipt <= 2);
+
+        if (!receipt) {
+            return;
+        }
 
         let decodedLog: { [key: string]: string };
         receipt.logs.some((receiptLog) => {

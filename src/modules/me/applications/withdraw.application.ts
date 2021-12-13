@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -20,6 +20,8 @@ import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.respon
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { config } from 'src/config';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
+import { PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class WithdrawApplication {
@@ -35,6 +37,7 @@ export class WithdrawApplication {
         private readonly swapQuoteService: SwapQuoteService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly transactionService: TransactionService,
+        private readonly transactionSyncService: TransactionSyncService,
     ) {}
 
     async prepare(
@@ -137,23 +140,35 @@ export class WithdrawApplication {
 
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress, amount, cut, penalty } =
-            await this.meService.decodeWithdrawEventData(logParams);
+        try {
+            const { userAddress, partyAddress, amount, cut, penalty } =
+                await this.meService.decodeWithdrawEventData(
+                    logParams.result.transactionHash,
+                );
 
-        await this.transactionService.storeWithdrawTransaction(
-            userAddress,
-            partyAddress,
-            amount,
-            cut,
-            penalty,
-            null,
-            logParams.result.transactionHash,
-        );
+            await this.transactionService.storeWithdrawTransaction(
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                null,
+                logParams.result.transactionHash,
+            );
 
-        await this.partyCalculationService.withdraw(
-            partyAddress,
-            userAddress,
-            amount,
-        );
+            await this.partyCalculationService.withdraw(
+                partyAddress,
+                userAddress,
+                amount,
+            );
+        } catch (error) {
+            // save to log for retrial
+            await this.transactionSyncService.store({
+                transactionHash: logParams.result.transactionHash,
+                eventName: PartyEvents.WithdrawEvent,
+                isSync: false,
+            });
+            Logger.error('[WITHDRAW-NOT-SYNC]', error);
+        }
     }
 }

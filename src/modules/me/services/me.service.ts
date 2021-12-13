@@ -1,4 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+    Injectable,
+    Logger,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import BN from 'bn.js';
 import { PartyEvents } from 'src/contracts/Party';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
@@ -45,7 +49,7 @@ export class MeService {
         return await this.web3Service.sign(message);
     }
 
-    async decodeWithdrawEventData({ result: log }: ILogParams): Promise<{
+    async decodeWithdrawEventData(transactionHash: string): Promise<{
         userAddress: string;
         partyAddress: string;
         amount: BN;
@@ -53,10 +57,11 @@ export class MeService {
         penalty: BN;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
-            log.transactionHash,
+            transactionHash,
             PartyEvents.WithdrawEvent,
         );
-        if (Object.keys(decodedLog).length <= 0) return;
+        if (!decodedLog)
+            throw new UnprocessableEntityException('Receipt is null');
 
         // TODO: this the usual way to get the docoded log. will try to access the input name directly in leave party event.
         const data = {
