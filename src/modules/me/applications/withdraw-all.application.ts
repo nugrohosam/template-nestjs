@@ -209,10 +209,19 @@ export class WithdrawAllApplication {
                     partyMember.partyId,
                 ),
             ]);
+
+            await this.transactionSyncService.updateStatusSync(
+                transactionHash,
+                true,
+            );
+
             Logger.debug('<= Retry Withdraw-All End sync ');
         } catch (error) {
             // skip retry and will be delegated to next execution
-            Logger.error('[RETRY-WITHDRAW-ALL-NOT-SYNC]', error);
+            Logger.error(
+                `[RETRY-WITHDRAW-ALL-NOT-SYNC] => ${transactionHash} || error =>`,
+                error,
+            );
         }
     }
 }

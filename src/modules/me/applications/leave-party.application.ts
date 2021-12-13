@@ -206,10 +206,19 @@ export class LeavePartyApplication {
                     partyMember.partyId,
                 ),
             ]);
+
+            await this.transactionSyncService.updateStatusSync(
+                transactionHash,
+                true,
+            );
+
             Logger.debug('<= Retry Leave Party End sync ');
         } catch (error) {
             // save to log for retrial
-            Logger.error('[RETRY-LEAVE-PARTY-NOT-SYNC]', error);
+            Logger.error(
+                `[RETRY-LEAVE-PARTY-NOT-SYNC]  => ${transactionHash} || error =>`,
+                error,
+            );
         }
     }
 }
