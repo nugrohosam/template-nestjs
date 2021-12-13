@@ -31,7 +31,10 @@ import {
 } from '../requests/withdraw.request';
 import { ClosePreparationResponse } from '../responses/close-preparation.response';
 import { LeavePreparationResponse } from '../responses/leave-preparation.response';
-import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.response';
+import {
+    WithdrawAllPreparationResponse,
+    WithdrawPreparationResponse,
+} from '../responses/withdraw-preparation.response';
 
 @Controller('me/parties')
 export class MePartiesController {
@@ -134,7 +137,7 @@ export class MePartiesController {
         @Headers('Signature') signature: string,
         @Param('partyId') partyId: string,
         @Body() request: WithdrawAllRequest,
-    ): Promise<IApiResponse<WithdrawPreparationResponse>> {
+    ): Promise<IApiResponse<WithdrawAllPreparationResponse>> {
         const user = await this.getSignerService.get(signature, true);
         const party = await this.getPartyService.getById(partyId);
 
@@ -151,7 +154,7 @@ export class MePartiesController {
 
         WS.initWebSocketInstance(
             party.address,
-            PartyContract.getEventSignature(PartyEvents.WithdrawEvent),
+            PartyContract.getEventSignature(PartyEvents.LeavePartyEvent),
             async (logParams: ILogParams) => {
                 await this.withdrawAllApplication.sync(logParams);
             },
