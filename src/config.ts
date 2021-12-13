@@ -103,5 +103,7 @@ export const config = {
 
     scheduler: {
         partyGain: process.env.PARTY_GAIN_SCHEDULER === 'true' || true,
+        transactionSyncRetrial:
+            process.env.TRANSACTION_SYNC_RETRIAL_SCHEDULER === 'true' || true,
     },
 };

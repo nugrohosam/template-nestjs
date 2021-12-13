@@ -13,7 +13,9 @@ import { MyPartiesApplication } from './applications/my-parties.application';
 import { WithdrawAllApplication } from './applications/withdraw-all.application';
 import { WithdrawApplication } from './applications/withdraw.application';
 import { MePartiesController } from './controllers/parties.controller';
+import { TransactionSyncSchedulerService } from './scheduler/transaction-sync-scheduler.service';
 import { MeService } from './services/me.service';
+import { TransactionSyncRetrialService } from './services/transaction-sync-retrial.service';
 
 @Module({
     imports: [
@@ -33,6 +35,10 @@ import { MeService } from './services/me.service';
         WithdrawApplication,
         WithdrawAllApplication,
 
+        //Scheduler
+        TransactionSyncSchedulerService,
+
+        TransactionSyncRetrialService,
         MeService,
     ],
     exports: [

@@ -76,7 +76,7 @@ export class MeService {
         return data;
     }
 
-    async decodeLeaveEventData({ result: log }: ILogParams): Promise<{
+    async decodeLeaveEventData(transactionHash: string): Promise<{
         partyAddress: string;
         userAddress: string;
         amount: BN;
@@ -84,7 +84,7 @@ export class MeService {
         penalty: BN;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
-            log.transactionHash,
+            transactionHash,
             PartyEvents.LeavePartyEvent,
         );
 
