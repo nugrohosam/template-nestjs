@@ -428,8 +428,7 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
     },
     {
         "inputs": [
@@ -448,8 +447,7 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
     },
     {
         "inputs": [],
@@ -462,8 +460,7 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
     },
     {
         "inputs": [],
@@ -476,8 +473,7 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
     },
     {
         "inputs": [],
@@ -555,8 +551,7 @@
         "name": "fillQuote",
         "outputs": [],
         "stateMutability": "payable",
-        "type": "function",
-        "payable": true
+        "type": "function"
     },
     {
         "inputs": [
@@ -636,8 +631,7 @@
         "name": "withdraw",
         "outputs": [],
         "stateMutability": "payable",
-        "type": "function",
-        "payable": true
+        "type": "function"
     },
     {
         "inputs": [],
@@ -650,8 +644,7 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function",
-        "constant": true
+        "type": "function"
     },
     {
         "inputs": [
@@ -792,8 +785,7 @@
         "name": "leaveParty",
         "outputs": [],
         "stateMutability": "payable",
-        "type": "function",
-        "payable": true
+        "type": "function"
     },
     {
         "inputs": [
@@ -873,8 +865,7 @@
         "name": "kickParty",
         "outputs": [],
         "stateMutability": "payable",
-        "type": "function",
-        "payable": true
+        "type": "function"
     },
     {
         "inputs": [
@@ -897,7 +888,6 @@
         "name": "closeParty",
         "outputs": [],
         "stateMutability": "payable",
-        "type": "function",
-        "payable": true
+        "type": "function"
     }
 ]
