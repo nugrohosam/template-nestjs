@@ -7,15 +7,12 @@ import { UserModel } from 'src/models/user.model';
 import { GetPartyMemberService } from 'src/modules/parties/services/members/get-party-member.service';
 import { Repository } from 'typeorm';
 import { WithdrawAllRequest } from '../requests/withdraw.request';
-import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.response';
 import { MeService } from '../services/me.service';
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { TokenService } from 'src/modules/parties/services/token/token.service';
-import { IPartyTokenBalance } from 'src/entities/party-token.entity';
 import { ILogParams } from 'src/modules/parties/types/logData';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { Utils } from 'src/common/utils/util';
-import { BN } from 'bn.js';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { config } from 'src/config';
@@ -24,6 +21,7 @@ import { PartyMemberService } from 'src/modules/parties/services/members/party-m
 import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
 import { PartyEvents } from 'src/contracts/Party';
+import { WithdrawAllPreparationResponse } from '../responses/withdraw-preparation.response';
 
 @Injectable()
 export class WithdrawAllApplication {
@@ -48,8 +46,7 @@ export class WithdrawAllApplication {
         user: UserModel,
         party: PartyModel,
         request: WithdrawAllRequest,
-    ): Promise<WithdrawPreparationResponse> {
-        const withdrawAllPercentage = 100;
+    ): Promise<WithdrawAllPreparationResponse> {
         const partyMember = await this.getPartyMemberService.getByMemberParty(
             user.id,
             party.id,
@@ -67,7 +64,6 @@ export class WithdrawAllApplication {
             .where('party_id = :partyId', { partyId: party.id })
             .getMany();
 
-        let totalWithdrawAmount = new BN(0); // in base token wei
         const defaultToken = await this.tokenService.getDefaultToken();
         const results = await Promise.all(
             tokens.map(async (token) => {
@@ -77,14 +73,9 @@ export class WithdrawAllApplication {
                 );
                 const withdrawAmount = balance
                     .mul(weight)
-                    .divn(config.calculation.maxPercentage)
-                    .muln(
-                        withdrawAllPercentage *
-                            config.calculation.percentageWei,
-                    )
                     .divn(config.calculation.maxPercentage);
 
-                let swapResponse: ISwap0xResponse;
+                let swapResponse: ISwap0xResponse = null;
                 if (token.address !== defaultToken.address) {
                     const { data, err } = await this.swapQuoteService.getQuote(
                         defaultToken.address,
@@ -99,18 +90,7 @@ export class WithdrawAllApplication {
                     swapResponse = data.data;
                 }
 
-                totalWithdrawAmount = totalWithdrawAmount.add(
-                    swapResponse
-                        ? new BN(swapResponse.buyAmount)
-                        : withdrawAmount,
-                );
-                return {
-                    tokens: {
-                        ...token,
-                        balance: balance.toString(),
-                    } as IPartyTokenBalance,
-                    swap: swapResponse,
-                };
+                return swapResponse;
             }),
         );
 
@@ -125,31 +105,32 @@ export class WithdrawAllApplication {
         );
 
         const platformSignature =
-            await this.meService.generateWithdrawPlatformSignature(
-                party.address,
-                totalWithdrawAmount,
-                distributionPass,
+            await this.partyMemberService.generateLeavePlatformSignature(
+                user.address,
+                weight,
             );
 
         return {
             weight: weight.toString(),
-            amount: totalWithdrawAmount.toString(),
-            tokens: results.map((result) => result.tokens),
-            swap: results
-                .map((result) => result.swap)
-                .filter((result) => result !== undefined),
+            swap: results.filter((result) => result !== null),
             distributionPass,
-            platformSignature,
+            platformSignature: platformSignature,
         };
     }
 
-    @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
                 await this.meService.decodeWithdrawEventData(
                     logParams.result.transactionHash,
                 );
+
+            let partyMember =
+                await this.getPartyMemberService.getByUserAndPartyAddress(
+                    userAddress,
+                    partyAddress,
+                );
+
             await this.transactionService.storeWithdrawTransaction(
                 userAddress,
                 partyAddress,
@@ -166,12 +147,9 @@ export class WithdrawAllApplication {
                 amount,
             );
 
-            // leaver party
-            const partyMember =
-                await this.getPartyMemberService.getByUserAndPartyAddress(
-                    userAddress,
-                    partyAddress,
-                );
+            partyMember = await this.partyMemberService.update(partyMember, {
+                leaveTransactionHash: logParams.result.transactionHash,
+            });
 
             await Promise.all([
                 this.partyMemberService.delete(partyMember),
@@ -180,6 +158,7 @@ export class WithdrawAllApplication {
                     partyMember.partyId,
                 ),
             ]);
+            Logger.debug('<= withdraw-all all End sync ');
         } catch (error) {
             // save to log for retrial
             await this.transactionSyncService.store({
@@ -196,6 +175,13 @@ export class WithdrawAllApplication {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
                 await this.meService.decodeWithdrawEventData(transactionHash);
+
+            let partyMember =
+                await this.getPartyMemberService.getByUserAndPartyAddress(
+                    userAddress,
+                    partyAddress,
+                );
+
             await this.transactionService.storeWithdrawTransaction(
                 userAddress,
                 partyAddress,
@@ -212,12 +198,9 @@ export class WithdrawAllApplication {
                 amount,
             );
 
-            // leaver party
-            const partyMember =
-                await this.getPartyMemberService.getByUserAndPartyAddress(
-                    userAddress,
-                    partyAddress,
-                );
+            partyMember = await this.partyMemberService.update(partyMember, {
+                leaveTransactionHash: transactionHash,
+            });
 
             await Promise.all([
                 this.partyMemberService.delete(partyMember),
@@ -226,11 +209,6 @@ export class WithdrawAllApplication {
                     partyMember.partyId,
                 ),
             ]);
-
-            await this.transactionSyncService.updateStatusSync(
-                transactionHash,
-                true,
-            );
         } catch (error) {
             // skip retry and will be delegated to next execution
             Logger.error('[RETRY-WITHDRAW-ALL-NOT-SYNC]', error);
