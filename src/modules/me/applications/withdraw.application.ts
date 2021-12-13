@@ -171,4 +171,36 @@ export class WithdrawApplication {
             Logger.error('[WITHDRAW-NOT-SYNC]', error);
         }
     }
+
+    @Transactional()
+    async retrySync(transactionHash: string): Promise<void> {
+        try {
+            const { userAddress, partyAddress, amount, cut, penalty } =
+                await this.meService.decodeWithdrawEventData(transactionHash);
+
+            await this.transactionService.storeWithdrawTransaction(
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                null,
+                transactionHash,
+            );
+
+            await this.partyCalculationService.withdraw(
+                partyAddress,
+                userAddress,
+                amount,
+            );
+
+            await this.transactionSyncService.updateStatusSync(
+                transactionHash,
+                true,
+            );
+        } catch (error) {
+            // skip retry and will be delegated to next execution
+            Logger.error('[RETRY-WITHDRAW-NOT-SYNC]', error);
+        }
+    }
 }

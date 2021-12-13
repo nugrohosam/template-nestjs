@@ -190,4 +190,50 @@ export class WithdrawAllApplication {
             Logger.error('[WITHDRAW-ALL-NOT-SYNC]', error);
         }
     }
+
+    @Transactional()
+    async retrySync(transactionHash: string): Promise<void> {
+        try {
+            const { userAddress, partyAddress, amount, cut, penalty } =
+                await this.meService.decodeWithdrawEventData(transactionHash);
+            await this.transactionService.storeWithdrawTransaction(
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                null,
+                transactionHash,
+            );
+
+            await this.partyCalculationService.withdraw(
+                partyAddress,
+                userAddress,
+                amount,
+            );
+
+            // leaver party
+            const partyMember =
+                await this.getPartyMemberService.getByUserAndPartyAddress(
+                    userAddress,
+                    partyAddress,
+                );
+
+            await Promise.all([
+                this.partyMemberService.delete(partyMember),
+                this.joinRequestService.deleteJoinRequest(
+                    partyMember.memberId,
+                    partyMember.partyId,
+                ),
+            ]);
+
+            await this.transactionSyncService.updateStatusSync(
+                transactionHash,
+                true,
+            );
+        } catch (error) {
+            // skip retry and will be delegated to next execution
+            Logger.error('[RETRY-WITHDRAW-ALL-NOT-SYNC]', error);
+        }
+    }
 }

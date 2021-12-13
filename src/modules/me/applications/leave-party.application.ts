@@ -19,6 +19,8 @@ import { Utils } from 'src/common/utils/util';
 import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
+import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
+import { PartyEvents } from 'src/contracts/Party';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -36,6 +38,7 @@ export class LeavePartyApplication {
         private readonly joinRequestService: JoinRequestService,
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
+        private readonly transactionSyncService: TransactionSyncService,
     ) {}
 
     async prepare(
@@ -115,43 +118,52 @@ export class LeavePartyApplication {
     }
 
     async sync(logParams: ILogParams): Promise<void> {
-        Logger.debug('Leave Party Enter sync => ');
-        const { userAddress, partyAddress, amount, cut, penalty } =
-            await this.meService.decodeLeaveEventData(logParams);
+        try {
+            const { userAddress, partyAddress, amount, cut, penalty } =
+                await this.meService.decodeLeaveEventData(logParams);
 
-        let partyMember =
-            await this.getPartyMemberService.getByUserAndPartyAddress(
+            let partyMember =
+                await this.getPartyMemberService.getByUserAndPartyAddress(
+                    userAddress,
+                    partyAddress,
+                );
+
+            await this.transactionService.storeWithdrawTransaction(
                 userAddress,
                 partyAddress,
+                amount,
+                cut,
+                penalty,
+                null,
+                logParams.result.transactionHash,
             );
 
-        await this.transactionService.storeWithdrawTransaction(
-            userAddress,
-            partyAddress,
-            amount,
-            cut,
-            penalty,
-            null,
-            logParams.result.transactionHash,
-        );
+            await this.partyCalculationService.withdraw(
+                partyAddress,
+                userAddress,
+                amount,
+            );
 
-        await this.partyCalculationService.withdraw(
-            partyAddress,
-            userAddress,
-            amount,
-        );
+            partyMember = await this.partyMemberService.update(partyMember, {
+                leaveTransactionHash: logParams.result.transactionHash,
+            });
 
-        partyMember = await this.partyMemberService.update(partyMember, {
-            leaveTransactionHash: logParams.result.transactionHash,
-        });
-
-        await Promise.all([
-            this.partyMemberService.delete(partyMember),
-            this.joinRequestService.deleteJoinRequest(
-                partyMember.memberId,
-                partyMember.partyId,
-            ),
-        ]);
-        Logger.debug('<= Leave Party End sync ');
+            await Promise.all([
+                this.partyMemberService.delete(partyMember),
+                this.joinRequestService.deleteJoinRequest(
+                    partyMember.memberId,
+                    partyMember.partyId,
+                ),
+            ]);
+            Logger.debug('<= Leave Party End sync ');
+        } catch (error) {
+            // save to log for retrial
+            await this.transactionSyncService.store({
+                transactionHash: logParams.result.transactionHash,
+                eventName: PartyEvents.LeavePartyEvent,
+                isSync: false,
+            });
+            Logger.error('[LEAVE-PARTY-NOT-SYNC]', error);
+        }
     }
 }

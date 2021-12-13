@@ -73,7 +73,20 @@ export class Web3Service {
     async getTransactionReceipt(
         transactionHash: string,
     ): Promise<TransactionReceipt> {
-        return await this.web3.eth.getTransactionReceipt(transactionHash);
+        let receipt;
+        let trialGetReceipt = 0;
+        do {
+            await Utils.takeDelay(2000);
+            receipt = await this.web3.eth.getTransactionReceipt(
+                transactionHash,
+            );
+            trialGetReceipt++;
+        } while (!receipt && trialGetReceipt <= 2);
+
+        if (!receipt) {
+            return;
+        }
+        return receipt;
     }
 
     soliditySha3(data: Mixed[]): string {
@@ -168,17 +181,7 @@ export class Web3Service {
         transactionHash: string,
         eventName: PartyEvents,
     ): Promise<{ [key: string]: string } | undefined> {
-        let receipt;
-        let trialGetReceipt = 0;
-        do {
-            await Utils.takeDelay(2000);
-            receipt = await this.getTransactionReceipt(transactionHash);
-            trialGetReceipt++;
-        } while (!receipt && trialGetReceipt <= 2);
-
-        if (!receipt) {
-            return;
-        }
+        const receipt = await this.getTransactionReceipt(transactionHash);
 
         let decodedLog: { [key: string]: string };
         receipt.logs.some((receiptLog) => {
