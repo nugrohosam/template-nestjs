@@ -12,11 +12,11 @@ export class TransactionSyncSchedulerService {
     ) {}
 
     @Cron('0 */3 * * * *')
-    handleTask(): void {
+    async handleTask(): Promise<void> {
         if (!config.scheduler.transactionSyncRetrial) return;
 
         this.logger.debug('------ PROCESSING TRANSACTION_SYNC SERVICE ------');
-        this.transactionSyncRetrialService.retry();
+        await this.transactionSyncRetrialService.retry();
         this.logger.debug(
             '------ END PROCESSING TRANSACTION_SYNC SERVICE ------',
         );
