@@ -60,6 +60,7 @@ export class MeService {
             transactionHash,
             PartyEvents.WithdrawEvent,
         );
+
         if (!decodedLog)
             throw new UnprocessableEntityException('Receipt is null');
 

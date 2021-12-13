@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PartyEvents } from 'src/contracts/Party';
-import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
+import {
+    SyncEnumOptions,
+    TransactionSyncService,
+} from 'src/modules/transactions/services/transaction-sync.service';
 import { LeavePartyApplication } from '../applications/leave-party.application';
 import { WithdrawAllApplication } from '../applications/withdraw-all.application';
 import { WithdrawApplication } from '../applications/withdraw.application';
@@ -15,7 +18,10 @@ export class TransactionSyncRetrialService {
     ) {}
 
     async retry(): Promise<any> {
-        const data = await this.transactionSyncService.get(false);
+        const data = await this.transactionSyncService.get(
+            SyncEnumOptions.IsNotSync,
+        );
+
         if (!data) return;
 
         for await (const transactionSync of data) {
@@ -34,6 +40,9 @@ export class TransactionSyncRetrialService {
                     await this.leavePartyApplication.retrySync(
                         transactionSync.transactionHash,
                     );
+                    break;
+                default:
+                    break;
             }
         }
     }
