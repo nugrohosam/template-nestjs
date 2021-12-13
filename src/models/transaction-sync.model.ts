@@ -17,7 +17,7 @@ export class TransactionSyncModel implements ITransactionSync {
     @Column('varchar', { name: 'transaction_hash' })
     transactionHash: string;
 
-    @Column('enum', { enum: PartyEvents })
+    @Column('enum', { name: 'event_name', enum: PartyEvents })
     eventName: PartyEvents;
 
     @Column('boolean', { name: 'is_sync' })
