@@ -88,6 +88,8 @@ export class MeService {
             PartyEvents.LeavePartyEvent,
         );
 
+        if (!decodedLog)
+            throw new UnprocessableEntityException('Receipt is null');
         // TODO: need to test it direct through network. if fail then will change to the usual way like above.
         const data = {
             partyAddress: decodedLog.partyAddress,
@@ -109,6 +111,9 @@ export class MeService {
             log.transactionHash,
             PartyEvents.ClosePartyEvent,
         );
+
+        if (!decodedLog)
+            throw new UnprocessableEntityException('Receipt is null');
 
         // TODO: need to test it direct through network. if fail then will change to the usual way like above.
         const data = {

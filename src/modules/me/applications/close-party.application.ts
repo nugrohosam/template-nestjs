@@ -1,5 +1,10 @@
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Logger,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PartyEvents } from 'src/contracts/Party';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyModel } from 'src/models/party.model';
@@ -13,6 +18,7 @@ import { PartyService } from 'src/modules/parties/services/party.service';
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { TokenService } from 'src/modules/parties/services/token/token.service';
 import { ILogParams } from 'src/modules/parties/types/logData';
+import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
 import { Repository } from 'typeorm';
 import { LeavePartyRequest } from '../requests/leave.request';
 import {
@@ -36,6 +42,7 @@ export class ClosePartyApplication {
         private readonly swapQuoteService: SwapQuoteService,
         private readonly meService: MeService,
         private readonly partyService: PartyService,
+        private readonly transactionSyncService: TransactionSyncService,
     ) {}
 
     async prepare(
@@ -112,14 +119,24 @@ export class ClosePartyApplication {
     }
 
     async sync(logParams: ILogParams): Promise<void> {
-        const { partyAddress } = await this.meService.decodeCloseEventData(
-            logParams,
-        );
+        try {
+            const { partyAddress } = await this.meService.decodeCloseEventData(
+                logParams,
+            );
 
-        const party = await this.getPartyServicce.getByAddress(
-            partyAddress,
-            true,
-        );
-        await this.partyService.close(party);
+            const party = await this.getPartyServicce.getByAddress(
+                partyAddress,
+                true,
+            );
+            await this.partyService.close(party);
+        } catch (error) {
+            // save to log for retrial
+            await this.transactionSyncService.store({
+                transactionHash: logParams.result.transactionHash,
+                eventName: PartyEvents.ClosePartyEvent,
+                isSync: false,
+            });
+            Logger.error('[CLOSE-PARTY-NOT-SYNC]', error);
+        }
     }
 }
