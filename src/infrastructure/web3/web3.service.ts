@@ -1,5 +1,6 @@
 import {
     Injectable,
+    Logger,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -84,6 +85,7 @@ export class Web3Service {
         } while (!receipt && trialGetReceipt <= 2);
 
         if (!receipt) {
+            Logger.debug(transactionHash, '[WEB3SERVICE]Receipt not found');
             return;
         }
         return receipt;
@@ -182,6 +184,10 @@ export class Web3Service {
         eventName: PartyEvents,
     ): Promise<{ [key: string]: string } | undefined> {
         const receipt = await this.getTransactionReceipt(transactionHash);
+
+        if (!receipt) {
+            return;
+        }
 
         let decodedLog: { [key: string]: string };
         receipt.logs.some((receiptLog) => {
