@@ -7,7 +7,6 @@ import BN from 'bn.js';
 import { PartyEvents } from 'src/contracts/Party';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
-import { ILogParams } from 'src/modules/parties/types/logData';
 
 @Injectable()
 export class MeService {
@@ -104,12 +103,12 @@ export class MeService {
         return data;
     }
 
-    async decodeCloseEventData({ result: log }: ILogParams): Promise<{
+    async decodeCloseEventData(transactionHash: string): Promise<{
         partyAddress: string;
         ownerAddress: string;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
-            log.transactionHash,
+            transactionHash,
             PartyEvents.ClosePartyEvent,
         );
 

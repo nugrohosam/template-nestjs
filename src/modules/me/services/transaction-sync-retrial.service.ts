@@ -4,6 +4,7 @@ import {
     SyncEnumOptions,
     TransactionSyncService,
 } from 'src/modules/transactions/services/transaction-sync.service';
+import { ClosePartyApplication } from '../applications/close-party.application';
 import { LeavePartyApplication } from '../applications/leave-party.application';
 import { WithdrawAllApplication } from '../applications/withdraw-all.application';
 import { WithdrawApplication } from '../applications/withdraw.application';
@@ -15,6 +16,7 @@ export class TransactionSyncRetrialService {
         private readonly withdrawAllService: WithdrawAllApplication,
         private readonly withdrawService: WithdrawApplication,
         private readonly leavePartyApplication: LeavePartyApplication,
+        private readonly closePartyApplication: ClosePartyApplication,
     ) {}
 
     async retry(): Promise<any> {
@@ -38,6 +40,11 @@ export class TransactionSyncRetrialService {
                     break;
                 case PartyEvents.LeavePartyEvent:
                     await this.leavePartyApplication.retrySync(
+                        transactionSync.transactionHash,
+                    );
+                    break;
+                case PartyEvents.ClosePartyEvent:
+                    await this.closePartyApplication.retrySync(
                         transactionSync.transactionHash,
                     );
                     break;

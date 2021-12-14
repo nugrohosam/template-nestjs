@@ -121,7 +121,7 @@ export class ClosePartyApplication {
     async sync(logParams: ILogParams): Promise<void> {
         try {
             const { partyAddress } = await this.meService.decodeCloseEventData(
-                logParams,
+                logParams.result.transactionHash,
             );
 
             const party = await this.getPartyServicce.getByAddress(
@@ -133,6 +133,34 @@ export class ClosePartyApplication {
             // save to log for retrial
             await this.transactionSyncService.store({
                 transactionHash: logParams.result.transactionHash,
+                eventName: PartyEvents.ClosePartyEvent,
+                isSync: false,
+            });
+            Logger.error('[CLOSE-PARTY-NOT-SYNC]', error);
+        }
+    }
+
+    async retrySync(transactionHash: string): Promise<void> {
+        try {
+            const { partyAddress } = await this.meService.decodeCloseEventData(
+                transactionHash,
+            );
+
+            const party = await this.getPartyServicce.getByAddress(
+                partyAddress,
+                true,
+            );
+            await this.partyService.close(party);
+
+            await this.transactionSyncService.updateStatusSync(
+                transactionHash,
+                true,
+            );
+            Logger.debug('<= Retry Close Party End sync ');
+        } catch (error) {
+            // save to log for retrial
+            await this.transactionSyncService.store({
+                transactionHash: transactionHash,
                 eventName: PartyEvents.ClosePartyEvent,
                 isSync: false,
             });
