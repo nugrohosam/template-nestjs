@@ -168,6 +168,7 @@ export class LeavePartyApplication {
             Logger.error('[LEAVE-PARTY-NOT-SYNC]', error);
         }
     }
+
     async retrySync(transactionHash: string): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
