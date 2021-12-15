@@ -28,7 +28,9 @@ export class GeckoTokenService {
     ): Promise<AxiosResponse<IFetchMarketsResp>> {
         return this.httpService
             .get<IFetchMarketsResp>(
-                `${config.api.gecko}/coins/polygon-pos/contract/${tokenAddress}`,
+                `${
+                    config.api.gecko
+                }/coins/polygon-pos/contract/${tokenAddress.toLowerCase()}`,
             )
             .toPromise();
     }
