@@ -10,6 +10,7 @@ import {
     Injectable,
     InternalServerErrorException,
     Logger,
+    UnprocessableEntityException,
 } from '@nestjs/common';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
@@ -29,6 +30,7 @@ import { PartyFundService } from '../services/party-fund/party-fund.service';
 import { GetTokenPriceService } from '../services/token/get-token-price.service';
 import { GetTokenBalanceService } from '../utils/get-token-balance.util';
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
+import { GeckoTokenService } from '../services/token/gecko-token.service';
 
 @Injectable()
 export class SwapQuoteApplication {
@@ -48,6 +50,7 @@ export class SwapQuoteApplication {
         private readonly tokenPrice: GetTokenPriceService,
         private readonly tokenBalanceService: GetTokenBalanceService,
         private readonly transactionSyncService: TransactionSyncService,
+        private readonly geckoTokenService: GeckoTokenService,
     ) {}
 
     @Transactional()
@@ -127,6 +130,13 @@ export class SwapQuoteApplication {
                 request.sellAmount.toString(),
             ),
         );
+
+        // check token and register
+        const checkToken = await this.geckoTokenService.checkAndRegisterCoin(
+            request.buyToken,
+        );
+        if (!checkToken)
+            throw new UnprocessableEntityException('Error checking token');
 
         const { data: quoteResponse, err } =
             await this.swapQuoteService.getQuote(

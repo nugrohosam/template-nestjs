@@ -65,6 +65,7 @@ export interface IFetchMarketsResp {
     price_change_percentage24h_in_currency?: number;
     price_change_percentage30d_in_currency?: number;
     price_change_percentage7d_in_currency?: number;
+    error?: string;
 }
 
 @Injectable()
