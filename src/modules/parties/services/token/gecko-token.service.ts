@@ -23,7 +23,7 @@ export class GeckoTokenService {
         private readonly web3Service: Web3Service,
     ) {}
 
-    async fetchMarketValue(
+    async fetchTokenContractInfo(
         tokenAddress: string,
     ): Promise<AxiosResponse<IFetchMarketsResp>> {
         return this.httpService
@@ -45,7 +45,7 @@ export class GeckoTokenService {
         const coin = await this.getBySymbol(symbol);
         if (!coin) {
             const geckoNet: AxiosResponse<IFetchMarketsResp> =
-                await this.fetchMarketValue(tokenAddress).catch(
+                await this.fetchTokenContractInfo(tokenAddress).catch(
                     (error: AxiosError) => {
                         console.log('gecko coin contract', error.response.data);
                         throw new UnprocessableEntityException(
