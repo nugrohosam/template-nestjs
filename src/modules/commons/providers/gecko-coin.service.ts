@@ -11,7 +11,7 @@ export class GeckoCoinService {
     async getGeckoCoins(symbols: string[]): Promise<GeckoCoinModel[]> {
         return await this.repository
             .createQueryBuilder('gecko_coin')
-            .where('symbol in (:...symbols)', { symbols })
+            .where('LOWER(symbol) in (:...symbols)', { symbols })
             .getMany();
     }
 }
