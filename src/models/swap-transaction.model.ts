@@ -29,10 +29,10 @@ export class SwapTransactionModel implements ISwapTransaction {
     @Column('varchar', { name: 'token_target' })
     tokenTarget: string;
 
-    @Column('bigint', { name: 'buy_amount', transformer: TransformBN })
+    @Column('varchar', { name: 'buy_amount', transformer: TransformBN })
     buyAmount: BN;
 
-    @Column('bigint', { name: 'sell_amount', transformer: TransformBN })
+    @Column('varchar', { name: 'sell_amount', transformer: TransformBN })
     sellAmount: BN;
 
     @Column('decimal', {
