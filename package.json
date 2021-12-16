@@ -42,6 +42,7 @@
         "@types/lodash": "^4.14.170",
         "@types/passport-http": "^0.3.8",
         "@types/pluralize": "^0.0.29",
+        "bignumber.js": "^9.0.2",
         "bn.js": "^5.2.0",
         "class-transformer": "^0.4.0",
         "class-validator": "^0.13.1",
