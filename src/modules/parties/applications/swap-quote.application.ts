@@ -136,6 +136,7 @@ export class SwapQuoteApplication {
         const checkToken = await this.geckoTokenService.checkAndRegisterCoin(
             request.buyToken,
         );
+
         if (!checkToken)
             throw new UnprocessableEntityException('Error checking token');
 
