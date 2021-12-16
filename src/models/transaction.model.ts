@@ -24,7 +24,7 @@ export class TransactionModel implements ITransaction {
     @Column('varchar', { name: 'address_to' })
     addressTo: string;
 
-    @Column('bigint', { transformer: TransformBN })
+    @Column('varchar', { transformer: TransformBN })
     amount: BN;
 
     @Column('int', { name: 'currency_id' })

@@ -7,7 +7,7 @@ export interface ISwapTransaction {
     tokenTarget: string;
     buyAmount: BN | string;
     sellAmount: BN | string;
-    usd: number;
+    usd: BN | string;
     transactionHash: string;
     createdAt?: Date;
     updatedAt?: Date;

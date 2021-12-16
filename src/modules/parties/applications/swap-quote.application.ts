@@ -31,6 +31,7 @@ import { GetTokenPriceService } from '../services/token/get-token-price.service'
 import { GetTokenBalanceService } from '../utils/get-token-balance.util';
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
 import { GeckoTokenService } from '../services/token/gecko-token.service';
+import BigNumber from 'bignumber.js';
 
 @Injectable()
 export class SwapQuoteApplication {
@@ -135,6 +136,7 @@ export class SwapQuoteApplication {
         const checkToken = await this.geckoTokenService.checkAndRegisterCoin(
             request.buyToken,
         );
+
         if (!checkToken)
             throw new UnprocessableEntityException('Error checking token');
 
@@ -233,11 +235,17 @@ export class SwapQuoteApplication {
             partyToken.symbol,
         ]);
 
-        const usd =
-            this.tokenBalanceService.formatFromWeiToken(
-                swapEventData.sellAmount,
-                Number(decimal),
-            ) * marketValue[partyToken.symbol].current_price;
+        const bigNumber = new BigNumber(
+            marketValue[partyToken.symbol].current_price,
+        );
+        const usd = bigNumber
+            .times(
+                this.tokenBalanceService.formatFromWeiToken(
+                    swapEventData.sellAmount,
+                    Number(decimal),
+                ),
+            )
+            .toFixed();
 
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,

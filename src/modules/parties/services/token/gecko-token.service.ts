@@ -67,6 +67,9 @@ export class GeckoTokenService {
     }
 
     async getBySymbol(symbol: string): Promise<GeckoCoinModel> {
-        return await this.repository.findOne({ symbol: symbol });
+        return await this.repository
+            .createQueryBuilder('gecko_coins')
+            .where('LOWER(symbol) = :symbol', { symbol: symbol.toLowerCase() })
+            .getOne();
     }
 }
