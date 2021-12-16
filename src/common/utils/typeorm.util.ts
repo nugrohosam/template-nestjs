@@ -1,10 +1,16 @@
 import BN from 'bn.js';
 import { ValueTransformer } from 'typeorm';
+import { BigNumber } from 'bignumber.js';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const TransformBN: ValueTransformer = {
     to: (value?: BN) => (value ? value.toString() : value),
     from: (value?: string) => (value ? new BN(value) : value),
+};
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const TransformBigNumber: ValueTransformer = {
+    to: (value?: BigNumber) => (value ? value.toString() : value),
+    from: (value?: string) => (value ? new BigNumber(value) : value),
 };
 
 function isNullOrUndefined<T>(

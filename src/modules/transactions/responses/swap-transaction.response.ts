@@ -8,7 +8,7 @@ export class SwapTransactionResponse
     tokenTarget: string;
     buyAmount: string;
     sellAmount: string;
-    usd: number;
+    usd: string;
     updatedAt?: Date;
     id: string;
     createdAt: Date;

@@ -12,6 +12,9 @@ export class ChangeSellAndBuyAmountSwapTransaction1639563370554
         await queryRunner.query(
             'ALTER TABLE swap_transactions MODIFY COLUMN sell_amount varchar(255) NOT NULL;',
         );
+        await queryRunner.query(
+            'ALTER TABLE swap_transactions MODIFY COLUMN usd varchar(255) NOT NULL;',
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -20,6 +23,9 @@ export class ChangeSellAndBuyAmountSwapTransaction1639563370554
         );
         await queryRunner.query(
             'ALTER TABLE swap_transactions MODIFY COLUMN sell_amount bigint(20) NOT NULL;',
+        );
+        await queryRunner.query(
+            'ALTER TABLE kaget.swap_transactions MODIFY COLUMN usd decimal(10,6) NOT NULL;',
         );
     }
 }
