@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import BN from 'bn.js';
 import { PartyGainModel } from 'src/models/party-gain.model';
@@ -131,13 +131,22 @@ export class PartyGainService {
         this.partyRepository.save(party);
     }
 
-    private calculateGainPercentage(currentFund: BN, lastFund: BN): number {
-        const diff = currentFund.sub(lastFund);
-
-        if (lastFund.isZero()) {
-            return diff.isNeg() ? -1 : 1;
-        }
-
-        return +(diff.toNumber() / lastFund.toNumber()).toFixed(6);
+    calculateGainPercentage(currentFund: BN, lastFund: BN): number {
+        const currNumber = currentFund.toNumber();
+        const lastNumber = lastFund.toNumber();
+        const diff = currNumber - lastNumber;
+        const result = diff / lastNumber;
+        Logger.debug(
+            JSON.stringify({
+                currentFund,
+                lastFund,
+                diff,
+                currNumber,
+                lastNumber,
+                result,
+            }),
+            'log calculation: ',
+        );
+        return result;
     }
 }
