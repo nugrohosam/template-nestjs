@@ -206,4 +206,13 @@ export class PartyModel implements IParty {
         transformer: TransformBN,
     })
     lastFund?: BN;
+
+    @Column({
+        type: 'bigint',
+        select: false,
+        update: false,
+        insert: false,
+        transformer: TransformBN,
+    })
+    initialFund?: BN;
 }
