@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import BN from 'bn.js';
 import { PartyGainModel } from 'src/models/party-gain.model';
+import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
 import { PartyFundService } from '../party-fund/party-fund.service';
@@ -24,7 +25,7 @@ export class PartyGainService {
         const listPartiesQuery =
             this.partyRepository.createQueryBuilder('party');
 
-        const lastFund = listPartiesQuery
+        const lastFundQuery = listPartiesQuery
             .subQuery()
             .select('fund')
             .from(PartyGainModel, 'partyGainLastFund')
@@ -34,10 +35,26 @@ export class PartyGainService {
             .getSql();
 
         listPartiesQuery.addSelect(
-            `COALESCE(${lastFund},0)`,
-            'partyGain_lastFund',
+            `COALESCE(${lastFundQuery},0)`,
+            'party_lastFund',
         );
+
+        const initialFundQuery = listPartiesQuery
+            .subQuery()
+            .select('pm.initialFund')
+            .from(PartyMemberModel, 'pm')
+            .where('pm.party_id = party.id')
+            .andWhere('pm.member_id = party.creator_id')
+            .limit(1)
+            .getSql();
+
+        listPartiesQuery.addSelect(
+            `COALESCE(${initialFundQuery},0)`,
+            'party_initialFund',
+        );
+
         const listParties = await listPartiesQuery
+            .where(`${initialFundQuery} > 0`)
             .orderBy('party.createdAt', 'DESC')
             .getMany();
 
@@ -53,7 +70,13 @@ export class PartyGainService {
                 );
 
             // get party last gain
-            const lastFund = item?.lastFund ?? new BN(0);
+            let lastFund = item.lastFund;
+            if (lastFund.isZero()) {
+                // get party creator
+                lastFund = item.initialFund;
+            }
+            console.log({ lastFund: item.lastFund });
+
             const gain = this.calculateGainPercentage(
                 new BN(partyTotalValue),
                 lastFund,
