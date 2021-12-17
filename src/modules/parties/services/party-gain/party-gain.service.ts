@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import BN from 'bn.js';
 import { PartyGainModel } from 'src/models/party-gain.model';
@@ -70,13 +70,7 @@ export class PartyGainService {
                 );
 
             // get party last gain
-            let lastFund = item.lastFund;
-            if (lastFund.isZero()) {
-                // get party creator
-                lastFund = item.initialFund;
-            }
-            console.log({ lastFund: item.lastFund });
-
+            const lastFund = this.getPartyLastFund(item);
             const gain = this.calculateGainPercentage(
                 new BN(partyTotalValue),
                 lastFund,
@@ -154,22 +148,20 @@ export class PartyGainService {
         this.partyRepository.save(party);
     }
 
-    calculateGainPercentage(currentFund: BN, lastFund: BN): number {
-        const currNumber = currentFund.toNumber();
-        const lastNumber = lastFund.toNumber();
-        const diff = currNumber - lastNumber;
-        const result = diff / lastNumber;
-        Logger.debug(
-            JSON.stringify({
-                currentFund,
-                lastFund,
-                diff,
-                currNumber,
-                lastNumber,
-                result,
-            }),
-            'log calculation: ',
-        );
-        return result;
+    private getPartyLastFund(item: PartyModel): BN {
+        let lastFund = item.lastFund;
+        if (lastFund.isZero()) {
+            // get party creator
+            lastFund = item.initialFund;
+        }
+
+        return lastFund;
+    }
+
+    private calculateGainPercentage(currentFund: BN, lastFund: BN): number {
+        const currFundNumber = currentFund.toNumber();
+        const lastFundNumber = lastFund.toNumber();
+        const diff = currFundNumber - lastFundNumber;
+        return diff / lastFundNumber;
     }
 }
