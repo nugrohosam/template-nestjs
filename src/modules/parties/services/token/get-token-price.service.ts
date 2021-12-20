@@ -128,7 +128,7 @@ export class GetTokenPriceService {
             });
         const marketValue = {};
         marketValueResp.data.forEach((item) => {
-            marketValue[item.symbol] = item;
+            marketValue[item.symbol.toLocaleLowerCase()] = item;
         });
         return marketValue;
     }
@@ -178,7 +178,8 @@ export class GetTokenPriceService {
             const tokenValue = this.getTokenBalanceIn(
                 partyToken,
                 item.symbol,
-                marketValue[item.symbol].current_price * currency.decimal,
+                marketValue[item.symbol.toLocaleLowerCase()].current_price *
+                    currency.decimal,
             );
             totalFund = totalFund.addn(tokenValue);
         });
