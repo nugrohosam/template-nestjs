@@ -5,6 +5,7 @@ import {
 } from 'src/common/enums/party.enum';
 
 export enum GainPeriod {
+    Per24Hours = 'per24Hours',
     Per7Days = 'per7Days',
     Per1Month = 'per1Month',
     Per1Year = 'per1Year',
