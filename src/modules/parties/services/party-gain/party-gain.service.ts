@@ -120,6 +120,12 @@ export class PartyGainService {
             .andWhere('date(created_at) = date(now()) + interval -1 year')
             .orderBy('created_at', 'DESC')
             .getOne();
+        const lastDayGain = await this.partyGainRepository
+            .createQueryBuilder('partyGain')
+            .where('party_id = :partyId', { partyId: party.id })
+            .andWhere('date(created_at) = date(now()) + interval -24 hour')
+            .orderBy('created_at', 'DESC')
+            .getOne();
         const veryFirstGain = await this.partyGainRepository
             .createQueryBuilder('partyGain')
             .where('party_id = :partyId', { partyId: party.id })
@@ -127,6 +133,10 @@ export class PartyGainService {
             .getOne();
 
         party.gain = {
+            per24Hours: this.calculateGainPercentage(
+                currentGain?.fund ?? new BN(0),
+                lastDayGain?.fund ?? new BN(0),
+            ),
             per7Days: this.calculateGainPercentage(
                 currentGain?.fund ?? new BN(0),
                 lastWeekGain?.fund ?? new BN(0),
