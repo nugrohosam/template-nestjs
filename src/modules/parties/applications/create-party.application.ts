@@ -149,6 +149,6 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         if (request.signature !== party.signature)
             throw new UnauthorizedException('Invalid Signature');
 
-        this.partyService.delete(party);
+        this.partyService.delete(party, true);
     }
 }
