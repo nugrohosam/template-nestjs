@@ -1,4 +1,4 @@
-# NFT Infinity API
+# Polkaparty API
 
 # Spec Requirement
 ## Requirements :
