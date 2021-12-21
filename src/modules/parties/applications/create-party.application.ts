@@ -144,7 +144,7 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
         const party = await this.getPartyService.getById(partyId);
 
         if (party.address)
-            throw new UnauthorizedException('Party has been activated');
+            throw new UnauthorizedException('Cannot delete this active party');
 
         if (request.signature !== party.signature)
             throw new UnauthorizedException('Invalid Signature');
