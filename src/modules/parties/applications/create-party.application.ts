@@ -136,4 +136,19 @@ export class CreatePartyApplication extends OnchainSeriesApplication {
 
         this.partyService.delete(party);
     }
+
+    async deletePartyCreation(
+        request: RevertCreatePartyRequest,
+        partyId: string,
+    ): Promise<void> {
+        const party = await this.getPartyService.getById(partyId);
+
+        if (party.address)
+            throw new UnauthorizedException('Cannot delete this active party');
+
+        if (request.signature !== party.signature)
+            throw new UnauthorizedException('Invalid Signature');
+
+        this.partyService.delete(party);
+    }
 }
