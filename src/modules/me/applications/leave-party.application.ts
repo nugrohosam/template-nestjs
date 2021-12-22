@@ -21,6 +21,7 @@ import { TransactionService } from 'src/modules/transactions/services/transactio
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
 import { PartyEvents } from 'src/contracts/Party';
+import BN from 'bn.js';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -70,11 +71,15 @@ export class LeavePartyApplication {
                     party.address,
                     token.address,
                 );
-                const withdrawAmount = weight.isZero()
-                    ? 0
-                    : balance
-                          .mul(weight)
-                          .divn(config.calculation.maxPercentage);
+                let withdrawAmount = new BN(0);
+                if (
+                    (typeof weight === 'number' && weight !== 0) ||
+                    (typeof weight === 'object' && !weight.isZero)
+                ) {
+                    withdrawAmount = balance
+                        .mul(weight)
+                        .divn(config.calculation.maxPercentage);
+                }
 
                 let swapResponse: ISwap0xResponse = null;
                 if (token.address !== defaultToken.address) {
