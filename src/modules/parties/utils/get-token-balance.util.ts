@@ -9,12 +9,10 @@ export class GetTokenBalanceService {
     constructor(private readonly web3Service: Web3Service) {}
     getTokenBalance = async (
         addressToken: string,
-        tokenName: string,
         address: string,
     ): Promise<{
         balance: string;
         decimal: string;
-        name: string;
     }> => {
         // TODO: for log
         const erc20Token = this.web3Service.getContractInstance(
@@ -32,7 +30,6 @@ export class GetTokenBalanceService {
         return {
             balance: result[0],
             decimal: result[1],
-            name: tokenName,
         };
     };
 

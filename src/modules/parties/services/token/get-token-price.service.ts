@@ -152,7 +152,7 @@ export class GetTokenPriceService {
             .getMany();
         // map to get list token symbol
         const tokensSymbol = partyTokens.map((item) => {
-            return item.symbol;
+            return item.geckoTokenId;
         });
         if (!tokensSymbol.length) {
             return '0';
@@ -163,10 +163,10 @@ export class GetTokenPriceService {
             const tokenBalance =
                 await this.getTokenBalanceService.getTokenBalance(
                     item.address,
-                    item.symbol,
                     party.address,
                 );
-            return (partyToken[tokenBalance.name] = {
+
+            return (partyToken[item.geckoTokenId] = {
                 balance: tokenBalance.balance,
                 decimal: tokenBalance.decimal,
             });
@@ -179,9 +179,9 @@ export class GetTokenPriceService {
         partyTokens.forEach((item) => {
             const tokenValue = this.getTokenBalanceIn(
                 partyToken,
-                item.symbol,
-                marketValue[item.symbol.toLocaleLowerCase()].current_price *
-                    currency.decimal,
+                item.geckoTokenId,
+                marketValue[item.geckoTokenId.toLocaleLowerCase()]
+                    .current_price * currency.decimal,
             );
             totalFund = totalFund.addn(tokenValue);
         });
@@ -193,10 +193,10 @@ export class GetTokenPriceService {
     // 1 usd equal 100
     getTokenBalanceIn = (
         partyTokenBalance: ITokenBalanceParty,
-        symbol: string,
+        tokenId: string,
         price: number,
     ): number => {
-        const token = partyTokenBalance[symbol];
+        const token = partyTokenBalance[tokenId];
         if (!token) {
             return 0;
         }
