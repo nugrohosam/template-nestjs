@@ -29,5 +29,10 @@ export class IndexPartyRequest extends IndexRequest {
     isClosed?: number;
 
     @IsOptional()
+    @IsNumber()
+    @Expose({ name: 'is_active' })
+    isActive?: number;
+
+    @IsOptional()
     name?: string;
 }
