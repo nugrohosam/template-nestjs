@@ -2,6 +2,7 @@ import {
     BadRequestException,
     Body,
     Controller,
+    Delete,
     Get,
     Headers,
     Param,
@@ -70,6 +71,18 @@ export class PartyController {
         @Body() request: RevertCreatePartyRequest,
     ): Promise<IApiResponse<null>> {
         await this.createPartyApplication.revert(request);
+        return {
+            message: 'Success delete party',
+            data: null,
+        };
+    }
+
+    @Delete('/:partyId')
+    async deleteCreateParty(
+        @Param('partyId') partyId: string,
+        @Body() request: RevertCreatePartyRequest,
+    ): Promise<IApiResponse<null>> {
+        await this.createPartyApplication.deletePartyCreation(request, partyId);
         return {
             message: 'Success delete party',
             data: null,
