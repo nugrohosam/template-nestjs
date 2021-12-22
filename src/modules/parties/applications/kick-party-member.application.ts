@@ -73,9 +73,11 @@ export class KickPartyMemberApplication {
                     party.address,
                     token.address,
                 );
-                const withdrawAmount = balance
-                    .mul(weight)
-                    .divn(config.calculation.maxPercentage);
+                const withdrawAmount = weight.isZero()
+                    ? 0
+                    : balance
+                          .mul(weight)
+                          .divn(config.calculation.maxPercentage);
 
                 let swapResponse: ISwap0xResponse = null;
                 if (token.address !== defaultToken.address) {
