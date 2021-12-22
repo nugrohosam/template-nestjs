@@ -94,25 +94,25 @@ export class GetTokenPriceService {
         const listTokenParties = await this.currencyRepository
             .createQueryBuilder('currency')
             .getMany();
-        const listSymbol = listTokenParties.map((item) => item.symbol);
-        const marketValue = await this.getMarketValue(listSymbol);
+        // TODO: change symbol to id
+        const listGeckoTokenIds = listTokenParties.map(
+            (item) => item.geckoTokenId,
+        );
+        const marketValue = await this.getMarketValue(listGeckoTokenIds);
         if (!marketValue) throw new Error('Gecko Market value fetch error');
         return marketValue;
     }
 
     async getMarketValue(
-        tokensSymbol: string[],
+        tokensId: string[],
         currency: { name: string; decimal: number } = {
             name: 'usd',
             decimal: config.calculation.usdDecimal,
         },
     ): Promise<IMarketValue | undefined> {
-        const lowerCaseTokenSymbol = tokensSymbol.map((item) =>
-            item.toLowerCase(),
-        );
-        const coins = await this.geckoCoinService.getGeckoCoins(
-            lowerCaseTokenSymbol,
-        );
+        // TODO: change symbol to id
+        const coins = await this.geckoCoinService.getGeckoCoins(tokensId);
+
         if (!coins.length) return undefined;
         const ids = coins.map((coin) => coin.id).join(',');
         const marketValueResp: AxiosResponse<IFetchMarketsResp[]> =
@@ -127,12 +127,14 @@ export class GetTokenPriceService {
                 return undefined;
             });
         const marketValue = {};
+        // TODO: change symbol to id key
         marketValueResp.data.forEach((item) => {
-            marketValue[item.symbol.toLocaleLowerCase()] = item;
+            marketValue[item.id] = item;
         });
         return marketValue;
     }
 
+    // TODO: change symbol to id // belum tau
     async getPartyTokenValue(
         party: PartyModel,
         marketValue: IMarketValue,

@@ -44,18 +44,19 @@ export class GeckoTokenService {
             tokenInstance.methods.symbol() as ContractSendMethod;
         const symbol: string = await contractMethod.call();
         console.log('name symbol', symbol);
-        const coin = await this.getBySymbol(symbol);
+        const geckoNet: AxiosResponse<IFetchMarketsResp> =
+            await this.fetchTokenContractInfo(tokenAddress).catch(
+                (error: AxiosError) => {
+                    console.log('gecko coin contract', error.response.data);
+                    throw new UnprocessableEntityException(
+                        'Token Not Supported',
+                        error.response.data.error,
+                    );
+                },
+            );
+        console.log('id symbol', geckoNet.data.id);
+        const coin = await this.getById(symbol);
         if (!coin) {
-            const geckoNet: AxiosResponse<IFetchMarketsResp> =
-                await this.fetchTokenContractInfo(tokenAddress).catch(
-                    (error: AxiosError) => {
-                        console.log('gecko coin contract', error.response.data);
-                        throw new UnprocessableEntityException(
-                            'Token Not Supported',
-                            error.response.data.error,
-                        );
-                    },
-                );
             const geckoCoin = this.repository.create({
                 id: geckoNet.data.id,
                 name: geckoNet.data.name,
@@ -66,10 +67,10 @@ export class GeckoTokenService {
         return coin;
     }
 
-    async getBySymbol(symbol: string): Promise<GeckoCoinModel> {
+    async getById(id: string): Promise<GeckoCoinModel> {
         return await this.repository
             .createQueryBuilder('gecko_coins')
-            .where('LOWER(symbol) = :symbol', { symbol: symbol.toLowerCase() })
+            .where('id = :id', { id: id })
             .getOne();
     }
 }

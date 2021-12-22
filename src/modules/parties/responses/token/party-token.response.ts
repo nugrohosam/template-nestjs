@@ -4,6 +4,7 @@ export class PartyTokenResponse {
     id: string;
     partyId: string;
     symbol: string;
+    geckoTokenId: string;
     address: string;
 
     static mapFromPartyTokenModel(model: PartyTokenModel): PartyTokenResponse {
@@ -11,6 +12,7 @@ export class PartyTokenResponse {
             id: model.id,
             partyId: model.partyId,
             symbol: model.symbol,
+            geckoTokenId: model.geckoTokenId,
             address: model.address,
         };
     }

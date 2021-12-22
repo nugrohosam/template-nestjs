@@ -16,6 +16,9 @@ export class CurrencyModel implements ICurrency {
     @Column('varchar')
     symbol: string;
 
+    @Column('varchar', { name: 'gecko_token_id' })
+    geckoTokenId: string;
+
     @Column('varchar')
     address: string;
 

@@ -2,6 +2,7 @@ export interface IPartyToken {
     id: string;
     partyId: string;
     symbol: string;
+    geckoTokenId: string;
     address: string;
     createdAt?: Date;
     updatedAt?: Date;
