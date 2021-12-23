@@ -84,7 +84,7 @@ export class KickPartyMemberApplication {
                 }
 
                 let swapResponse: ISwap0xResponse = null;
-                if (token.address !== defaultToken.address) {
+                if (token.address !== defaultToken.address && !balance.isZero) {
                     const { data, err } = await this.swapQuoteService.getQuote(
                         defaultToken.address,
                         token.address,
