@@ -8,7 +8,6 @@ import { config } from 'src/config';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { Repository } from 'typeorm';
-import { ContractSendMethod } from 'web3-eth-contract';
 import BN from 'bn.js';
 import { Erc20AbiItem } from 'src/contracts/ERC20';
 import { IFetchMarketsResp } from './get-token-price.service';
@@ -66,14 +65,14 @@ export class TokenService {
     }
 
     async registerToken(tokenAddress: string): Promise<CurrencyModel> {
-        const tokenInstance = this.web3Service.getContractInstance(
+        // TODO: temporarily replaced by geckoCoin checker
+        /*         const tokenInstance = this.web3Service.getContractInstance(
             Erc20AbiItem,
             tokenAddress,
         );
         const contractMethod =
             tokenInstance.methods.symbol() as ContractSendMethod;
-        const symbol: string = await contractMethod.call();
-        console.log('name token', symbol);
+        const symbol: string = await contractMethod.call(); */
         const geckoNet: AxiosResponse<IFetchMarketsResp> =
             await this.fetchTokenContractInfo(tokenAddress).catch(
                 (error: AxiosError) => {
@@ -84,11 +83,12 @@ export class TokenService {
                     );
                 },
             );
-        console.log('id symbol', geckoNet.data.id);
+        console.log('name token', geckoNet.data.symbol);
+        console.log('id token', geckoNet.data.id);
 
         const currency = this.repository.create({
             address: tokenAddress,
-            symbol: symbol,
+            symbol: geckoNet.data.symbol,
             geckoTokenId: geckoNet.data.id,
         });
         return this.repository.save(currency);
