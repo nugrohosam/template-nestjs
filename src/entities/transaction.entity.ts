@@ -12,6 +12,7 @@ export interface ITransaction {
     signature?: string;
     transactionHash: string;
     transactionHashStatus: boolean;
+    isDepositeDone?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
