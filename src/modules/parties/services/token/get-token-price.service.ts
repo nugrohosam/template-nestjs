@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse, AxiosError } from 'axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { config } from 'src/config';
 import { PartyModel } from 'src/models/party.model';
 import { GeckoCoinService } from 'src/modules/commons/providers/gecko-coin.service';
@@ -94,25 +94,25 @@ export class GetTokenPriceService {
         const listTokenParties = await this.currencyRepository
             .createQueryBuilder('currency')
             .getMany();
-        const listSymbol = listTokenParties.map((item) => item.symbol);
-        const marketValue = await this.getMarketValue(listSymbol);
+        // TODO: change symbol to id
+        const listGeckoTokenIds = listTokenParties.map(
+            (item) => item.geckoTokenId,
+        );
+        const marketValue = await this.getMarketValue(listGeckoTokenIds);
         if (!marketValue) throw new Error('Gecko Market value fetch error');
         return marketValue;
     }
 
     async getMarketValue(
-        tokensSymbol: string[],
+        tokensId: string[],
         currency: { name: string; decimal: number } = {
             name: 'usd',
             decimal: config.calculation.usdDecimal,
         },
     ): Promise<IMarketValue | undefined> {
-        const lowerCaseTokenSymbol = tokensSymbol.map((item) =>
-            item.toLowerCase(),
-        );
-        const coins = await this.geckoCoinService.getGeckoCoins(
-            lowerCaseTokenSymbol,
-        );
+        // TODO: change symbol to id
+        const coins = await this.geckoCoinService.getGeckoCoins(tokensId);
+
         if (!coins.length) return undefined;
         const ids = coins.map((coin) => coin.id).join(',');
         const marketValueResp: AxiosResponse<IFetchMarketsResp[]> =
@@ -127,12 +127,14 @@ export class GetTokenPriceService {
                 return undefined;
             });
         const marketValue = {};
+        // TODO: change symbol to id key
         marketValueResp.data.forEach((item) => {
-            marketValue[item.symbol.toLocaleLowerCase()] = item;
+            marketValue[item.id] = item;
         });
         return marketValue;
     }
 
+    // TODO: change symbol to id // belum tau
     async getPartyTokenValue(
         party: PartyModel,
         marketValue: IMarketValue,
@@ -149,10 +151,10 @@ export class GetTokenPriceService {
             .where('party_id = :partyId', { partyId: party.id })
             .getMany();
         // map to get list token symbol
-        const tokensSymbol = partyTokens.map((item) => {
-            return item.symbol;
+        const tokensId = partyTokens.map((item) => {
+            return item.geckoTokenId;
         });
-        if (!tokensSymbol.length) {
+        if (!tokensId.length) {
             return '0';
         }
         const partyToken: ITokenBalanceParty = {};
@@ -161,40 +163,42 @@ export class GetTokenPriceService {
             const tokenBalance =
                 await this.getTokenBalanceService.getTokenBalance(
                     item.address,
-                    item.symbol,
                     party.address,
                 );
-            return (partyToken[tokenBalance.name] = {
+
+            return (partyToken[item.geckoTokenId] = {
                 balance: tokenBalance.balance,
                 decimal: tokenBalance.decimal,
             });
         });
+        Logger.debug(JSON.stringify(marketValue), 'MARKET VALUE');
         await Promise.all(promiseToken);
         // ---- normalizing data -----
         // -----------------------------
         let totalFund = new BN(0);
         // iterate all coin from party which fetch before to calculate total value
         partyTokens.forEach((item) => {
+            Logger.debug(item.geckoTokenId, 'GECKO TOKEN ID');
             const tokenValue = this.getTokenBalanceIn(
                 partyToken,
-                item.symbol,
-                marketValue[item.symbol.toLocaleLowerCase()].current_price *
-                    currency.decimal,
+                item.geckoTokenId,
+                marketValue[item.geckoTokenId].current_price * currency.decimal,
             );
             totalFund = totalFund.addn(tokenValue);
         });
         return totalFund.toString(); // big int detail 4 exponent
     }
 
+    // TODO: change symbol to id
     // getTokenBalanceIn, get total value in ether value
     // for example using usd currency
     // 1 usd equal 100
     getTokenBalanceIn = (
         partyTokenBalance: ITokenBalanceParty,
-        symbol: string,
+        tokenId: string,
         price: number,
     ): number => {
-        const token = partyTokenBalance[symbol];
+        const token = partyTokenBalance[tokenId];
         if (!token) {
             return 0;
         }

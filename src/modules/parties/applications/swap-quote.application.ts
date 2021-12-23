@@ -232,11 +232,11 @@ export class SwapQuoteApplication {
             swapEventData.sellTokenAddress,
         );
         const marketValue = await this.tokenPrice.getMarketValue([
-            partyToken.symbol,
+            partyToken.geckoTokenId,
         ]);
 
         const bigNumber = new BigNumber(
-            marketValue[partyToken.symbol].current_price,
+            marketValue[partyToken.geckoTokenId].current_price,
         );
         const usd = bigNumber
             .times(

@@ -8,10 +8,10 @@ export class GeckoCoinService {
         private readonly repository: Repository<GeckoCoinModel>,
     ) {}
 
-    async getGeckoCoins(symbols: string[]): Promise<GeckoCoinModel[]> {
+    async getGeckoCoins(ids: string[]): Promise<GeckoCoinModel[]> {
         return await this.repository
             .createQueryBuilder('gecko_coin')
-            .where('LOWER(symbol) in (:...symbols)', { symbols })
+            .where('id in (:...ids)', { ids })
             .getMany();
     }
 }

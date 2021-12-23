@@ -93,6 +93,7 @@ export class PartyService {
                 partyId: party.id,
                 address: token.address,
                 symbol: token.symbol,
+                geckoTokenId: token.geckoTokenId,
             });
             return await this.partyTokenRepository.save(partyToken);
         }

@@ -10,10 +10,10 @@ export class GeckoCoinController {
 
     @Get()
     async index(
-        @Query() { symbols }: GeckoCoinRequest,
+        @Query() { ids }: GeckoCoinRequest,
     ): Promise<IApiResponse<GeckoCoinModel[]>> {
         const coins = await this.geckoCoinService.getGeckoCoins(
-            symbols.map((v) => v.toLowerCase()),
+            ids.map((v) => v.toLowerCase()),
         );
         return {
             message: 'Success get list from gecko',
