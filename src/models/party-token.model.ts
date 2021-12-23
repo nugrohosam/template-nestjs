@@ -24,6 +24,9 @@ export class PartyTokenModel implements IPartyToken {
     })
     symbol: string;
 
+    @Column('varchar', { name: 'gecko_token_id' })
+    geckoTokenId: string;
+
     @Column('varchar')
     address: string;
 

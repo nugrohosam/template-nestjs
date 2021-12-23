@@ -4,11 +4,9 @@ import {
     UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Erc20AbiItem } from 'src/contracts/ERC20';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { GeckoCoinModel } from 'src/models/gecko-coin.model';
 import { Repository } from 'typeorm';
-import { ContractSendMethod } from 'web3-eth-contract';
 import { IFetchMarketsResp } from './get-token-price.service';
 import { AxiosResponse, AxiosError } from 'axios';
 import { config } from 'src/config';
@@ -36,40 +34,43 @@ export class GeckoTokenService {
     }
 
     async checkAndRegisterCoin(tokenAddress: string): Promise<GeckoCoinModel> {
-        const tokenInstance = this.web3Service.getContractInstance(
+        // TODO: temporarily replaced by geckoCoin checker
+        /*         const tokenInstance = this.web3Service.getContractInstance(
             Erc20AbiItem,
             tokenAddress,
         );
         const contractMethod =
             tokenInstance.methods.symbol() as ContractSendMethod;
-        const symbol: string = await contractMethod.call();
-        console.log('name symbol', symbol);
-        const coin = await this.getBySymbol(symbol);
+            const symbol: string = await contractMethod.call();
+        */
+        const geckoNet: AxiosResponse<IFetchMarketsResp> =
+            await this.fetchTokenContractInfo(tokenAddress).catch(
+                (error: AxiosError) => {
+                    console.log('gecko coin contract', error.response.data);
+                    throw new UnprocessableEntityException(
+                        'Token Not Supported',
+                        error.response.data.error,
+                    );
+                },
+            );
+        console.log('name token', geckoNet.data.symbol);
+        console.log('id token', geckoNet.data.id);
+        const coin = await this.getById(geckoNet.data.id);
         if (!coin) {
-            const geckoNet: AxiosResponse<IFetchMarketsResp> =
-                await this.fetchTokenContractInfo(tokenAddress).catch(
-                    (error: AxiosError) => {
-                        console.log('gecko coin contract', error.response.data);
-                        throw new UnprocessableEntityException(
-                            'Token Not Supported',
-                            error.response.data.error,
-                        );
-                    },
-                );
             const geckoCoin = this.repository.create({
                 id: geckoNet.data.id,
                 name: geckoNet.data.name,
-                symbol: symbol,
+                symbol: geckoNet.data.symbol,
             });
             return this.repository.save(geckoCoin);
         }
         return coin;
     }
 
-    async getBySymbol(symbol: string): Promise<GeckoCoinModel> {
+    async getById(id: string): Promise<GeckoCoinModel> {
         return await this.repository
             .createQueryBuilder('gecko_coins')
-            .where('LOWER(symbol) = :symbol', { symbol: symbol.toLowerCase() })
+            .where('id = :id', { id: id })
             .getOne();
     }
 }

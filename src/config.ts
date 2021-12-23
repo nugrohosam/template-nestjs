@@ -64,6 +64,7 @@ export const config = {
     defaultToken: {
         symbol: process.env.DEFAULT_TOKEN_SYMBOL ?? 'usdc',
         address: process.env.DEFAULT_TOKEN_ADDRESS,
+        geckoTokenId: process.env.DEFAULT_TOKEN_ID,
     },
 
     /**
