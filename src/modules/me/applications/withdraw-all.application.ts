@@ -76,7 +76,10 @@ export class WithdrawAllApplication {
                     .divn(config.calculation.maxPercentage);
 
                 let swapResponse: ISwap0xResponse = null;
-                if (token.address !== defaultToken.address) {
+                if (
+                    token.address !== defaultToken.address &&
+                    !balance.isZero()
+                ) {
                     const { data, err } = await this.swapQuoteService.getQuote(
                         defaultToken.address,
                         token.address,
