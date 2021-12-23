@@ -102,7 +102,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         );
         if (!txh) return partyMember;
 
-        // TODO: need to CHECK if transactionHash exists
+        // need to check if transactionHash exists
         let transaction = await this.getTransactionService.getByTx(
             request.transactionHash,
             TransactionTypeEnum.Deposit,
@@ -115,7 +115,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 request.joinPartySignature,
                 request.transactionHash,
             );
-            // TODO: should nod be executed
+
             partyMember = await this.partyMemberService.update(partyMember, {
                 transactionHash: request.transactionHash,
                 depositTransactionId: transaction.id,
