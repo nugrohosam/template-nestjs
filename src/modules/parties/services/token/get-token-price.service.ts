@@ -166,7 +166,8 @@ export class GetTokenPriceService {
                     item.geckoTokenId,
                     party.address,
                 );
-            return (partyToken[tokenBalance.name] = {
+
+            return (partyToken[item.geckoTokenId] = {
                 balance: tokenBalance.balance,
                 decimal: tokenBalance.decimal,
             });
