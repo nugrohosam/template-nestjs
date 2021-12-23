@@ -163,7 +163,6 @@ export class GetTokenPriceService {
             const tokenBalance =
                 await this.getTokenBalanceService.getTokenBalance(
                     item.address,
-                    item.geckoTokenId,
                     party.address,
                 );
 
