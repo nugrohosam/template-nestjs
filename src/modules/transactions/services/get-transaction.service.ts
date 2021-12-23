@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { TransactionModel } from 'src/models/transaction.model';
@@ -33,7 +37,7 @@ export class GetTransactionService {
 
         if (isRequired)
             if (!transaction)
-                throw new NotFoundException('Transation not found');
+                throw new BadRequestException('Transation not found');
 
         return transaction;
     }

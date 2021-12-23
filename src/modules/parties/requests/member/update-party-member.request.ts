@@ -11,4 +11,6 @@ export class UpdatePartyMemberRequest {
     @IsString()
     @Expose({ name: 'transaction_hash' })
     transactionHash: string;
+
+    // LAPO
 }

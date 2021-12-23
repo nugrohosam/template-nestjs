@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { GetPartyService } from './get-party.service';
@@ -12,6 +12,8 @@ import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { PartyMemberService } from './members/party-member.service';
 import { PartyFundService } from './party-fund/party-fund.service';
+import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
+import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 
 @Injectable()
 export class PartyCalculationService {
@@ -24,10 +26,12 @@ export class PartyCalculationService {
         private readonly getPartyService: GetPartyService,
         private readonly getUserService: GetUserService,
         private readonly getPartyMemberService: GetPartyMemberService,
+        private readonly getTransactionService: GetTransactionService,
         private readonly partyService: PartyService,
         private readonly partyMemberService: PartyMemberService,
         private readonly tokenService: TokenService,
         private readonly partyFundService: PartyFundService,
+        private readonly transactionService: TransactionService,
     ) {}
 
     async updatePartyTotalFund(
@@ -72,7 +76,19 @@ export class PartyCalculationService {
     }
 
     @Transactional()
-    async deposit(partyMember: PartyMemberModel, amount: BN): Promise<void> {
+    async deposit(
+        partyMember: PartyMemberModel,
+        amount: BN,
+        transactionHash: string,
+    ): Promise<void> {
+        const transaction = await this.getTransactionService.getByTx(
+            transactionHash,
+        );
+
+        if (transaction.isDepositeDone) {
+            throw new BadRequestException('TransactionHash has been processed');
+        }
+
         const party =
             partyMember.party ??
             (await this.getPartyService.getById(partyMember.partyId));
@@ -84,6 +100,10 @@ export class PartyCalculationService {
             await this.updatePartyMembersWeight(party),
             await this.partyService.storeToken(party, token),
             await this.partyFundService.updatePartyFund(party),
+            await this.transactionService.updateDepositeStatus(
+                transactionHash,
+                true,
+            ),
         ]);
     }
 
