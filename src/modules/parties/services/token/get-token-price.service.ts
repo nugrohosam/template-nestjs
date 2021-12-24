@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse, AxiosError } from 'axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { config } from 'src/config';
 import { PartyModel } from 'src/models/party.model';
 import { GeckoCoinService } from 'src/modules/commons/providers/gecko-coin.service';
@@ -171,14 +171,12 @@ export class GetTokenPriceService {
                 decimal: tokenBalance.decimal,
             });
         });
-        Logger.debug(JSON.stringify(marketValue), 'MARKET VALUE');
         await Promise.all(promiseToken);
         // ---- normalizing data -----
         // -----------------------------
         let totalFund = new BN(0);
         // iterate all coin from party which fetch before to calculate total value
         partyTokens.forEach((item) => {
-            Logger.debug(item.geckoTokenId, 'GECKO TOKEN ID');
             const tokenValue = this.getTokenBalanceIn(
                 partyToken,
                 item.geckoTokenId,
