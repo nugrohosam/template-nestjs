@@ -1,5 +1,6 @@
 import {
     Injectable,
+    Logger,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -84,12 +85,18 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         partyMember: PartyMemberModel,
         request: UpdatePartyMemberRequest,
     ): Promise<PartyMemberModel> {
+        Logger.debug(request.transactionHash, 'Init commit Join Party');
         const member = partyMember.member ?? (await partyMember.getMember);
 
-        if (request.joinPartySignature !== partyMember.signature)
+        if (request.joinPartySignature !== partyMember.signature) {
+            Logger.debug(
+                'request.joinPartySignature !== partyMember.signature',
+            );
             throw new UnauthorizedException('Signature not valid');
+        }
 
         if (partyMember.transactionHash) {
+            Logger.debug('partyMember.transactionHash');
             const existingTransactionHash =
                 await this.web3Service.getTransactionReceipt(
                     partyMember.transactionHash,
@@ -101,6 +108,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             request.transactionHash,
         );
         if (!txh) return partyMember;
+        Logger.debug('!thx passed');
 
         // need to check if transactionHash exists
         let transaction = await this.getTransactionService.getByTx(
@@ -109,6 +117,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         );
 
         if (!transaction) {
+            Logger.debug('!transaction');
             transaction = await this.transactionService.storeDepositTransaction(
                 partyMember,
                 partyMember.initialFund,
@@ -120,7 +129,9 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 transactionHash: request.transactionHash,
                 depositTransactionId: transaction.id,
             });
+            Logger.debug('!partyMember updated depositTransactionId');
         }
+        Logger.debug('!transaction passed');
 
         const receipt = this.web3Service.getTransactionReceipt(
             request.transactionHash,

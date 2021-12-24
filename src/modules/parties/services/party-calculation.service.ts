@@ -81,6 +81,8 @@ export class PartyCalculationService {
         amount: BN,
         transactionHash: string,
     ): Promise<void> {
+        Logger.debug('calculation service.deposite');
+
         const transaction = await this.getTransactionService.getByTx(
             transactionHash,
         );
@@ -88,6 +90,7 @@ export class PartyCalculationService {
         if (transaction.isDepositeDone) {
             throw new BadRequestException('TransactionHash has been processed');
         }
+        Logger.debug('isDepositeDone passed');
 
         const party =
             partyMember.party ??
@@ -105,6 +108,7 @@ export class PartyCalculationService {
                 true,
             ),
         ]);
+        Logger.debug(' ALL transaction passed');
     }
 
     @Transactional()
