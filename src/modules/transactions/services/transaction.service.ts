@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ITransaction } from 'src/entities/transaction.entity';
 import { PartyMemberModel } from 'src/models/party-member.model';
@@ -131,6 +131,13 @@ export class TransactionService {
         txhash: string,
         status: boolean,
     ): Promise<UpdateResult> {
+        const transaction = await this.repository
+            .createQueryBuilder()
+            .where('transaction_hash = :transaction_hash', {
+                transaction_hash: txhash,
+            })
+            .getOne();
+        Logger.debug(transaction, 'updateTxHashStatus transaction');
         return this.repository
             .createQueryBuilder()
             .update(TransactionModel)
@@ -138,7 +145,11 @@ export class TransactionService {
             .where('transaction_hash = :transaction_hash', {
                 transaction_hash: txhash,
             })
-            .execute();
+            .execute()
+            .then((a) => {
+                Logger.debug(a, 'updateTxHashStatus update');
+                return a;
+            });
     }
 
     async updateDepositeStatus(
