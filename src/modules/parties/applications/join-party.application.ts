@@ -21,6 +21,8 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { PartyCalculationService } from '../services/party-calculation.service';
 import BN from 'bn.js';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
+import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
@@ -29,6 +31,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         private readonly partyMemberValidation: PartyMemberValidation,
         private readonly partyMemberService: PartyMemberService,
         private readonly transactionService: TransactionService,
+        private readonly getTransactionService: GetTransactionService,
         private readonly partyCalculationService: PartyCalculationService,
     ) {
         super();
@@ -99,18 +102,25 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         );
         if (!txh) return partyMember;
 
-        const transaction =
-            await this.transactionService.storeDepositTransaction(
+        // need to check if transactionHash exists
+        let transaction = await this.getTransactionService.getByTx(
+            request.transactionHash,
+            TransactionTypeEnum.Deposit,
+        );
+
+        if (!transaction) {
+            transaction = await this.transactionService.storeDepositTransaction(
                 partyMember,
                 partyMember.initialFund,
                 request.joinPartySignature,
                 request.transactionHash,
             );
 
-        partyMember = await this.partyMemberService.update(partyMember, {
-            transactionHash: request.transactionHash,
-            depositTransactionId: transaction.id,
-        });
+            partyMember = await this.partyMemberService.update(partyMember, {
+                transactionHash: request.transactionHash,
+                depositTransactionId: transaction.id,
+            });
+        }
 
         const receipt = this.web3Service.getTransactionReceipt(
             request.transactionHash,
@@ -127,6 +137,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         await this.partyCalculationService.deposit(
             partyMember,
             transaction.amount,
+            request.transactionHash,
         );
         return partyMember;
     }
