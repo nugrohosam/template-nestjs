@@ -65,6 +65,7 @@ export class DepositApplication extends OffchainApplication {
         await this.partyCalculationService.deposit(
             partyMember,
             transaction.amount,
+            request.transactionHash,
         );
 
         return transaction;

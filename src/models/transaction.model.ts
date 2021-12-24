@@ -45,6 +45,9 @@ export class TransactionModel implements ITransaction {
     @Column('boolean', { name: 'transaction_hash_status' })
     transactionHashStatus: boolean;
 
+    @Column('boolean', { name: 'is_deposite_done' })
+    isDepositeDone: boolean;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;
 
