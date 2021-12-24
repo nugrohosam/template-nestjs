@@ -54,6 +54,7 @@ export class SwapQuoteApplication {
         private readonly geckoTokenService: GeckoTokenService,
     ) {}
 
+    // this transaction is handling swap request as well. ref=withdraw-transaction
     @Transactional()
     async transaction(
         request: SwapQuoteTransactionRequest,

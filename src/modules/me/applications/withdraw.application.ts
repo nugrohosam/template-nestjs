@@ -90,6 +90,15 @@ export class WithdrawApplication {
                         withdrawAmount.toString(),
                     );
                     if (err) {
+                        Logger.debug(
+                            {
+                                tokenAddress: token.address,
+                                withdrawAmount: withdrawAmount.toString(),
+                                weight,
+                                balance,
+                            },
+                            err.response.data.validationErrors[0].reason,
+                        );
                         throw new BadRequestException(
                             err.response.data.validationErrors[0].reason,
                         );
