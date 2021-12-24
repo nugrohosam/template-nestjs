@@ -114,6 +114,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         let transaction = await this.getTransactionService.getByTx(
             request.transactionHash,
             TransactionTypeEnum.Deposit,
+            false,
         );
 
         Logger.debug(transaction, 'transaction var line 114');
