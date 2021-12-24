@@ -137,7 +137,10 @@ export class TransactionService {
                 transaction_hash: txhash,
             })
             .getOne();
-        Logger.debug(transaction, 'updateTxHashStatus transaction');
+        Logger.debug(
+            JSON.stringify(transaction),
+            'updateTxHashStatus transaction',
+        );
         return this.repository
             .createQueryBuilder()
             .update(TransactionModel)
@@ -147,7 +150,7 @@ export class TransactionService {
             })
             .execute()
             .then((a) => {
-                Logger.debug(a, 'updateTxHashStatus update');
+                Logger.debug(JSON.stringify(a), 'updateTxHashStatus update');
                 return a;
             });
     }
