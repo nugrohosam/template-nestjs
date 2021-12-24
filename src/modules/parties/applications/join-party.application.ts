@@ -116,6 +116,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             TransactionTypeEnum.Deposit,
         );
 
+        Logger.debug(transaction, 'transaction var line 114');
+
         if (!transaction) {
             Logger.debug('!transaction');
             transaction = await this.transactionService.storeDepositTransaction(
@@ -136,6 +138,9 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         const receipt = this.web3Service.getTransactionReceipt(
             request.transactionHash,
         );
+        Logger.debug(receipt, 'receipt');
+        Logger.debug(partyMember, 'parrty member after receipt');
+
         if (!receipt) return partyMember;
 
         await this.web3Service.validateTransaction(
