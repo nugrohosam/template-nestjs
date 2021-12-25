@@ -74,7 +74,7 @@ export class LeavePartyApplication {
                 let withdrawAmount = new BN(0);
                 if (
                     (typeof weight === 'number' && weight !== 0) ||
-                    (typeof weight === 'object' && !weight.isZero)
+                    (typeof weight === 'object' && !weight.isZero())
                 ) {
                     withdrawAmount = balance
                         .mul(weight)
@@ -82,7 +82,10 @@ export class LeavePartyApplication {
                 }
 
                 let swapResponse: ISwap0xResponse = null;
-                if (token.address !== defaultToken.address && !balance.isZero) {
+                if (
+                    token.address !== defaultToken.address &&
+                    !balance.isZero()
+                ) {
                     const { data, err } = await this.swapQuoteService.getQuote(
                         defaultToken.address,
                         token.address,
