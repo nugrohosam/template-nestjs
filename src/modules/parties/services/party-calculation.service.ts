@@ -97,17 +97,17 @@ export class PartyCalculationService {
             (await this.getPartyService.getById(partyMember.partyId));
 
         const token = await this.tokenService.getDefaultToken();
-        Promise.all([
-            await this.updatePartyTotalFund(party, amount),
-            await this.updatePartyMemberTotalDeposit(partyMember, amount),
-            await this.updatePartyMembersWeight(party),
-            await this.partyService.storeToken(party, token),
-            await this.partyFundService.updatePartyFund(party),
-            await this.transactionService.updateDepositeStatus(
-                transactionHash,
-                true,
-            ),
-        ]);
+
+        // must be run sequentially : need to use Promise.all.
+        await this.updatePartyTotalFund(party, amount);
+        await this.updatePartyMemberTotalDeposit(partyMember, amount);
+        await this.updatePartyMembersWeight(party);
+        await this.partyService.storeToken(party, token);
+        await this.partyFundService.updatePartyFund(party);
+        await this.transactionService.updateDepositeStatus(
+            transactionHash,
+            true,
+        );
         Logger.debug(' ALL transaction passed');
     }
 
@@ -127,15 +127,11 @@ export class PartyCalculationService {
         );
 
         const withdrawAmount = amount.muln(-1);
-        await Promise.all([
-            await this.updatePartyTotalFund(party, withdrawAmount),
-            await this.updatePartyMemberTotalDeposit(
-                partyMember,
-                withdrawAmount,
-            ),
-            await this.updatePartyMembersWeight(party),
-            await this.partyFundService.updatePartyFund(party),
-        ]);
+        // must be run sequentially : need to use Promise.all.
+        await this.updatePartyTotalFund(party, withdrawAmount);
+        await this.updatePartyMemberTotalDeposit(partyMember, withdrawAmount);
+        await this.updatePartyMembersWeight(party);
+        await this.partyFundService.updatePartyFund(party);
         Logger.debug('LeaveWithdraw line 96');
     }
 }
