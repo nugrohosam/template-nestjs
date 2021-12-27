@@ -271,7 +271,7 @@ export class SwapQuoteApplication {
                 partyId: party.id,
                 type: TransactionTypeEnum.Swap,
                 transactionHash: log.transactionHash,
-                amountUsd: Utils.getFromWeiToUsd(swapEventData.sellAmount),
+                amountUsd: usd,
             }),
         ]);
     }
