@@ -114,11 +114,9 @@ export class PartyController {
     ): Promise<IApiResponse<DetailPartyResponse>> {
         const signer = await this.getSignerService.get(signature);
         const party = await this.getPartyService.getById(partyId, signer?.id);
-        console.time('volume');
         const partyVolume = await this.transactionVolumeService.get24Hours(
             partyId,
         );
-        console.timeEnd('volume');
 
         return {
             message: 'Success get party',
@@ -126,11 +124,11 @@ export class PartyController {
         };
     }
 
+    // TODO: endoint for testing volume
     @Get('/:partyId/volume')
     async volume(
         @Param('partyId') partyId: string,
     ): Promise<IApiResponse<{ partyId: string; sum: string }>> {
-        // const party = await this.getPartyService.getById(partyId, signer?.id);
         const sum = await this.transactionVolumeService.get24Hours(partyId);
         return {
             message: 'Success get party',
