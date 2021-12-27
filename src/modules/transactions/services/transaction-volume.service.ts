@@ -32,11 +32,11 @@ export class TransactionVolumeService {
                 .createQueryBuilder('tx')
                 .select('SUM(tx.amount_usd)', 'sum')
                 .where('tx.party_id = :partyId', { partyId })
-                .andWhere('date(created_at) = date(now()) + interval -24 hour')
+                .andWhere('created_at >= now() + interval -24 hour')
                 .getRawOne();
             volume = sum;
             await this.cacheManager.set(keyVolumeCache, sum, {
-                ttl: 10,
+                ttl: 300,
             });
         }
 
