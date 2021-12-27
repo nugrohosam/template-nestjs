@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TransactionVolumeModel } from 'src/models/transaction-volume.model';
 import { ITransactionVolume } from 'src/entities/transaction-voluime.entity';
+import { Cache } from 'cache-manager';
 
 export enum VolumeEnumOptions {
     All = 'All',
@@ -15,28 +16,31 @@ export class TransactionVolumeService {
     constructor(
         @InjectRepository(TransactionVolumeModel)
         private readonly repository: Repository<TransactionVolumeModel>,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
     ) {}
 
-    async get(
-        option: VolumeEnumOptions = VolumeEnumOptions.All,
-    ): Promise<TransactionVolumeModel[]> {
-        const query = this.repository.createQueryBuilder('trx');
+    private getVolumeCacheKey(partyId: string): string {
+        return `VL_${partyId}}`;
+    }
 
-        switch (option) {
-            case VolumeEnumOptions.IsSync:
-                query.where('trx.is_sync= :isSync', {
-                    isSync: true,
-                });
-                break;
-            case VolumeEnumOptions.IsNotSync:
-                query.where('trx.is_sync= :isSync', {
-                    isSync: false,
-                });
-                break;
-            default:
-                break;
+    async get24Hours(partyId: string): Promise<string> {
+        const keyVolumeCache = this.getVolumeCacheKey(partyId);
+        let volume = await this.cacheManager.get<string>(keyVolumeCache);
+        console.log(volume);
+        if (!volume) {
+            const { sum } = await this.repository
+                .createQueryBuilder('tx')
+                .select('SUM(tx.amount_usd)', 'sum')
+                .where('tx.party_id = :partyId', { partyId })
+                .andWhere('date(created_at) = date(now()) + interval -24 hour')
+                .getRawOne();
+            volume = sum;
+            await this.cacheManager.set(keyVolumeCache, sum, {
+                ttl: 10,
+            });
         }
-        return query.getMany();
+
+        return volume;
     }
 
     async store(data: ITransactionVolume): Promise<TransactionVolumeModel> {

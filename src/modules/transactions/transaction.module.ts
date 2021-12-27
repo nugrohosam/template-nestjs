@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { CacheModule, forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Web3Module } from 'src/infrastructure/web3/web3.module';
 import { TransactionSyncModel } from 'src/models/transaction-sync.model';
@@ -22,6 +22,7 @@ import { TransactionService } from './services/transaction.service';
             TransactionSyncModel,
             TransactionVolumeModel,
         ]),
+        CacheModule.register(),
     ],
     controllers: [],
     providers: [

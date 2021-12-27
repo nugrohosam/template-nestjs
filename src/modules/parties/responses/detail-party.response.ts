@@ -37,8 +37,12 @@ export class DetailPartyResponse
     updatedAt: Date;
     deletedAt: Date | null;
     joinRequestStatus?: string;
+    volume24Hours?: string;
 
-    static mapFromPartyModel(party: PartyModel): DetailPartyResponse {
+    static mapFromPartyModel(
+        party: PartyModel,
+        volume?: string,
+    ): DetailPartyResponse {
         const creator = party.creator;
         const owner = party.owner;
 
@@ -87,6 +91,7 @@ export class DetailPartyResponse
             updatedAt: party.updatedAt,
             deletedAt: party.deletedAt,
             joinRequestStatus: party.joinRequestStatus,
+            volume24Hours: volume,
         };
     }
 }
