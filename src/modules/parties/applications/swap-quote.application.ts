@@ -32,6 +32,7 @@ import { GetTokenBalanceService } from '../utils/get-token-balance.util';
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
 import { GeckoTokenService } from '../services/token/gecko-token.service';
 import BigNumber from 'bignumber.js';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 
 @Injectable()
 export class SwapQuoteApplication {
@@ -52,6 +53,7 @@ export class SwapQuoteApplication {
         private readonly tokenBalanceService: GetTokenBalanceService,
         private readonly transactionSyncService: TransactionSyncService,
         private readonly geckoTokenService: GeckoTokenService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
     @Transactional()
@@ -265,6 +267,12 @@ export class SwapQuoteApplication {
             this.swapTransactionRepository.save(swapTransaction),
             this.partyGainService.updatePartyGain(party),
             this.partyFundService.updatePartyFund(party),
+            this.transactionVolumeService.store({
+                partyId: party.id,
+                type: TransactionTypeEnum.Swap,
+                transactionHash: log.transactionHash,
+                amountUsd: Utils.getFromWeiToUsd(swapEventData.sellAmount),
+            }),
         ]);
     }
 }
