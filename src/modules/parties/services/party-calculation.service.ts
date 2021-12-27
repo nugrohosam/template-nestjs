@@ -116,7 +116,7 @@ export class PartyCalculationService {
         partyAddress: string,
         memberAddress: string,
         amount: BN,
-    ): Promise<void> {
+    ): Promise<PartyMemberModel> {
         const party = await this.getPartyService.getByAddress(partyAddress);
         const member = await this.getUserService.getUserByAddress(
             memberAddress,
@@ -133,5 +133,6 @@ export class PartyCalculationService {
         await this.updatePartyMembersWeight(party);
         await this.partyFundService.updatePartyFund(party);
         Logger.debug('LeaveWithdraw line 96');
+        return partyMember;
     }
 }

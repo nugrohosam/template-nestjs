@@ -24,6 +24,8 @@ import BN from 'bn.js';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
+import { Utils } from 'src/common/utils/util';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
@@ -34,6 +36,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         private readonly transactionService: TransactionService,
         private readonly getTransactionService: GetTransactionService,
         private readonly partyCalculationService: PartyCalculationService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {
         super();
     }
@@ -131,6 +134,13 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             partyMember = await this.partyMemberService.update(partyMember, {
                 transactionHash: request.transactionHash,
                 depositTransactionId: transaction.id,
+            });
+
+            await this.transactionVolumeService.store({
+                partyId: partyMember.partyId,
+                type: TransactionTypeEnum.Deposit,
+                transactionHash: request.transactionHash,
+                amountUsd: Utils.getFromWeiToUsd(partyMember.initialFund),
             });
             Logger.debug('!partyMember updated depositTransactionId');
         }
