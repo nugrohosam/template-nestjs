@@ -24,7 +24,7 @@ export class TransactionVolumeModel implements ITransactionVolume {
     @Column('varchar', { name: 'transaction_hash' })
     transactionHash: string;
 
-    @Column('enum', { name: 'type', enum: TransactionTypeEnum })
+    @Column('enum', { enum: TransactionTypeEnum })
     type: TransactionTypeEnum;
 
     @Column('varchar', { name: 'amount_usd', transformer: TransformBigNumber })
