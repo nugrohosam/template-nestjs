@@ -26,7 +26,6 @@ export class TransactionVolumeService {
     async get24Hours(partyId: string): Promise<string> {
         const keyVolumeCache = this.getVolumeCacheKey(partyId);
         let volume = await this.cacheManager.get<string>(keyVolumeCache);
-        console.log(volume);
         if (!volume) {
             const { sum } = await this.repository
                 .createQueryBuilder('tx')
