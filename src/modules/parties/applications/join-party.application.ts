@@ -88,13 +88,9 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         partyMember: PartyMemberModel,
         request: UpdatePartyMemberRequest,
     ): Promise<PartyMemberModel> {
-        Logger.debug(request.transactionHash, 'Init commit Join Party');
         const member = partyMember.member ?? (await partyMember.getMember);
 
         if (request.joinPartySignature !== partyMember.signature) {
-            Logger.debug(
-                'request.joinPartySignature !== partyMember.signature',
-            );
             throw new UnauthorizedException('Signature not valid');
         }
 
@@ -111,7 +107,6 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             request.transactionHash,
         );
         if (!txh) return partyMember;
-        Logger.debug('!thx passed');
 
         // need to check if transactionHash exists
         let transaction = await this.getTransactionService.getByTx(
@@ -120,10 +115,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             false,
         );
 
-        Logger.debug(transaction, 'transaction var line 114');
-
         if (!transaction) {
-            Logger.debug('!transaction');
             transaction = await this.transactionService.storeDepositTransaction(
                 partyMember,
                 partyMember.initialFund,
@@ -142,15 +134,11 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
                 transactionHash: request.transactionHash,
                 amountUsd: Utils.getFromWeiToUsd(partyMember.initialFund),
             });
-            Logger.debug('!partyMember updated depositTransactionId');
         }
-        Logger.debug('!transaction passed');
 
         const receipt = this.web3Service.getTransactionReceipt(
             request.transactionHash,
         );
-        Logger.debug(receipt, 'receipt');
-        Logger.debug(partyMember, 'parrty member after receipt');
 
         if (!receipt) return partyMember;
 
