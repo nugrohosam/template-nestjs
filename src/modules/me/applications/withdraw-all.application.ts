@@ -22,6 +22,8 @@ import { JoinRequestService } from 'src/modules/parties/services/join-request/jo
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
 import { PartyEvents } from 'src/contracts/Party';
 import { WithdrawAllPreparationResponse } from '../responses/withdraw-preparation.response';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 
 @Injectable()
 export class WithdrawAllApplication {
@@ -40,6 +42,7 @@ export class WithdrawAllApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly joinRequestService: JoinRequestService,
         private readonly transactionSyncService: TransactionSyncService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
     async prepare(
@@ -160,6 +163,12 @@ export class WithdrawAllApplication {
                     partyMember.memberId,
                     partyMember.partyId,
                 ),
+                this.transactionVolumeService.store({
+                    partyId: partyMember.partyId,
+                    type: TransactionTypeEnum.Withdraw,
+                    transactionHash: logParams.result.transactionHash,
+                    amountUsd: Utils.getFromWeiToUsd(amount),
+                }),
             ]);
             Logger.debug('<= withdraw-all all End sync ');
         } catch (error) {
@@ -211,6 +220,12 @@ export class WithdrawAllApplication {
                     partyMember.memberId,
                     partyMember.partyId,
                 ),
+                this.transactionVolumeService.store({
+                    partyId: partyMember.partyId,
+                    type: TransactionTypeEnum.Withdraw,
+                    transactionHash: transactionHash,
+                    amountUsd: Utils.getFromWeiToUsd(amount),
+                }),
             ]);
 
             await this.transactionSyncService.updateStatusSync(

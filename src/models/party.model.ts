@@ -215,4 +215,6 @@ export class PartyModel implements IParty {
         transformer: TransformBN,
     })
     initialFund?: BN;
+
+    volume?: string;
 }

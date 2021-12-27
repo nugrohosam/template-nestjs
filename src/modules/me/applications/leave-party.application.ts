@@ -22,6 +22,8 @@ import { PartyCalculationService } from 'src/modules/parties/services/party-calc
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
 import { PartyEvents } from 'src/contracts/Party';
 import BN from 'bn.js';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -40,6 +42,7 @@ export class LeavePartyApplication {
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly transactionSyncService: TransactionSyncService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
     async prepare(
@@ -166,6 +169,12 @@ export class LeavePartyApplication {
                     partyMember.memberId,
                     partyMember.partyId,
                 ),
+                this.transactionVolumeService.store({
+                    partyId: partyMember.partyId,
+                    type: TransactionTypeEnum.Withdraw,
+                    transactionHash: logParams.result.transactionHash,
+                    amountUsd: Utils.getFromWeiToUsd(amount),
+                }),
             ]);
             Logger.debug('<= Leave Party End sync ');
         } catch (error) {
@@ -216,6 +225,12 @@ export class LeavePartyApplication {
                     partyMember.memberId,
                     partyMember.partyId,
                 ),
+                this.transactionVolumeService.store({
+                    partyId: partyMember.partyId,
+                    type: TransactionTypeEnum.Withdraw,
+                    transactionHash: transactionHash,
+                    amountUsd: Utils.getFromWeiToUsd(amount),
+                }),
             ]);
 
             await this.transactionSyncService.updateStatusSync(

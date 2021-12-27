@@ -22,6 +22,8 @@ import { config } from 'src/config';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
 import { PartyEvents } from 'src/contracts/Party';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 
 @Injectable()
 export class WithdrawApplication {
@@ -38,6 +40,7 @@ export class WithdrawApplication {
         private readonly partyCalculationService: PartyCalculationService,
         private readonly transactionService: TransactionService,
         private readonly transactionSyncService: TransactionSyncService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
     async prepare(
@@ -168,11 +171,18 @@ export class WithdrawApplication {
                 logParams.result.transactionHash,
             );
 
-            await this.partyCalculationService.withdraw(
+            const partyMember = await this.partyCalculationService.withdraw(
                 partyAddress,
                 userAddress,
                 amount,
             );
+
+            await this.transactionVolumeService.store({
+                partyId: partyMember.partyId,
+                type: TransactionTypeEnum.Withdraw,
+                transactionHash: logParams.result.transactionHash,
+                amountUsd: Utils.getFromWeiToUsd(amount),
+            });
         } catch (error) {
             // save to log for retrial
             await this.transactionSyncService.store({
@@ -200,11 +210,18 @@ export class WithdrawApplication {
                 transactionHash,
             );
 
-            await this.partyCalculationService.withdraw(
+            const partyMember = await this.partyCalculationService.withdraw(
                 partyAddress,
                 userAddress,
                 amount,
             );
+
+            await this.transactionVolumeService.store({
+                partyId: partyMember.partyId,
+                type: TransactionTypeEnum.Withdraw,
+                transactionHash: transactionHash,
+                amountUsd: Utils.getFromWeiToUsd(amount),
+            });
 
             await this.transactionSyncService.updateStatusSync(
                 transactionHash,

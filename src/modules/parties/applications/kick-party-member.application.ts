@@ -21,6 +21,8 @@ import { UserModel } from 'src/models/user.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import BN from 'bn.js';
 import { PartyEvents } from 'src/contracts/Party';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 
 @Injectable()
 export class KickPartyMemberApplication {
@@ -38,6 +40,7 @@ export class KickPartyMemberApplication {
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly getUserService: GetUserService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
     async prepare(
@@ -69,6 +72,7 @@ export class KickPartyMemberApplication {
         Logger.debug(JSON.stringify(tokens), 'tokens db');
 
         const defaultToken = await this.tokenService.getDefaultToken();
+
         Logger.debug(JSON.stringify(defaultToken), 'default token');
         const results = await Promise.all(
             tokens.map(async (token) => {
@@ -186,6 +190,12 @@ export class KickPartyMemberApplication {
                 partyMember.memberId,
                 partyMember.partyId,
             ),
+            this.transactionVolumeService.store({
+                partyId: partyMember.partyId,
+                type: TransactionTypeEnum.Withdraw,
+                transactionHash: logParams.result.transactionHash,
+                amountUsd: Utils.getFromWeiToUsd(amount),
+            }),
         ]);
         Logger.debug('', 'PassedSync');
     }
