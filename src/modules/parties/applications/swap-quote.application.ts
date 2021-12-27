@@ -56,6 +56,7 @@ export class SwapQuoteApplication {
         private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
+    // this transaction is handling swap request as well. ref=withdraw-transaction
     @Transactional()
     async transaction(
         request: SwapQuoteTransactionRequest,

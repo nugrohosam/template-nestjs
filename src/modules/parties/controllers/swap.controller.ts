@@ -68,6 +68,8 @@ export class SwapController {
     ): Promise<IApiResponse<null>> {
         const party = await this.getPartyService.getById(partyId);
         // TODO: need to add signature validation
+
+        //transactionHash
         WS.initWebSocketInstance(
             party.address,
             PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),

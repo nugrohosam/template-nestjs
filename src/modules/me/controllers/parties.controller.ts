@@ -3,6 +3,7 @@ import {
     Controller,
     Get,
     Headers,
+    Logger,
     Param,
     Post,
     Query,
@@ -16,6 +17,7 @@ import { IndexPartyResponse } from 'src/modules/parties/responses/index-party.re
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { ILogParams } from 'src/modules/parties/types/logData';
 import { TransactionResponse } from 'src/modules/transactions/responses/transaction.response';
+import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
 import { ClosePartyApplication } from '../applications/close-party.application';
 import { DepositApplication } from '../applications/deposit.application';
 import { LeavePartyApplication } from '../applications/leave-party.application';
@@ -49,6 +51,7 @@ export class MePartiesController {
 
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
+        private readonly getTransactionService: GetTransactionService,
     ) {}
 
     @Get()
@@ -114,6 +117,14 @@ export class MePartiesController {
             party.address,
             PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
             async (logParams: ILogParams) => {
+                await this.getTransactionService
+                    .getByTx(logParams.result.transactionHash, undefined, false)
+                    .then((a) => {
+                        Logger.debug(
+                            JSON.stringify(a),
+                            'Transaction withdraw checker',
+                        );
+                    });
                 await this.swapApplication.buySync(logParams);
             },
         );

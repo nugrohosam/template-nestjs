@@ -69,8 +69,11 @@ export class KickPartyMemberApplication {
             .where('party_id = :partyId', { partyId: party.id })
             .getMany();
 
+        Logger.debug(JSON.stringify(tokens), 'tokens db');
+
         const defaultToken = await this.tokenService.getDefaultToken();
 
+        Logger.debug(JSON.stringify(defaultToken), 'default token');
         const results = await Promise.all(
             tokens.map(async (token) => {
                 const balance = await this.tokenService.getTokenBalance(
@@ -107,6 +110,15 @@ export class KickPartyMemberApplication {
                         token.symbol,
                     );
                     if (err) {
+                        Logger.debug(
+                            {
+                                tokenAddress: token.address,
+                                withdrawAmount: withdrawAmount.toString(),
+                                weight,
+                                balance,
+                            },
+                            err.response.data.validationErrors[0].reason,
+                        );
                         throw new BadRequestException(
                             err.response.data.validationErrors[0].reason,
                         );
