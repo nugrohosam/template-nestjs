@@ -13,7 +13,7 @@ import {
 } from 'typeorm';
 import { PartyModel } from './party.model';
 
-@Entity({ name: 'swap_transactions' })
+@Entity({ name: 'transaction_volume' })
 export class TransactionVolumeModel implements ITransactionVolume {
     @PrimaryGeneratedColumn('uuid')
     id?: string;
