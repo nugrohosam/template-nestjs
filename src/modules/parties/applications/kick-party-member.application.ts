@@ -67,6 +67,7 @@ export class KickPartyMemberApplication {
             .getMany();
 
         const defaultToken = await this.tokenService.getDefaultToken();
+
         const results = await Promise.all(
             tokens.map(async (token) => {
                 const balance = await this.tokenService.getTokenBalance(
@@ -76,7 +77,7 @@ export class KickPartyMemberApplication {
                 let withdrawAmount = new BN(0);
                 if (
                     (typeof weight === 'number' && weight !== 0) ||
-                    (typeof weight === 'object' && !weight.isZero)
+                    (typeof weight === 'object' && !weight.isZero())
                 ) {
                     withdrawAmount = balance
                         .mul(weight)
@@ -84,11 +85,23 @@ export class KickPartyMemberApplication {
                 }
 
                 let swapResponse: ISwap0xResponse = null;
-                if (token.address !== defaultToken.address && !balance.isZero) {
+                if (
+                    token.address !== defaultToken.address &&
+                    !balance.isZero()
+                ) {
                     const { data, err } = await this.swapQuoteService.getQuote(
                         defaultToken.address,
                         token.address,
                         withdrawAmount.toString(),
+                    );
+                    Logger.debug(
+                        {
+                            tokenAddress: token.address,
+                            withdrawAmount: withdrawAmount.toString(),
+                            weight,
+                            balance,
+                        },
+                        token.symbol,
                     );
                     if (err) {
                         throw new BadRequestException(
