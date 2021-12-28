@@ -27,6 +27,7 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class KickPartyMemberApplication {
+    private kickWithdrawPercentage = new BN(config.calculation.maxPercentage);
     constructor(
         @InjectRepository(PartyTokenModel)
         private readonly partyTokenRepository: Repository<PartyTokenModel>,
@@ -158,7 +159,7 @@ export class KickPartyMemberApplication {
 
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress, amount, cut, penalty, percentage } =
+        const { userAddress, partyAddress, amount, cut, penalty } =
             await this.decodeKickEventData(logParams);
 
         let partyMember =
@@ -180,7 +181,7 @@ export class KickPartyMemberApplication {
             partyAddress,
             userAddress,
             amount,
-            percentage,
+            this.kickWithdrawPercentage,
         );
 
         partyMember = await this.partyMemberService.update(partyMember, {
@@ -209,7 +210,7 @@ export class KickPartyMemberApplication {
         amount: BN;
         cut: BN;
         penalty: BN;
-        percentage: BN;
+        weight: BN;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
             log.transactionHash,
@@ -223,7 +224,7 @@ export class KickPartyMemberApplication {
             amount: new BN(decodedLog.sent),
             cut: new BN(decodedLog.cut),
             penalty: new BN(decodedLog.penalty),
-            percentage: new BN(decodedLog.weight),
+            weight: new BN(decodedLog.weight),
         };
 
         Logger.debug(data, 'KickEventData');
