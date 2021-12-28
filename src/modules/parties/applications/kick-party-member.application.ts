@@ -144,7 +144,7 @@ export class KickPartyMemberApplication {
     }
 
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress, amount, cut, penalty } =
+        const { userAddress, partyAddress, amount, cut, penalty, percentage } =
             await this.decodeKickEventData(logParams);
 
         let partyMember =
@@ -166,6 +166,7 @@ export class KickPartyMemberApplication {
             partyAddress,
             userAddress,
             amount,
+            percentage,
         );
 
         partyMember = await this.partyMemberService.update(partyMember, {
@@ -194,6 +195,7 @@ export class KickPartyMemberApplication {
         amount: BN;
         cut: BN;
         penalty: BN;
+        percentage: BN;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
             log.transactionHash,
@@ -207,6 +209,7 @@ export class KickPartyMemberApplication {
             amount: new BN(decodedLog.sent),
             cut: new BN(decodedLog.cut),
             penalty: new BN(decodedLog.penalty),
+            percentage: new BN(decodedLog.withdrawPercentage),
         };
 
         Logger.debug(data, 'KickEventData');
