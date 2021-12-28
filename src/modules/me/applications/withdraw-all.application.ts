@@ -127,6 +127,7 @@ export class WithdrawAllApplication {
         };
     }
 
+    @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
@@ -149,7 +150,6 @@ export class WithdrawAllApplication {
                 null,
                 logParams.result.transactionHash,
             );
-
             await this.partyCalculationService.withdraw(
                 partyAddress,
                 userAddress,

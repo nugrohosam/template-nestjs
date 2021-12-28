@@ -42,21 +42,22 @@ export class MyPartiesApplication extends IndexApplication {
                 return 'exists ' + subQuery;
             });
         } else {
+            // TODO: MASIH RESEARCH BOS
             // filter member
-            query.where((qb) => {
-                const subQuery = qb
-                    .subQuery()
-                    .select('party_members.member_id')
-                    .from(PartyMemberModel, 'party_members')
-                    .where('party_members.party_id = parties.id')
-                    .andWhere('party_members.member_id = :userId', {
-                        userId: user.id,
-                    })
-                    .getQuery();
-                return 'exists ' + subQuery;
-            });
+            // query.where((qb) => {
+            //     const subQuery = qb
+            //         .subQuery()
+            //         .select('party_members.member_id')
+            //         .from(PartyMemberModel, 'party_members')
+            //         .where('party_members.party_id = parties.id')
+            //         .andWhere('party_members.member_id = :userId', {
+            //             userId: user.id,
+            //         })
+            //         .getQuery();
+            //     return 'exists ' + subQuery;
+            // });
 
-            const isActiveQuery = query
+            const isDraftQuery = query
                 .subQuery()
                 .select('p.id')
                 .from(PartyModel, 'p')
@@ -65,21 +66,32 @@ export class MyPartiesApplication extends IndexApplication {
                 .andWhere('pm.member_id = parties.owner_id')
                 .andWhere('parties.address is not null')
                 .andWhere('parties.transaction_hash is not null')
+                .andWhere('parties.is_closed =0')
                 .take(1)
                 .getQuery();
-            query.addSelect(`${isActiveQuery} is not null`, 'party_isActive');
+
+            const isMember = query
+                .subQuery()
+                .select('p.id')
+                .from(PartyModel, 'p')
+                .leftJoin(PartyMemberModel, 'pm', 'pm.party_id = p.id')
+                .where('p.id = parties.id')
+                .andWhere('pm.member_id = parties.owner_id')
+                .take(1)
+                .getQuery();
+            // query.addSelect(`${isDraftQuery} is not null`, 'party_isActive');
 
             // is_active condition
             query.where(
-                `${isActiveQuery} is not null OR (${isActiveQuery} is null AND parties.owner_id = :userId)`,
+                `${isMember} is not null OR (${isDraftQuery} is null AND parties.owner_id = :userId)`,
                 { userId: user.id },
             );
 
             // is_closed condition
-            query.where(
-                `parties.is_closed=0 OR (parties.is_closed=1 AND parties.owner_id = :userId)`,
-                { userId: user.id },
-            );
+            // query.where(
+            //     `parties.is_closed=0 OR (parties.is_closed=1 AND parties.owner_id = :userId)`,
+            //     { userId: user.id },
+            // );
         }
 
         query.orderBy(

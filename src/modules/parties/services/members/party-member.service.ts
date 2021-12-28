@@ -107,6 +107,11 @@ export class PartyMemberService {
         partyMember: PartyMemberModel,
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
+        console.log(partyMember, 'partyMember');
+        console.log(party.totalDeposit, 'total deposit party');
+
+        if (partyMember.totalDeposit.isZero() && party.totalDeposit.isZero())
+            return partyMember;
 
         const weight = partyMember.totalDeposit
             .muln(config.calculation.maxPercentage)
