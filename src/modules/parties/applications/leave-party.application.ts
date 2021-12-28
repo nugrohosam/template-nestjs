@@ -11,7 +11,10 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { GetPartyService } from '../services/get-party.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
+import { config } from 'src/config';
+import BN from 'bn.js';
 
+// TODO: unused service
 @Injectable()
 export class LeavePartyApplication extends OnchainParalelApplication {
     constructor(
@@ -74,6 +77,7 @@ export class LeavePartyApplication extends OnchainParalelApplication {
             party.address,
             user.address,
             transaction.amount,
+            new BN(config.calculation.maxPercentage),
         );
 
         await this.partyMemberService.delete(partyMember, true);

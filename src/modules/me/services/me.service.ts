@@ -54,6 +54,7 @@ export class MeService {
         amount: BN;
         cut: BN;
         penalty: BN;
+        percentage: BN;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
             transactionHash,
@@ -70,6 +71,7 @@ export class MeService {
             amount: new BN(decodedLog[2]),
             cut: new BN(decodedLog[3]),
             penalty: new BN(decodedLog[4]),
+            percentage: new BN(decodedLog[5]),
         };
 
         Logger.debug(data, 'WithdrawEventData');
@@ -82,6 +84,7 @@ export class MeService {
         amount: BN;
         cut: BN;
         penalty: BN;
+        percentage: BN;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
             transactionHash,
@@ -97,6 +100,7 @@ export class MeService {
             amount: new BN(decodedLog.sent),
             cut: new BN(decodedLog.cut),
             penalty: new BN(decodedLog.penalty),
+            percentage: new BN(decodedLog.withdrawPercentage),
         };
 
         Logger.debug(data, 'LeaveEventData');

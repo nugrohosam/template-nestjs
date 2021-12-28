@@ -14,6 +14,7 @@ import { PartyMemberService } from './members/party-member.service';
 import { PartyFundService } from './party-fund/party-fund.service';
 import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
+import { config } from 'src/config';
 
 @Injectable()
 export class PartyCalculationService {
@@ -81,8 +82,6 @@ export class PartyCalculationService {
         amount: BN,
         transactionHash: string,
     ): Promise<void> {
-        Logger.debug('calculation service.deposite');
-
         const transaction = await this.getTransactionService.getByTx(
             transactionHash,
         );
@@ -90,7 +89,6 @@ export class PartyCalculationService {
         if (transaction.isDepositeDone) {
             throw new BadRequestException('TransactionHash has been processed');
         }
-        Logger.debug('isDepositeDone passed');
 
         const party =
             partyMember.party ??
@@ -108,7 +106,6 @@ export class PartyCalculationService {
             transactionHash,
             true,
         );
-        Logger.debug(' ALL transaction passed');
     }
 
     @Transactional()
@@ -116,6 +113,7 @@ export class PartyCalculationService {
         partyAddress: string,
         memberAddress: string,
         amount: BN,
+        percentage: BN,
     ): Promise<PartyMemberModel> {
         const party = await this.getPartyService.getByAddress(partyAddress);
         const member = await this.getUserService.getUserByAddress(
@@ -126,8 +124,22 @@ export class PartyCalculationService {
             party.id,
         );
 
-        const withdrawAmount = amount.muln(-1);
-        // must be run sequentially : need to use Promise.all.
+        const withdrawAmount = partyMember.totalDeposit
+            .mul(percentage)
+            .divn(config.calculation.maxPercentage)
+            .muln(-1);
+
+        Logger.debug(
+            {
+                withdrawAmount,
+                amount,
+                percentage,
+                totalDeposit: partyMember.totalDeposit,
+            },
+            'LOG WITHDRAW',
+        );
+
+        // must be run sequentially : no need to use Promise.all.
         await this.updatePartyTotalFund(party, withdrawAmount);
         await this.updatePartyMemberTotalDeposit(partyMember, withdrawAmount);
         await this.updatePartyMembersWeight(party);

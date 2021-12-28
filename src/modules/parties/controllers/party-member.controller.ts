@@ -198,6 +198,7 @@ export class PartyMemberController {
         };
     }
 
+    // TODO: unused
     @Put('leave')
     async leave(
         @Param('partyId') partyId: string,
@@ -217,6 +218,7 @@ export class PartyMemberController {
         };
     }
 
+    // TODO: unused
     @Put('leave/revert')
     async revertLeave(
         @Param('partyId') partyId: string,
