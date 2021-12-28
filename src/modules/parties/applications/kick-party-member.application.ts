@@ -221,7 +221,7 @@ export class KickPartyMemberApplication {
             amount: new BN(decodedLog.sent),
             cut: new BN(decodedLog.cut),
             penalty: new BN(decodedLog.penalty),
-            percentage: new BN(decodedLog.withdrawPercentage),
+            percentage: new BN(decodedLog.weight),
         };
 
         Logger.debug(data, 'KickEventData');
