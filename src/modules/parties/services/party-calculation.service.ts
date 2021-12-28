@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { PartyService } from './party.service';
 import { TokenService } from './token/token.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 import { PartyMemberService } from './members/party-member.service';
 import { PartyFundService } from './party-fund/party-fund.service';
 import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
@@ -108,7 +108,7 @@ export class PartyCalculationService {
         );
     }
 
-    @Transactional()
+    @Transactional({ propagation: Propagation.NESTED })
     async withdraw(
         partyAddress: string,
         memberAddress: string,
