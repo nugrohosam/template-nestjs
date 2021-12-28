@@ -386,8 +386,14 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "caller",
+                "name": "userAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "withdrawPercentage",
+                "type": "uint256"
             },
             {
                 "indexed": false,
@@ -559,6 +565,11 @@
                 "internalType": "address",
                 "name": "partyAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "withdrawPercentage",
+                "type": "uint256"
             },
             {
                 "internalType": "uint256",

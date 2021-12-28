@@ -156,10 +156,16 @@ export class WithdrawApplication {
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
         try {
-            const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeWithdrawEventData(
-                    logParams.result.transactionHash,
-                );
+            const {
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                percentage,
+            } = await this.meService.decodeWithdrawEventData(
+                logParams.result.transactionHash,
+            );
 
             await this.transactionService.storeWithdrawTransaction(
                 userAddress,
@@ -171,10 +177,13 @@ export class WithdrawApplication {
                 logParams.result.transactionHash,
             );
 
+            // percentage of partymember
+
             const partyMember = await this.partyCalculationService.withdraw(
                 partyAddress,
                 userAddress,
                 amount,
+                percentage,
             );
 
             await this.transactionVolumeService.store({
@@ -197,8 +206,14 @@ export class WithdrawApplication {
     @Transactional()
     async retrySync(transactionHash: string): Promise<void> {
         try {
-            const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeWithdrawEventData(transactionHash);
+            const {
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                percentage,
+            } = await this.meService.decodeWithdrawEventData(transactionHash);
 
             await this.transactionService.storeWithdrawTransaction(
                 userAddress,
@@ -214,6 +229,7 @@ export class WithdrawApplication {
                 partyAddress,
                 userAddress,
                 amount,
+                percentage,
             );
 
             await this.transactionVolumeService.store({

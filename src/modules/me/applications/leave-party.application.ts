@@ -132,10 +132,16 @@ export class LeavePartyApplication {
 
     async sync(logParams: ILogParams): Promise<void> {
         try {
-            const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeLeaveEventData(
-                    logParams.result.transactionHash,
-                );
+            const {
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                percentage,
+            } = await this.meService.decodeLeaveEventData(
+                logParams.result.transactionHash,
+            );
 
             let partyMember =
                 await this.getPartyMemberService.getByUserAndPartyAddress(
@@ -157,6 +163,7 @@ export class LeavePartyApplication {
                 partyAddress,
                 userAddress,
                 amount,
+                percentage,
             );
 
             partyMember = await this.partyMemberService.update(partyMember, {
@@ -190,8 +197,14 @@ export class LeavePartyApplication {
 
     async retrySync(transactionHash: string): Promise<void> {
         try {
-            const { userAddress, partyAddress, amount, cut, penalty } =
-                await this.meService.decodeLeaveEventData(transactionHash);
+            const {
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                percentage,
+            } = await this.meService.decodeLeaveEventData(transactionHash);
 
             let partyMember =
                 await this.getPartyMemberService.getByUserAndPartyAddress(
@@ -213,6 +226,7 @@ export class LeavePartyApplication {
                 partyAddress,
                 userAddress,
                 amount,
+                percentage,
             );
 
             partyMember = await this.partyMemberService.update(partyMember, {
