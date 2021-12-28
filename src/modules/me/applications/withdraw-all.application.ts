@@ -24,9 +24,12 @@ import { PartyEvents } from 'src/contracts/Party';
 import { WithdrawAllPreparationResponse } from '../responses/withdraw-preparation.response';
 import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import BN from 'bn.js';
 
 @Injectable()
 export class WithdrawAllApplication {
+    private withdrawAllPercentage = new BN(config.calculation.maxPercentage);
+
     constructor(
         @InjectRepository(PartyTokenModel)
         private readonly partyTokenRepository: Repository<PartyTokenModel>,
@@ -126,16 +129,10 @@ export class WithdrawAllApplication {
 
     async sync(logParams: ILogParams): Promise<void> {
         try {
-            const {
-                userAddress,
-                partyAddress,
-                amount,
-                cut,
-                penalty,
-                percentage,
-            } = await this.meService.decodeLeaveEventData(
-                logParams.result.transactionHash,
-            );
+            const { userAddress, partyAddress, amount, cut, penalty } =
+                await this.meService.decodeLeaveEventData(
+                    logParams.result.transactionHash,
+                );
 
             let partyMember =
                 await this.getPartyMemberService.getByUserAndPartyAddress(
@@ -157,7 +154,7 @@ export class WithdrawAllApplication {
                 partyAddress,
                 userAddress,
                 amount,
-                percentage,
+                this.withdrawAllPercentage,
             );
 
             partyMember = await this.partyMemberService.update(partyMember, {
@@ -192,14 +189,8 @@ export class WithdrawAllApplication {
     @Transactional()
     async retrySync(transactionHash: string): Promise<void> {
         try {
-            const {
-                userAddress,
-                partyAddress,
-                amount,
-                cut,
-                penalty,
-                percentage,
-            } = await this.meService.decodeLeaveEventData(transactionHash);
+            const { userAddress, partyAddress, amount, cut, penalty } =
+                await this.meService.decodeLeaveEventData(transactionHash);
 
             let partyMember =
                 await this.getPartyMemberService.getByUserAndPartyAddress(
@@ -221,7 +212,7 @@ export class WithdrawAllApplication {
                 partyAddress,
                 userAddress,
                 amount,
-                percentage,
+                this.withdrawAllPercentage,
             );
 
             partyMember = await this.partyMemberService.update(partyMember, {
