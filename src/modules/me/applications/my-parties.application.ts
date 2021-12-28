@@ -57,6 +57,14 @@ export class MyPartiesApplication extends IndexApplication {
             });
         }
 
+        if (request.isClosed) {
+            query.andWhere('parties.is_closed = :isClosed', {
+                isClosed: request.isClosed,
+            });
+        } else {
+            query.andWhere('parties.is_closed = 0');
+        }
+
         query.orderBy(
             request.sort ?? this.DefaultSort,
             request.order ?? this.DefaultOrder,
