@@ -67,11 +67,11 @@ export class MeService {
         // TODO: this the usual way to get the docoded log. will try to access the input name directly in leave party event.
         const data = {
             userAddress: decodedLog[0],
-            partyAddress: decodedLog[1],
-            amount: new BN(decodedLog[2]),
-            cut: new BN(decodedLog[3]),
-            penalty: new BN(decodedLog[4]),
-            percentage: new BN(decodedLog[5]),
+            percentage: new BN(decodedLog[1]),
+            partyAddress: decodedLog[2],
+            amount: new BN(decodedLog[3]),
+            cut: new BN(decodedLog[4]),
+            penalty: new BN(decodedLog[5]),
         };
 
         Logger.debug(data, 'WithdrawEventData');
@@ -100,7 +100,7 @@ export class MeService {
             amount: new BN(decodedLog.sent),
             cut: new BN(decodedLog.cut),
             penalty: new BN(decodedLog.penalty),
-            percentage: new BN(decodedLog.withdrawPercentage),
+            percentage: new BN(decodedLog.weight),
         };
 
         Logger.debug(data, 'LeaveEventData');
