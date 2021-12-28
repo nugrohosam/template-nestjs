@@ -17,4 +17,9 @@ export class IndexMePartyRequest extends IndexRequest {
     @IsNumber()
     @Expose({ name: 'is_closed' })
     isClosed?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Expose({ name: 'is_active' })
+    isActive?: number;
 }
