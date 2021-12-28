@@ -23,6 +23,7 @@ import BN from 'bn.js';
 import { PartyEvents } from 'src/contracts/Party';
 import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class KickPartyMemberApplication {
@@ -155,6 +156,7 @@ export class KickPartyMemberApplication {
         };
     }
 
+    @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
         const { userAddress, partyAddress, amount, cut, penalty, percentage } =
             await this.decodeKickEventData(logParams);
