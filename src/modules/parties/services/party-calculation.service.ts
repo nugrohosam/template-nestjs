@@ -39,18 +39,26 @@ export class PartyCalculationService {
         party: PartyModel,
         amount: BN,
     ): Promise<UpdateResult> {
-        const totalDeposit = party.totalDeposit.add(amount);
+        const totalDepositParty = party.totalDeposit.add(amount);
         Logger.debug(
-            party.totalDeposit,
+            totalDepositParty,
             `update partyId total fund: ${party.id} =>`,
         );
 
         const updateParty = await this.partyRepository
             .createQueryBuilder()
             .update(PartyModel)
-            .set({ totalDeposit })
+            .set({ totalDeposit: totalDepositParty })
             .where('id=:partyId', { partyId: party.id })
             .execute();
+
+        const updateCek = this.partyRepository
+            .createQueryBuilder()
+            .update(PartyModel)
+            .set({ totalDeposit: totalDepositParty })
+            .where('id=:partyId', { partyId: party.id })
+            .getQuery();
+        Logger.debug(updateCek, 'CEK QUERY party ');
 
         Logger.debug(JSON.stringify(updateParty), 'UPDATE PARTY TOTAL FUND');
         return updateParty;
@@ -60,16 +68,19 @@ export class PartyCalculationService {
         partyMember: PartyMemberModel,
         amount: BN,
     ): Promise<UpdateResult> {
-        const totalDeposit = partyMember.totalDeposit.add(amount);
+        const totalDepositPartyMember = partyMember.totalDeposit.add(amount);
         Logger.debug(
-            totalDeposit,
+            totalDepositPartyMember,
             `update memberId total deposit: ${partyMember.id} =>`,
         );
 
+        /**
+         * @info : dont use .where() as second execution. it's like orWhere.
+         */
         const updateQuery = await this.partyMemberRepository
             .createQueryBuilder()
             .update(PartyMemberModel)
-            .set({ totalDeposit })
+            .set({ totalDeposit: totalDepositPartyMember })
             .where('party_id= :partyId', { partyId: partyMember.partyId })
             .andWhere('member_id= :memberId', {
                 memberId: partyMember.memberId,
@@ -78,13 +89,13 @@ export class PartyCalculationService {
         const updateCek = await this.partyMemberRepository
             .createQueryBuilder()
             .update(PartyMemberModel)
-            .set({ totalDeposit })
+            .set({ totalDeposit: totalDepositPartyMember })
             .where('party_id= :partyId', { partyId: partyMember.partyId })
             .andWhere('member_id= :memberId', {
                 memberId: partyMember.memberId,
             })
             .getQuery();
-        Logger.debug(updateCek, 'CEK QUERY');
+        Logger.debug(updateCek, 'CEK QUERY party member');
         Logger.debug(
             JSON.stringify(updateQuery),
             'UPDATE PARTY MEMBER TOTAL FUND',
