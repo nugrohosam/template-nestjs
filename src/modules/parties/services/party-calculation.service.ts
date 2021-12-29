@@ -49,7 +49,7 @@ export class PartyCalculationService {
             .createQueryBuilder()
             .update(PartyModel)
             .set({ totalDeposit })
-            .where('id:partyId', { partyId: party.id })
+            .where('id=:partyId', { partyId: party.id })
             .execute();
 
         Logger.debug(updateParty, 'UPDATE PARTY TOTAL FUND');
