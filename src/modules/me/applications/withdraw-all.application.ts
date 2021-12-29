@@ -77,9 +77,15 @@ export class WithdrawAllApplication {
                     party.address,
                     token.address,
                 );
-                const withdrawAmount = balance
-                    .mul(weight)
-                    .divn(config.calculation.maxPercentage);
+                let withdrawAmount = new BN(0);
+                if (
+                    (typeof weight === 'number' && weight !== 0) ||
+                    (typeof weight === 'object' && !weight.isZero())
+                ) {
+                    withdrawAmount = balance
+                        .mul(weight)
+                        .divn(config.calculation.maxPercentage);
+                }
 
                 let swapResponse: ISwap0xResponse = null;
                 if (
