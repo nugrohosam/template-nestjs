@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse, AxiosError } from 'axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { config } from 'src/config';
 import { PartyModel } from 'src/models/party.model';
 import { GeckoCoinService } from 'src/modules/commons/providers/gecko-coin.service';
@@ -143,48 +143,53 @@ export class GetTokenPriceService {
             decimal: config.calculation.usdDecimal,
         },
     ): Promise<string> {
-        if (!party.address) {
-            return '0';
-        }
-        const partyTokens = await this.partyTokenRepository
-            .createQueryBuilder('partyToken')
-            .where('party_id = :partyId', { partyId: party.id })
-            .getMany();
-        // map to get list token symbol
-        const tokensId = partyTokens.map((item) => {
-            return item.geckoTokenId;
-        });
-        if (!tokensId.length) {
-            return '0';
-        }
-        const partyToken: ITokenBalanceParty = {};
-        // set contract token data to token balance party
-        const promiseToken = partyTokens.map(async (item) => {
-            const tokenBalance =
-                await this.getTokenBalanceService.getTokenBalance(
-                    item.address,
-                    party.address,
-                );
-
-            return (partyToken[item.geckoTokenId] = {
-                balance: tokenBalance.balance,
-                decimal: tokenBalance.decimal,
+        try {
+            if (!party.address) {
+                return '0';
+            }
+            const partyTokens = await this.partyTokenRepository
+                .createQueryBuilder('partyToken')
+                .where('party_id = :partyId', { partyId: party.id })
+                .getMany();
+            // map to get list token symbol
+            const tokensId = partyTokens.map((item) => {
+                return item.geckoTokenId;
             });
-        });
-        await Promise.all(promiseToken);
-        // ---- normalizing data -----
-        // -----------------------------
-        let totalFund = new BN(0);
-        // iterate all coin from party which fetch before to calculate total value
-        partyTokens.forEach((item) => {
-            const tokenValue = this.getTokenBalanceIn(
-                partyToken,
-                item.geckoTokenId,
-                marketValue[item.geckoTokenId].current_price * currency.decimal,
-            );
-            totalFund = totalFund.addn(tokenValue);
-        });
-        return totalFund.toString(); // big int detail 4 exponent
+            if (!tokensId.length) {
+                return '0';
+            }
+            const partyToken: ITokenBalanceParty = {};
+            // set contract token data to token balance party
+            const promiseToken = partyTokens.map(async (item) => {
+                const tokenBalance =
+                    await this.getTokenBalanceService.getTokenBalance(
+                        item.address,
+                        party.address,
+                    );
+
+                return (partyToken[item.geckoTokenId] = {
+                    balance: tokenBalance.balance,
+                    decimal: tokenBalance.decimal,
+                });
+            });
+            await Promise.all(promiseToken);
+            // ---- normalizing data -----
+            // -----------------------------
+            let totalFund = new BN(0);
+            // iterate all coin from party which fetch before to calculate total value
+            partyTokens.forEach((item) => {
+                const tokenValue = this.getTokenBalanceIn(
+                    partyToken,
+                    item.geckoTokenId,
+                    marketValue[item.geckoTokenId].current_price *
+                        currency.decimal,
+                );
+                totalFund = totalFund.addn(tokenValue);
+            });
+            return totalFund.toString(); // big int detail 4 exponent
+        } catch (err) {
+            Logger.error('[GET-PARTY-TOKEN-VALUE]', err);
+        }
     }
 
     // TODO: change symbol to id

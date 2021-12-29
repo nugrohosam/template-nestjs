@@ -196,7 +196,18 @@ export class WithdrawAllApplication {
                 await this.getPartyMemberService.getByUserAndPartyAddress(
                     userAddress,
                     partyAddress,
+                    false,
                 );
+            if (!partyMember) {
+                Logger.debug(
+                    '<=Party Member not found then closing session withdraw all',
+                );
+                await this.transactionSyncService.updateStatusSync(
+                    transactionHash,
+                    true,
+                );
+                return;
+            }
 
             await this.transactionService.storeWithdrawTransaction(
                 userAddress,
