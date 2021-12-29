@@ -192,7 +192,7 @@ export class WithdrawApplication {
                 transactionHash: logParams.result.transactionHash,
                 amountUsd: Utils.getFromWeiToUsd(amount),
             });
-            Logger.error('[WITHDRAW-SYNC]');
+            Logger.debug('[WITHDRAW-SYNC]');
         } catch (error) {
             // save to log for retrial
             await this.transactionSyncService.store({

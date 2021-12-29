@@ -159,7 +159,7 @@ export class KickPartyMemberApplication {
 
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress, amount, cut, penalty } =
+        const { userAddress, partyAddress, amount, cut, penalty, weight } =
             await this.decodeKickEventData(logParams);
 
         let partyMember =
@@ -177,12 +177,14 @@ export class KickPartyMemberApplication {
             logParams.result.transactionHash,
         );
 
-        await this.partyCalculationService.withdraw(
-            partyAddress,
-            userAddress,
-            amount,
-            this.kickWithdrawPercentage,
-        );
+        if (!weight.isZero() && !amount.isZero()) {
+            await this.partyCalculationService.withdraw(
+                partyAddress,
+                userAddress,
+                amount,
+                this.kickWithdrawPercentage,
+            );
+        }
 
         partyMember = await this.partyMemberService.update(partyMember, {
             leaveTransactionHash: logParams.result.transactionHash,
