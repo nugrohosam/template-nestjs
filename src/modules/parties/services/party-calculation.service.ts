@@ -59,6 +59,10 @@ export class PartyCalculationService {
             .where('id=:partyId', { partyId: party.id })
             .getQuery();
         Logger.debug(updateCek, 'CEK QUERY party ');
+        Logger.debug(
+            await this.partyRepository.findOne({ where: { id: party.id } }),
+            'select after update',
+        );
 
         Logger.debug(JSON.stringify(updateParty), 'UPDATE PARTY TOTAL FUND');
         return updateParty;
