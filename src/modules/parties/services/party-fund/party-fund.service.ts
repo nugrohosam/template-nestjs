@@ -18,7 +18,6 @@ export class PartyFundService {
         private readonly partyMemberService: PartyMemberService,
     ) {}
 
-    // SUPECT SMENTARA: USE TRANSACTIONAL HERE
     async updatePartyFund(party: PartyModel): Promise<PartyModel> {
         const marketValue = await this.getTokenPriceService.getAllMarketValue();
         const partyTotalValue =
@@ -29,15 +28,21 @@ export class PartyFundService {
         // here we need to check
         Logger.debug(
             party.totalDeposit,
-            'log deposit party on party fund line 30.',
+            'log deposit party on party fund line 31.',
         );
-        party = await this.partyRepository.save({
-            ...party,
-            totalFund: partyTotalValue,
-        });
+
+        await this.partyRepository
+            .createQueryBuilder()
+            .update(PartyModel)
+            .set({
+                totalFund: partyTotalValue,
+            })
+            .where('id = :id', { id: party.id })
+            .execute();
+
         Logger.debug(
             party.totalDeposit,
-            'log deposit party on party fund line 35.',
+            'log deposit party on party fund line 43.',
         );
 
         await this.updatePartyMembersFund(party);
