@@ -25,10 +25,12 @@ export class PartyFundService {
                 party,
                 marketValue,
             );
+        // here we need to check
         party = await this.partyRepository.save({
             ...party,
             totalFund: partyTotalValue,
         });
+
         await this.updatePartyMembersFund(party);
         return party;
     }
