@@ -136,7 +136,7 @@ export class LeavePartyApplication {
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
         try {
-            const { userAddress, partyAddress, amount, cut, penalty } =
+            const { userAddress, partyAddress, amount, cut, penalty, weight } =
                 await this.meService.decodeLeaveEventData(
                     logParams.result.transactionHash,
                 );
@@ -157,12 +157,14 @@ export class LeavePartyApplication {
                 logParams.result.transactionHash,
             );
 
-            await this.partyCalculationService.withdraw(
-                partyAddress,
-                userAddress,
-                amount,
-                this.leaveWithdrawPercentage,
-            );
+            if (!weight.isZero() && !amount.isZero()) {
+                await this.partyCalculationService.withdraw(
+                    partyAddress,
+                    userAddress,
+                    amount,
+                    this.leaveWithdrawPercentage,
+                );
+            }
 
             partyMember = await this.partyMemberService.update(partyMember, {
                 leaveTransactionHash: logParams.result.transactionHash,
