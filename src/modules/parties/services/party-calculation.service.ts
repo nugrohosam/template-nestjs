@@ -99,9 +99,9 @@ export class PartyCalculationService {
             `update memberId total deposit: ${partyMember.id} =>`,
         );
 
-        return this.partyRepository
+        return this.partyMemberRepository
             .createQueryBuilder()
-            .update(PartyModel)
+            .update(PartyMemberModel)
             .set({
                 totalDeposit: totalDeposite,
             })
@@ -125,9 +125,9 @@ export class PartyCalculationService {
             `update memberId total deposit: ${partyMember.id} =>`,
         );
 
-        return this.partyRepository
+        return this.partyMemberRepository
             .createQueryBuilder()
-            .update(PartyModel)
+            .update(PartyMemberModel)
             .set({
                 totalDeposit: totalDeposite,
             })
