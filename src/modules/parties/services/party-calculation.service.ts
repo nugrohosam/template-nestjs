@@ -71,8 +71,20 @@ export class PartyCalculationService {
             .update(PartyMemberModel)
             .set({ totalDeposit })
             .where('party_id= :partyId', { partyId: partyMember.partyId })
-            .where('member_id= :memberId', { memberId: partyMember.memberId })
+            .andWhere('member_id= :memberId', {
+                memberId: partyMember.memberId,
+            })
             .execute();
+        const updateCek = await this.partyMemberRepository
+            .createQueryBuilder()
+            .update(PartyMemberModel)
+            .set({ totalDeposit })
+            .where('party_id= :partyId', { partyId: partyMember.partyId })
+            .andWhere('member_id= :memberId', {
+                memberId: partyMember.memberId,
+            })
+            .getQuery();
+        Logger.debug(updateCek, 'CEK QUERY');
         Logger.debug(
             JSON.stringify(updateQuery),
             'UPDATE PARTY MEMBER TOTAL FUND',
