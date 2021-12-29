@@ -24,6 +24,7 @@ export class MyPartiesApplication extends IndexApplication {
     ): Promise<IPaginateResponse<PartyModel>> {
         const user = await this.getSignerService.get(signature, true);
         const query = this.repository.createQueryBuilder('parties');
+        console.log(user);
 
         if (request.onlyOwner && !request.onlyMember) {
             query.where('owner_id = :userId', { userId: user.id });
@@ -48,11 +49,11 @@ export class MyPartiesApplication extends IndexApplication {
                 .from(PartyModel, 'p')
                 .leftJoin(PartyMemberModel, 'pm', 'pm.party_id = p.id')
                 .where('p.id = parties.id')
-                .andWhere('pm.member_id = parties.owner_id') // where owner becomes member on party_member
+                // .andWhere('pm.member_id = parties.owner_id') // where owner becomes member on party_member
                 .andWhere('parties.address is not null')
                 .andWhere('parties.transaction_hash is not null')
                 .andWhere('parties.is_closed =0')
-                .take(1)
+                .limit(1)
                 .getQuery();
 
             const isMember = query
@@ -69,7 +70,7 @@ export class MyPartiesApplication extends IndexApplication {
 
             // is_active condition
             query.where(
-                `${isMember} is not null OR (${isDraftQuery} is not null)`,
+                `${isMember} is not null OR ((${isDraftQuery} is not null AND parties.owner_id = :userId))`,
                 { userId: user.id },
             );
         }
