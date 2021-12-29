@@ -42,27 +42,34 @@ export class MyPartiesApplication extends IndexApplication {
                 return 'exists ' + subQuery;
             });
         } else {
-            query.where((qb) => {
-                const subQuery = qb
-                    .subQuery()
-                    .select('party_members.member_id')
-                    .from(PartyMemberModel, 'party_members')
-                    .where('party_members.party_id = parties.id')
-                    .andWhere('party_members.member_id = :userId', {
-                        userId: user.id,
-                    })
-                    .orWhere('parties.owner_id = :userId', { userId: user.id })
-                    .getQuery();
-                return 'exists ' + subQuery;
-            });
-        }
+            const isDraftQuery = query
+                .subQuery()
+                .select('p.id')
+                .from(PartyModel, 'p')
+                .leftJoin(PartyMemberModel, 'pm', 'pm.party_id = p.id')
+                .where('p.id = parties.id')
+                .andWhere('parties.address is not null')
+                .andWhere('parties.transaction_hash is not null')
+                .andWhere('parties.is_closed =0')
+                .limit(1)
+                .getQuery();
 
-        if (request.isClosed) {
-            query.andWhere('parties.is_closed = :isClosed', {
-                isClosed: request.isClosed,
-            });
-        } else {
-            query.andWhere('parties.is_closed = 0');
+            const isMember = query
+                .subQuery()
+                .select('pm.member_id')
+                .from(PartyModel, 'p')
+                .leftJoin(PartyMemberModel, 'pm', 'pm.party_id = p.id')
+                .where('p.id = parties.id')
+                .andWhere('pm.member_id = :userId', {
+                    userId: user.id,
+                })
+                .limit(1)
+                .getQuery();
+
+            query.where(
+                `${isMember} is not null OR ((${isDraftQuery} is not null AND parties.owner_id = :userId))`,
+                { userId: user.id },
+            );
         }
 
         query.orderBy(

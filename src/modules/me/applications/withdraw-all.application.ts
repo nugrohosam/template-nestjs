@@ -127,6 +127,7 @@ export class WithdrawAllApplication {
         };
     }
 
+    @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
         try {
             const { userAddress, partyAddress, amount, cut, penalty } =
@@ -149,7 +150,6 @@ export class WithdrawAllApplication {
                 null,
                 logParams.result.transactionHash,
             );
-
             await this.partyCalculationService.withdraw(
                 partyAddress,
                 userAddress,
@@ -196,7 +196,18 @@ export class WithdrawAllApplication {
                 await this.getPartyMemberService.getByUserAndPartyAddress(
                     userAddress,
                     partyAddress,
+                    false,
                 );
+            if (!partyMember) {
+                Logger.debug(
+                    '<=Party Member not found then closing session withdraw all',
+                );
+                await this.transactionSyncService.updateStatusSync(
+                    transactionHash,
+                    true,
+                );
+                return;
+            }
 
             await this.transactionService.storeWithdrawTransaction(
                 userAddress,

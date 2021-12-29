@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import BN from 'bn.js';
 import { config } from 'src/config';
@@ -108,18 +109,33 @@ export class PartyMemberService {
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
 
-        const weight = partyMember.totalDeposit
-            .muln(config.calculation.maxPercentage)
-            .div(party.totalDeposit);
+        if (partyMember.totalDeposit.isZero() && party.totalDeposit.isZero())
+            return partyMember;
 
-        await this.partyMemberRepository
-            .createQueryBuilder('partyMember')
-            .update(PartyMemberModel)
-            .set({ weight })
-            .where('id = :id', { id: partyMember.id })
-            .execute();
+        try {
+            const weight = partyMember.totalDeposit
+                .muln(config.calculation.maxPercentage)
+                .div(party.totalDeposit);
+            await this.partyMemberRepository
+                .createQueryBuilder('partyMember')
+                .update(PartyMemberModel)
+                .set({ weight })
+                .where('id = :id', { id: partyMember.id })
+                .execute();
 
-        return partyMember;
+            return partyMember;
+        } catch (error) {
+            Logger.debug({
+                partyMemberDeposit: partyMember.totalDeposit,
+                partyTotalDeposit: party.totalDeposit,
+                partyMemberId: partyMember.id,
+            });
+            Logger.error(
+                `ERROR CALCULATION WEIGHT on updatePartyMemberWeight`,
+                error,
+            );
+            throw error;
+        }
     }
 
     async updatePartyMemberFund(
