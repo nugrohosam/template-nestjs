@@ -123,11 +123,16 @@ export class PartyCalculationService {
             member.id,
             party.id,
         );
-
-        const withdrawAmount = partyMember.totalDeposit
-            .mul(percentage)
-            .divn(config.calculation.maxPercentage)
-            .muln(-1);
+        let withdrawAmount;
+        try {
+            withdrawAmount = partyMember.totalDeposit
+                .mul(percentage)
+                .divn(config.calculation.maxPercentage)
+                .muln(-1);
+        } catch (error) {
+            Logger.error(`ERROR CALCULATION WEIGHT on withdraw()`, error);
+            throw error;
+        }
 
         Logger.debug(
             {
