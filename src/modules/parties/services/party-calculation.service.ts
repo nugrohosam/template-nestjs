@@ -106,7 +106,9 @@ export class PartyCalculationService {
                 totalDeposit: totalDeposite,
             })
             .where('party_id = :partyId', { partyId: partyMember.partyId })
-            .andWhere('member_id = :id', { memberId: partyMember.memberId })
+            .andWhere('member_id = :memberId', {
+                memberId: partyMember.memberId,
+            })
             .execute();
     }
 
@@ -132,7 +134,9 @@ export class PartyCalculationService {
                 totalDeposit: totalDeposite,
             })
             .where('party_id = :partyId', { partyId: partyMember.partyId })
-            .andWhere('member_id = :id', { memberId: partyMember.memberId })
+            .andWhere('member_id = :memberId', {
+                memberId: partyMember.memberId,
+            })
             .execute();
     }
 
