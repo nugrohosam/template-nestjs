@@ -45,7 +45,7 @@ export class PartyCalculationService {
             `update partyId total fund: ${party.id} =>`,
         );
 
-        return await this.partyRepository.save(party);
+        return this.partyRepository.save(party);
     }
 
     async updatePartyMemberTotalDeposit(
@@ -58,7 +58,7 @@ export class PartyCalculationService {
             `update memberId total deposit: ${partyMember.id} =>`,
         );
 
-        return await this.partyMemberRepository.save(partyMember);
+        return this.partyMemberRepository.save(partyMember);
     }
 
     async updatePartyMembersWeight(party: PartyModel): Promise<void> {
