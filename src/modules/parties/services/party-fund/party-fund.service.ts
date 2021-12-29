@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CurrencyModel } from 'src/models/currency.model';
 import { PartyModel } from 'src/models/party.model';
@@ -18,6 +18,7 @@ export class PartyFundService {
         private readonly partyMemberService: PartyMemberService,
     ) {}
 
+    // SUPECT SMENTARA: USE TRANSACTIONAL HERE
     async updatePartyFund(party: PartyModel): Promise<PartyModel> {
         const marketValue = await this.getTokenPriceService.getAllMarketValue();
         const partyTotalValue =
@@ -26,10 +27,18 @@ export class PartyFundService {
                 marketValue,
             );
         // here we need to check
+        Logger.debug(
+            party.totalDeposit,
+            'log deposit party on party fund line 30.',
+        );
         party = await this.partyRepository.save({
             ...party,
             totalFund: partyTotalValue,
         });
+        Logger.debug(
+            party.totalDeposit,
+            'log deposit party on party fund line 35.',
+        );
 
         await this.updatePartyMembersFund(party);
         return party;
