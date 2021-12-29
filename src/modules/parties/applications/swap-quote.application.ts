@@ -260,6 +260,7 @@ export class SwapQuoteApplication {
             usd: usd,
         });
 
+        Logger.debug('will call updatePartyFund on buySync() swapQuote');
         await Promise.all([
             this.transactionService.updateTxHashStatus(
                 log.transactionHash,

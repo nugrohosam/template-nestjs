@@ -101,6 +101,7 @@ export class PartyCalculationService {
         await this.updatePartyMemberTotalDeposit(partyMember, amount);
         await this.updatePartyMembersWeight(party);
         await this.partyService.storeToken(party, token);
+        Logger.debug('call updatePartyFund on deposit()');
         await this.partyFundService.updatePartyFund(party);
         await this.transactionService.updateDepositeStatus(
             transactionHash,
@@ -148,6 +149,7 @@ export class PartyCalculationService {
         await this.updatePartyTotalFund(party, withdrawAmount);
         await this.updatePartyMemberTotalDeposit(partyMember, withdrawAmount);
         await this.updatePartyMembersWeight(party);
+        Logger.debug('call updatePartyFund on withdraw()');
         await this.partyFundService.updatePartyFund(party);
         Logger.debug('LeaveWithdraw line 96');
         return partyMember;
