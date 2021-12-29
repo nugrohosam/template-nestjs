@@ -198,7 +198,7 @@ export class LeavePartyApplication {
     @Transactional()
     async retrySync(transactionHash: string): Promise<void> {
         try {
-            const { userAddress, partyAddress, amount, cut, penalty } =
+            const { userAddress, partyAddress, amount, cut, penalty, weight } =
                 await this.meService.decodeLeaveEventData(transactionHash);
 
             let partyMember =
@@ -217,12 +217,14 @@ export class LeavePartyApplication {
                 transactionHash,
             );
 
-            await this.partyCalculationService.withdraw(
-                partyAddress,
-                userAddress,
-                amount,
-                this.leaveWithdrawPercentage,
-            );
+            if (!weight.isZero() && !amount.isZero()) {
+                await this.partyCalculationService.withdraw(
+                    partyAddress,
+                    userAddress,
+                    amount,
+                    this.leaveWithdrawPercentage,
+                );
+            }
 
             partyMember = await this.partyMemberService.update(partyMember, {
                 leaveTransactionHash: transactionHash,
