@@ -189,6 +189,7 @@ export class GetTokenPriceService {
             return totalFund.toString(); // big int detail 4 exponent
         } catch (err) {
             Logger.error('[GET-PARTY-TOKEN-VALUE]', err);
+            throw err;
         }
     }
 
