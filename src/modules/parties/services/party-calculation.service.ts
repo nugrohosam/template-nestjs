@@ -5,7 +5,7 @@ import { PartyModel } from 'src/models/party.model';
 import { GetPartyService } from './get-party.service';
 import { GetPartyMemberService } from './members/get-party-member.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PartyService } from './party.service';
 import { TokenService } from './token/token.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
@@ -38,74 +38,27 @@ export class PartyCalculationService {
     async updatePartyTotalFund(
         party: PartyModel,
         amount: BN,
-    ): Promise<UpdateResult> {
-        const totalDepositParty = party.totalDeposit.add(amount);
+    ): Promise<PartyModel> {
+        party.totalDeposit = party.totalDeposit.add(amount);
         Logger.debug(
-            totalDepositParty,
+            party.totalDeposit,
             `update partyId total fund: ${party.id} =>`,
         );
 
-        const updateParty = await this.partyRepository
-            .createQueryBuilder()
-            .update(PartyModel)
-            .set({ totalDeposit: totalDepositParty })
-            .where('id=:partyId', { partyId: party.id })
-            .execute();
-
-        const updateCek = this.partyRepository
-            .createQueryBuilder()
-            .update(PartyModel)
-            .set({ totalDeposit: totalDepositParty })
-            .where('id=:partyId', { partyId: party.id })
-            .getQuery();
-        Logger.debug(updateCek, 'CEK QUERY party ');
-        Logger.debug(
-            await this.partyRepository.findOne({ where: { id: party.id } }),
-            'select after update',
-        );
-
-        Logger.debug(JSON.stringify(updateParty), 'UPDATE PARTY TOTAL FUND');
-        return updateParty;
+        return this.partyRepository.save(party);
     }
 
     async updatePartyMemberTotalDeposit(
         partyMember: PartyMemberModel,
         amount: BN,
-    ): Promise<UpdateResult> {
-        const totalDepositPartyMember = partyMember.totalDeposit.add(amount);
+    ): Promise<PartyMemberModel> {
+        partyMember.totalDeposit = partyMember.totalDeposit.add(amount);
         Logger.debug(
-            totalDepositPartyMember,
+            partyMember.totalDeposit,
             `update memberId total deposit: ${partyMember.id} =>`,
         );
 
-        /**
-         * @info : dont use .where() as second execution. it's like orWhere.
-         */
-        const updateQuery = await this.partyMemberRepository
-            .createQueryBuilder()
-            .update(PartyMemberModel)
-            .set({ totalDeposit: totalDepositPartyMember })
-            .where('party_id= :partyId', { partyId: partyMember.partyId })
-            .andWhere('member_id= :memberId', {
-                memberId: partyMember.memberId,
-            })
-            .execute();
-        const updateCek = await this.partyMemberRepository
-            .createQueryBuilder()
-            .update(PartyMemberModel)
-            .set({ totalDeposit: totalDepositPartyMember })
-            .where('party_id= :partyId', { partyId: partyMember.partyId })
-            .andWhere('member_id= :memberId', {
-                memberId: partyMember.memberId,
-            })
-            .getQuery();
-        Logger.debug(updateCek, 'CEK QUERY party member');
-        Logger.debug(
-            JSON.stringify(updateQuery),
-            'UPDATE PARTY MEMBER TOTAL FUND',
-        );
-
-        return updateQuery;
+        return this.partyMemberRepository.save(partyMember);
     }
 
     async updatePartyMembersWeight(party: PartyModel): Promise<void> {
