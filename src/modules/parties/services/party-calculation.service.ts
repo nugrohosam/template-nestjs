@@ -52,7 +52,7 @@ export class PartyCalculationService {
             .where('id=:partyId', { partyId: party.id })
             .execute();
 
-        Logger.debug(updateParty, 'UPDATE PARTY TOTAL FUND');
+        Logger.debug(JSON.stringify(updateParty), 'UPDATE PARTY TOTAL FUND');
         return updateParty;
     }
 
@@ -73,7 +73,10 @@ export class PartyCalculationService {
             .where('party_id= :partyId', { partyId: partyMember.partyId })
             .where('member_id= :memberId', { memberId: partyMember.memberId })
             .execute();
-        Logger.debug(updateQuery, 'UPDATE PARTY MEMBER TOTAL FUND');
+        Logger.debug(
+            JSON.stringify(updateQuery),
+            'UPDATE PARTY MEMBER TOTAL FUND',
+        );
 
         return updateQuery;
     }
