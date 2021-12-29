@@ -8,7 +8,7 @@ import { GetPartyMemberService } from 'src/modules/parties/services/members/get-
 import { Repository } from 'typeorm';
 import { WithdrawRequest } from '../requests/withdraw.request';
 import { WithdrawPreparationResponse } from '../responses/withdraw-preparation.response';
-import { MeService } from '../services/me.service';
+import { IDecodeResult, MeService } from '../services/me.service';
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { TokenService } from 'src/modules/parties/services/token/token.service';
 import { IPartyTokenBalance } from 'src/entities/party-token.entity';
@@ -155,44 +155,12 @@ export class WithdrawApplication {
 
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
+        let decodeResult: IDecodeResult;
+
         try {
-            const {
-                userAddress,
-                partyAddress,
-                amount,
-                cut,
-                penalty,
-                percentage,
-            } = await this.meService.decodeWithdrawEventData(
+            decodeResult = await this.meService.decodeWithdrawEventData(
                 logParams.result.transactionHash,
             );
-
-            await this.transactionService.storeWithdrawTransaction(
-                userAddress,
-                partyAddress,
-                amount,
-                cut,
-                penalty,
-                null,
-                logParams.result.transactionHash,
-            );
-
-            // percentage of partymember
-
-            const partyMember = await this.partyCalculationService.withdraw(
-                partyAddress,
-                userAddress,
-                amount,
-                percentage,
-            );
-
-            await this.transactionVolumeService.store({
-                partyId: partyMember.partyId,
-                type: TransactionTypeEnum.Withdraw,
-                transactionHash: logParams.result.transactionHash,
-                amountUsd: Utils.getFromWeiToUsd(amount),
-            });
-            Logger.debug('[WITHDRAW-SYNC]');
         } catch (error) {
             // save to log for retrial
             await this.transactionSyncService.store({
@@ -201,48 +169,42 @@ export class WithdrawApplication {
                 isSync: false,
             });
             Logger.error('[WITHDRAW-NOT-SYNC]', error);
+            throw error;
         }
+
+        await this.transactionService.storeWithdrawTransaction(
+            decodeResult.userAddress,
+            decodeResult.partyAddress,
+            decodeResult.amount,
+            decodeResult.cut,
+            decodeResult.penalty,
+            null,
+            logParams.result.transactionHash,
+        );
+
+        const partyMember = await this.partyCalculationService.withdraw(
+            decodeResult.partyAddress,
+            decodeResult.userAddress,
+            decodeResult.amount,
+            decodeResult.percentage,
+        );
+
+        await this.transactionVolumeService.store({
+            partyId: partyMember.partyId,
+            type: TransactionTypeEnum.Withdraw,
+            transactionHash: logParams.result.transactionHash,
+            amountUsd: Utils.getFromWeiToUsd(decodeResult.amount),
+        });
+        Logger.debug('[WITHDRAW-SYNC]');
     }
 
     @Transactional()
     async retrySync(transactionHash: string): Promise<void> {
+        let decodeResult: IDecodeResult;
+
         try {
-            const {
-                userAddress,
-                partyAddress,
-                amount,
-                cut,
-                penalty,
-                percentage,
-            } = await this.meService.decodeWithdrawEventData(transactionHash);
-
-            await this.transactionService.storeWithdrawTransaction(
-                userAddress,
-                partyAddress,
-                amount,
-                cut,
-                penalty,
-                null,
+            decodeResult = await this.meService.decodeWithdrawEventData(
                 transactionHash,
-            );
-
-            const partyMember = await this.partyCalculationService.withdraw(
-                partyAddress,
-                userAddress,
-                amount,
-                percentage,
-            );
-
-            await this.transactionVolumeService.store({
-                partyId: partyMember.partyId,
-                type: TransactionTypeEnum.Withdraw,
-                transactionHash: transactionHash,
-                amountUsd: Utils.getFromWeiToUsd(amount),
-            });
-
-            await this.transactionSyncService.updateStatusSync(
-                transactionHash,
-                true,
             );
         } catch (error) {
             // skip retry and will be delegated to next execution
@@ -251,5 +213,33 @@ export class WithdrawApplication {
                 error,
             );
         }
+        await this.transactionService.storeWithdrawTransaction(
+            decodeResult.userAddress,
+            decodeResult.partyAddress,
+            decodeResult.amount,
+            decodeResult.cut,
+            decodeResult.penalty,
+            null,
+            transactionHash,
+        );
+
+        const partyMember = await this.partyCalculationService.withdraw(
+            decodeResult.partyAddress,
+            decodeResult.userAddress,
+            decodeResult.amount,
+            decodeResult.percentage,
+        );
+
+        await this.transactionVolumeService.store({
+            partyId: partyMember.partyId,
+            type: TransactionTypeEnum.Withdraw,
+            transactionHash: transactionHash,
+            amountUsd: Utils.getFromWeiToUsd(decodeResult.amount),
+        });
+
+        await this.transactionSyncService.updateStatusSync(
+            transactionHash,
+            true,
+        );
     }
 }
