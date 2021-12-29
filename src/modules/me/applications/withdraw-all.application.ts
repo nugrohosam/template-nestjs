@@ -136,7 +136,7 @@ export class WithdrawAllApplication {
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
         try {
-            const { userAddress, partyAddress, amount, cut, penalty } =
+            const { userAddress, partyAddress, amount, cut, penalty, weight } =
                 await this.meService.decodeLeaveEventData(
                     logParams.result.transactionHash,
                 );
@@ -156,12 +156,15 @@ export class WithdrawAllApplication {
                 null,
                 logParams.result.transactionHash,
             );
-            await this.partyCalculationService.withdraw(
-                partyAddress,
-                userAddress,
-                amount,
-                this.withdrawAllPercentage,
-            );
+
+            if (!weight.isZero() && !amount.isZero()) {
+                await this.partyCalculationService.withdraw(
+                    partyAddress,
+                    userAddress,
+                    amount,
+                    this.withdrawAllPercentage,
+                );
+            }
 
             partyMember = await this.partyMemberService.update(partyMember, {
                 leaveTransactionHash: logParams.result.transactionHash,
@@ -195,7 +198,7 @@ export class WithdrawAllApplication {
     @Transactional()
     async retrySync(transactionHash: string): Promise<void> {
         try {
-            const { userAddress, partyAddress, amount, cut, penalty } =
+            const { userAddress, partyAddress, amount, cut, penalty, weight } =
                 await this.meService.decodeLeaveEventData(transactionHash);
 
             let partyMember =
@@ -225,12 +228,14 @@ export class WithdrawAllApplication {
                 transactionHash,
             );
 
-            await this.partyCalculationService.withdraw(
-                partyAddress,
-                userAddress,
-                amount,
-                this.withdrawAllPercentage,
-            );
+            if (!weight.isZero() && !amount.isZero()) {
+                await this.partyCalculationService.withdraw(
+                    partyAddress,
+                    userAddress,
+                    amount,
+                    this.withdrawAllPercentage,
+                );
+            }
 
             partyMember = await this.partyMemberService.update(partyMember, {
                 leaveTransactionHash: transactionHash,

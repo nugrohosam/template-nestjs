@@ -5,7 +5,7 @@ import { PartyModel } from 'src/models/party.model';
 import { GetPartyService } from './get-party.service';
 import { GetPartyMemberService } from './members/get-party-member.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { PartyService } from './party.service';
 import { TokenService } from './token/token.service';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
@@ -15,6 +15,7 @@ import { PartyFundService } from './party-fund/party-fund.service';
 import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { config } from 'src/config';
+import { addAmount, substractAmount } from './calculation.service';
 
 @Injectable()
 export class PartyCalculationService {
@@ -35,30 +36,108 @@ export class PartyCalculationService {
         private readonly transactionService: TransactionService,
     ) {}
 
-    async updatePartyTotalFund(
+    /**
+     *
+     * @info add Party total deposit, the calculation using addAmount()
+     */
+    async addPartyTotalDeposit(
         party: PartyModel,
         amount: BN,
-    ): Promise<PartyModel> {
-        party.totalDeposit = party.totalDeposit.add(amount);
+    ): Promise<UpdateResult> {
+        const totalDeposite = addAmount(party.totalDeposit, amount);
+
         Logger.debug(
-            party.totalDeposit,
+            totalDeposite,
             `update partyId total fund: ${party.id} =>`,
         );
 
-        return this.partyRepository.save(party);
+        return this.partyRepository
+            .createQueryBuilder()
+            .update(PartyModel)
+            .set({
+                totalDeposit: totalDeposite,
+            })
+            .where('id = :id', { id: party.id })
+            .execute();
     }
 
-    async updatePartyMemberTotalDeposit(
+    /**
+     *
+     * @info substract Party total deposit, the calculation using substractAmount()
+     */
+    async subtractPartyTotalDeposit(
+        party: PartyModel,
+        amount: BN,
+    ): Promise<UpdateResult> {
+        const totalDeposite = substractAmount(party.totalDeposit, amount);
+        Logger.debug(
+            totalDeposite,
+            `update partyId total fund: ${party.id} =>`,
+        );
+
+        return this.partyRepository
+            .createQueryBuilder()
+            .update(PartyModel)
+            .set({
+                totalDeposit: totalDeposite,
+            })
+            .where('id = :id', { id: party.id })
+            .execute();
+    }
+
+    /**
+     *
+     * @info add PartyMember total deposit, the calculation using addAmount()
+     */
+    async addPartyMemberTotalDeposit(
         partyMember: PartyMemberModel,
         amount: BN,
-    ): Promise<PartyMemberModel> {
-        partyMember.totalDeposit = partyMember.totalDeposit.add(amount);
+    ): Promise<UpdateResult> {
+        const totalDeposite = addAmount(partyMember.totalDeposit, amount);
         Logger.debug(
-            partyMember.totalDeposit,
+            totalDeposite,
             `update memberId total deposit: ${partyMember.id} =>`,
         );
 
-        return this.partyMemberRepository.save(partyMember);
+        return this.partyMemberRepository
+            .createQueryBuilder()
+            .update(PartyMemberModel)
+            .set({
+                totalDeposit: totalDeposite,
+            })
+            .where('party_id = :partyId', { partyId: partyMember.partyId })
+            .andWhere('member_id = :memberId', {
+                memberId: partyMember.memberId,
+            })
+            .execute();
+    }
+
+    /**
+     *
+     * @info substract PartyMember total deposit, the calculation using substractAmount()
+     */
+    async substractPartyMemberTotalDeposit(
+        partyMember: PartyMemberModel,
+        amount: BN,
+    ): Promise<UpdateResult> {
+        const totalDeposite = substractAmount(partyMember.totalDeposit, amount);
+
+        Logger.debug(
+            totalDeposite,
+            `update memberId total deposit: ${partyMember.id} =>`,
+        );
+
+        return this.partyMemberRepository
+            .createQueryBuilder()
+            .update(PartyMemberModel)
+            .set({
+                totalDeposit: totalDeposite,
+            })
+            .where('party_id = :partyId', { partyId: partyMember.partyId })
+            .andWhere('member_id = :memberId', {
+                memberId: partyMember.memberId,
+            })
+            .execute();
     }
 
     async updatePartyMembersWeight(party: PartyModel): Promise<void> {
@@ -97,8 +176,8 @@ export class PartyCalculationService {
         const token = await this.tokenService.getDefaultToken();
 
         // must be run sequentially : need to use Promise.all.
-        await this.updatePartyTotalFund(party, amount);
-        await this.updatePartyMemberTotalDeposit(partyMember, amount);
+        await this.addPartyTotalDeposit(party, amount);
+        await this.addPartyMemberTotalDeposit(partyMember, amount);
         await this.updatePartyMembersWeight(party);
         await this.partyService.storeToken(party, token);
         Logger.debug('call updatePartyFund on deposit()');
@@ -128,8 +207,7 @@ export class PartyCalculationService {
         try {
             withdrawAmount = partyMember.totalDeposit
                 .mul(percentage)
-                .divn(config.calculation.maxPercentage)
-                .muln(-1);
+                .divn(config.calculation.maxPercentage);
         } catch (error) {
             Logger.error(`ERROR CALCULATION WEIGHT on withdraw()`, error);
             throw error;
@@ -146,8 +224,11 @@ export class PartyCalculationService {
         );
 
         // must be run sequentially : no need to use Promise.all.
-        await this.updatePartyTotalFund(party, withdrawAmount);
-        await this.updatePartyMemberTotalDeposit(partyMember, withdrawAmount);
+        await this.subtractPartyTotalDeposit(party, withdrawAmount);
+        await this.substractPartyMemberTotalDeposit(
+            partyMember,
+            withdrawAmount,
+        );
         await this.updatePartyMembersWeight(party);
         Logger.debug('call updatePartyFund on withdraw()');
         await this.partyFundService.updatePartyFund(party);
