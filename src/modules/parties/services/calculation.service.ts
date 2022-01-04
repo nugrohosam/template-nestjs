@@ -21,7 +21,7 @@ export function substractAmount(totalDeposit: BN, amount: BN): BN {
         );
     }
     if (amount.isZero()) {
-        throw new UnprocessableEntityException('amount cannot is zero');
+        throw new UnprocessableEntityException('amount cannot be zero');
     }
 
     return totalDeposit.sub(amount);
