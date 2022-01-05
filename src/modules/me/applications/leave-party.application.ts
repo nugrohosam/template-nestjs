@@ -161,6 +161,8 @@ export class LeavePartyApplication {
                 logParams.result.transactionHash,
             );
 
+            throw new Error('Gagal Error Coba Log Transaction');
+
             if (!weight.isZero() && !amount.isZero()) {
                 await this.partyCalculationService.withdraw(
                     partyAddress,
@@ -261,12 +263,19 @@ export class LeavePartyApplication {
             );
 
             Logger.debug('<= Retry Leave Party End sync ');
+            runOnTransactionCommit(() =>
+                Logger.debug('retry leave party commit db transaction'),
+            );
         } catch (error) {
             // save to log for retrial
             Logger.error(
                 `[RETRY-LEAVE-PARTY-NOT-SYNC]  => ${transactionHash} || error =>`,
                 error,
             );
+            runOnTransactionRollback(() => {
+                Logger.debug('retry leave party commit db transaction');
+            });
+            throw error;
         }
     }
 }
