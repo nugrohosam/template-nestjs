@@ -24,11 +24,7 @@ import { PartyEvents } from 'src/contracts/Party';
 import BN from 'bn.js';
 import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
-import {
-    runOnTransactionCommit,
-    runOnTransactionRollback,
-    Transactional,
-} from 'typeorm-transactional-cls-hooked';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -161,8 +157,6 @@ export class LeavePartyApplication {
                 logParams.result.transactionHash,
             );
 
-            throw new Error('Gagal Error Coba Log Transaction');
-
             if (!weight.isZero() && !amount.isZero()) {
                 await this.partyCalculationService.withdraw(
                     partyAddress,
@@ -190,9 +184,6 @@ export class LeavePartyApplication {
                 }),
             ]);
             Logger.debug('<= Leave Party End sync ');
-            runOnTransactionCommit(() =>
-                Logger.debug('leave party commit db transaction'),
-            );
         } catch (error) {
             // save to log for retrial
             await this.transactionSyncService.store({
@@ -201,9 +192,6 @@ export class LeavePartyApplication {
                 isSync: false,
             });
             Logger.error('[LEAVE-PARTY-NOT-SYNC]', error);
-            runOnTransactionRollback(() => {
-                Logger.debug('leave party commit db transaction');
-            });
             throw error;
         }
     }
@@ -263,18 +251,12 @@ export class LeavePartyApplication {
             );
 
             Logger.debug('<= Retry Leave Party End sync ');
-            runOnTransactionCommit(() =>
-                Logger.debug('retry leave party commit db transaction'),
-            );
         } catch (error) {
             // save to log for retrial
             Logger.error(
                 `[RETRY-LEAVE-PARTY-NOT-SYNC]  => ${transactionHash} || error =>`,
                 error,
             );
-            runOnTransactionRollback(() => {
-                Logger.debug('retry leave party commit db transaction');
-            });
             throw error;
         }
     }
