@@ -192,6 +192,7 @@ export class LeavePartyApplication {
                 isSync: false,
             });
             Logger.error('[LEAVE-PARTY-NOT-SYNC]', error);
+            throw error;
         }
     }
 
@@ -256,6 +257,7 @@ export class LeavePartyApplication {
                 `[RETRY-LEAVE-PARTY-NOT-SYNC]  => ${transactionHash} || error =>`,
                 error,
             );
+            throw error;
         }
     }
 }
