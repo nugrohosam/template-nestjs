@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { AbiItem } from 'web3-utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -24,6 +25,7 @@ import { TransactionSyncService } from 'src/modules/transactions/services/transa
 import { PartyEvents } from 'src/contracts/Party';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
+import PartyAbi from 'src/contracts/PartyAbi.json';
 
 @Injectable()
 export class WithdrawApplication {
@@ -134,11 +136,22 @@ export class WithdrawApplication {
             Utils.diffInDays(nextDistribution, new Date()),
         );
 
+        const partyContract = this.web3Service.getContractInstance(
+            PartyAbi as AbiItem[],
+            party.address,
+        );
+
+        const withdrawNonce = await partyContract.methods
+            .withdrawNonces(user.address)
+            .call();
+
         const platformSignature =
             await this.meService.generateWithdrawPlatformSignature(
                 party.address,
+                user.address,
                 totalWithdrawAmount,
                 distributionPass,
+                withdrawNonce,
             );
 
         return {
