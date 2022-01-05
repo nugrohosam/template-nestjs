@@ -722,6 +722,11 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "quittingMember",
                 "type": "address"
             },
@@ -802,6 +807,11 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "quittingMember",
                 "type": "address"
             },
@@ -880,6 +890,11 @@
     },
     {
         "inputs": [
+            {
+                "internalType": "address",
+                "name": "partyAddress",
+                "type": "address"
+            },
             {
                 "internalType": "bytes32",
                 "name": "r",
