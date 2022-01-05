@@ -43,13 +43,17 @@ export class MeService {
 
     async generateWithdrawPlatformSignature(
         partyAddress: string,
+        userAddress: string,
         amount: BN,
         distributionPass: number,
+        nonce: string,
     ): Promise<string> {
         const message = this.web3Service.soliditySha3([
             { t: 'address', v: partyAddress },
+            { t: 'address', v: userAddress },
             { t: 'uint256', v: amount.toString() },
             { t: 'uint256', v: distributionPass },
+            { t: 'uint256', v: nonce },
         ]);
         // TODO: need to removed after testing
         console.log('message[platform-withdraw]: ' + message);
