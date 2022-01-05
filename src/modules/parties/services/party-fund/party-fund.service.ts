@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CurrencyModel } from 'src/models/currency.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { GetPartyMemberService } from '../members/get-party-member.service';
 import { PartyMemberService } from '../members/party-member.service';
 import { GetTokenPriceService } from '../token/get-token-price.service';
@@ -18,6 +19,7 @@ export class PartyFundService {
         private readonly partyMemberService: PartyMemberService,
     ) {}
 
+    @Transactional()
     async updatePartyFund(party: PartyModel): Promise<PartyModel> {
         const marketValue = await this.getTokenPriceService.getAllMarketValue();
         const partyTotalValue =
