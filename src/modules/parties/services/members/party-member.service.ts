@@ -92,10 +92,12 @@ export class PartyMemberService {
     }
 
     async generateLeavePlatformSignature(
+        partyAddress: string,
         userAddress: string,
         weight: BN,
     ): Promise<string> {
         const message = this.web3Service.soliditySha3([
+            { t: 'address', v: partyAddress },
             { t: 'address', v: userAddress },
             { t: 'uint256', v: weight.toString() },
         ]);

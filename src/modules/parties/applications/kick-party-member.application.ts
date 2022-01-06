@@ -145,6 +145,7 @@ export class KickPartyMemberApplication {
         const member = await this.getUserService.getUserById(memberId);
         const platformSignature =
             await this.partyMemberService.generateLeavePlatformSignature(
+                party.address,
                 member.address,
                 weight,
             );
