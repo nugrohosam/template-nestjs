@@ -5,7 +5,7 @@ import { IndexPartyTokenApplication } from '../applications/index-party-token.ap
 import { BalanceResponse } from '../responses/balance/balance.response';
 import { GetPartyService } from '../services/get-party.service';
 
-@Controller('parties/:partyId/balance')
+@Controller('parties/:partyId/funds')
 export class PartyBalanceController {
     constructor(
         private readonly indexPartyTokenApplication: IndexPartyTokenApplication,
@@ -22,12 +22,10 @@ export class PartyBalanceController {
             request,
         );
 
-        const total = await this.getPartyService.getPartyBalance(
-            partyId,
-            data.map((item) => item.address),
-        );
+        const total = await this.getPartyService.getPartyFunds(partyId, data);
+
         const response = new BalanceResponse();
-        response.total = total.toString();
+        response.total = total;
 
         return {
             message: 'Success get balance of parties tokens',
