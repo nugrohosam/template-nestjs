@@ -6,6 +6,8 @@ import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { TokenService } from './token/token.service';
+import BN from 'bn.js';
 
 @Injectable()
 export class GetPartyService {
@@ -16,6 +18,7 @@ export class GetPartyService {
         private readonly partyTokenRepository: Repository<PartyTokenModel>,
         @InjectRepository(PartyGainModel)
         private readonly partyGainRepository: Repository<PartyGainModel>,
+        private readonly tokenService: TokenService,
     ) {}
 
     getBaseQuery(userId?: string): SelectQueryBuilder<PartyModel> {
@@ -132,5 +135,24 @@ export class GetPartyService {
             .where('party_id = :partyId', { partyId })
             .orderBy('date', 'DESC')
             .getOne();
+    }
+
+    async getPartyBalance(
+        partyId: string,
+        addressTokens: string[],
+    ): Promise<BN> {
+        const party = await this.getById(partyId);
+        const ownerAddress = party.address;
+
+        const balance = new BN(0);
+        addressTokens.forEach(async (addressToken) => {
+            const balanceCount = await this.tokenService.getTokenBalance(
+                ownerAddress,
+                addressToken,
+            );
+            balance.add(balanceCount);
+        });
+
+        return balance;
     }
 }
