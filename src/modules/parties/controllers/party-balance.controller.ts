@@ -17,12 +17,12 @@ export class PartyBalanceController {
         @Param('partyId') partyId: string,
         @Query() request: IndexRequest,
     ): Promise<IApiResponse<BalanceResponse>> {
-        const { data, meta } = await this.indexPartyTokenApplication.fetch(
+        const { data } = await this.indexPartyTokenApplication.fetch(
             partyId,
             request,
         );
 
-        const total = this.getPartyService.getPartyBalance(
+        const total = await this.getPartyService.getPartyBalance(
             partyId,
             data.map((item) => item.address),
         );
@@ -32,7 +32,6 @@ export class PartyBalanceController {
         return {
             message: 'Success get balance of parties tokens',
             data: response,
-            meta,
         };
     }
 }
