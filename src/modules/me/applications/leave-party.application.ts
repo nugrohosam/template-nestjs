@@ -24,7 +24,11 @@ import { PartyEvents } from 'src/contracts/Party';
 import BN from 'bn.js';
 import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
+import {
+    runOnTransactionCommit,
+    runOnTransactionRollback,
+    Transactional,
+} from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class LeavePartyApplication {
@@ -135,6 +139,12 @@ export class LeavePartyApplication {
 
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
+        runOnTransactionCommit(() => {
+            Logger.debug('[leave] commit');
+        });
+        runOnTransactionRollback(() => {
+            Logger.debug('[leave] rollback');
+        });
         try {
             const { userAddress, partyAddress, amount, cut, penalty, weight } =
                 await this.meService.decodeLeaveEventData(
