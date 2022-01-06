@@ -144,7 +144,7 @@ export class GetPartyService {
         const party = await this.getById(partyId);
         const ownerAddress = party.address;
 
-        const balance = new BN('0');
+        const balance = new BN(0);
         addressTokens.forEach(async (addressToken) => {
             const balanceCount = await this.tokenService.getTokenBalance(
                 ownerAddress,
