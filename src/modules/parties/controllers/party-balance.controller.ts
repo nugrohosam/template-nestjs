@@ -24,7 +24,7 @@ export class PartyBalanceController {
         balance.total = 1000;
         
         return {
-            message: 'Success get party tokens',
+            message: 'Success get balance of parties',
             data: balance,
             meta,
         };
