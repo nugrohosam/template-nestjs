@@ -137,13 +137,19 @@ export class GetPartyService {
             .getOne();
     }
 
-    async getPartyBalance(partyId: string, addressTokens: string[]): Promise<BN> {
+    async getPartyBalance(
+        partyId: string,
+        addressTokens: string[],
+    ): Promise<BN> {
         const party = await this.getById(partyId);
         const ownerAddress = party.address;
-        
-        let balance = new BN;
-        addressTokens.forEach( async (addressToken) => {
-            const balanceCount = await this.tokenService.getTokenBalance(ownerAddress, addressToken);
+
+        const balance = new BN('0');
+        addressTokens.forEach(async (addressToken) => {
+            const balanceCount = await this.tokenService.getTokenBalance(
+                ownerAddress,
+                addressToken,
+            );
             balance.add(balanceCount);
         });
 
