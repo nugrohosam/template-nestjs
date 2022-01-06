@@ -125,6 +125,7 @@ export class LeavePartyApplication {
 
         const platformSignature =
             await this.partyMemberService.generateLeavePlatformSignature(
+                party.address,
                 user.address,
                 weight,
             );
