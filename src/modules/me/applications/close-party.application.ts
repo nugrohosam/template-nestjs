@@ -108,6 +108,7 @@ export class ClosePartyApplication {
         );
 
         const platformSignature = await this.genPlatformSignature.closeParty(
+            party.address,
             user.address,
         );
 
