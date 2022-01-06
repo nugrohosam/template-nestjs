@@ -6,7 +6,7 @@ import { BalanceResponse } from '../responses/balance/balance.response';
 import { GetPartyService } from '../services/get-party.service';
 
 @Controller('parties/:partyId/funds')
-export class PartyBalanceController {
+export class PartyFundsController {
     constructor(
         private readonly indexPartyTokenApplication: IndexPartyTokenApplication,
         private readonly getPartyService: GetPartyService,

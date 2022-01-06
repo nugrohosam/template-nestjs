@@ -65,7 +65,7 @@ import { KickPartyMemberApplication } from './applications/kick-party-member.app
 import { MeService } from '../me/services/me.service';
 import { GeckoCoinModel } from 'src/models/gecko-coin.model';
 import { GeckoTokenService } from './services/token/gecko-token.service';
-import { PartyBalanceController } from './controllers/party-balance.controller';
+import { PartyFundsController } from './controllers/party-funds.controller';
 @Module({
     imports: [
         HttpModule,
@@ -97,7 +97,7 @@ import { PartyBalanceController } from './controllers/party-balance.controller';
         JoinRequestController,
         PartyTokenController,
         PartyGainController,
-        PartyBalanceController,
+        PartyFundsController,
         PartyAnnouncementController,
     ],
     providers: [
