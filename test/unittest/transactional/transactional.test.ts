@@ -11,7 +11,7 @@ import {
 import { News } from './news.entity';
 import { NewsService } from './news.service';
 import { Post } from './post.entity';
-import { IGeneratePostAndNews, PostService } from './simple.service';
+import { IGeneratePostAndNews, PostService } from './post.service';
 
 function takeDelay(milisecond: number): Promise<boolean> {
     return new Promise((resolve) => {
@@ -21,25 +21,31 @@ function takeDelay(milisecond: number): Promise<boolean> {
     });
 }
 
-describe('@Transactional() test', () => {
-    beforeAll(async () => {
-        initializeTransactionalContext();
-        patchTypeORMRepositoryWithBaseRepository();
-        await createConnection({
-            type: 'mysql',
-            host: config.database.host,
-            port: +config.database.port,
-            username: config.database.username,
-            password: config.database.password,
-            database: config.database.databaseTest,
-            entities: [Post, News],
-            synchronize: true,
-            logging: 'all',
-        });
+beforeAll(async () => {
+    initializeTransactionalContext();
+    patchTypeORMRepositoryWithBaseRepository();
+    await createConnection({
+        type: 'mysql',
+        host: config.databaseTest.host,
+        port: +config.databaseTest.port,
+        username: config.databaseTest.username,
+        password: config.databaseTest.password,
+        database: config.databaseTest.database,
+        entities: [Post, News],
+        synchronize: true,
+        logging: 'all',
     });
+});
 
-    afterAll(async () => await getConnection().close());
+afterAll(async () => {
+    const repositoryPost = getConnection().getRepository(Post);
+    const repositoryNews = getConnection().getRepository(News);
+    await repositoryPost.clear();
+    await repositoryNews.clear();
+    await getConnection().close();
+});
 
+describe('@Transactional() test', () => {
     it('Creates a post using service', async () => {
         const repository = getConnection().getRepository(Post);
         const service = new PostService(repository);
@@ -74,7 +80,6 @@ describe('@Transactional() test', () => {
         const repositoryNews = getConnection().getRepository(News);
         const servicePost = new PostService(repositoryPost);
         const serviceNews = new NewsService(repositoryNews);
-        const message = 'simple - An unsuccessful post';
 
         const param: IGeneratePostAndNews = {
             newsService: serviceNews,
@@ -88,9 +93,9 @@ describe('@Transactional() test', () => {
         await takeDelay(100);
 
         expect(servicePost.success).toEqual('true');
-        const dbPost = await servicePost.getPostByMessage(message);
+        const dbPost = await servicePost.getPostByMessage(param.message);
         console.log(`dbPost: ${dbPost}`);
-        expect(dbPost).toBeFalsy();
+        expect(dbPost).toBeTruthy();
     });
 
     it('Fails at News when creating a Post and News using service', async () => {
@@ -98,7 +103,6 @@ describe('@Transactional() test', () => {
         const repositoryNews = getConnection().getRepository(News);
         const servicePost = new PostService(repositoryPost);
         const serviceNews = new NewsService(repositoryNews);
-        const message = 'simple - An unsuccessful post';
 
         const param: IGeneratePostAndNews = {
             newsService: serviceNews,
@@ -111,8 +115,67 @@ describe('@Transactional() test', () => {
         await takeDelay(100);
 
         expect(servicePost.success).toEqual('false');
-        const dbPost = await servicePost.getPostByMessage(message);
+        const dbPost = await servicePost.getPostByMessage(param.message);
         console.log(`dbPost: ${dbPost}`);
         expect(dbPost).toBeFalsy();
+
+        const dbNews = await serviceNews.getNewsByTopic(param.message);
+        console.log(`dbNews: ${dbNews}`);
+        expect(dbNews).toBeFalsy();
+    });
+});
+
+describe('@Transactional({ propagation: Propagation.NOT_SUPPORTED }) test', () => {
+    it('Create a Post and News', async () => {
+        const repositoryPost = getConnection().getRepository(Post);
+        const repositoryNews = getConnection().getRepository(News);
+        const servicePost = new PostService(repositoryPost);
+        const serviceNews = new NewsService(repositoryNews);
+
+        const param: IGeneratePostAndNews = {
+            newsService: serviceNews,
+            message:
+                'Propagation.NOT_SUPPORTED => Post and News both are successful.',
+            failOnPost: false,
+            failOnNews: false,
+        };
+        const post = await servicePost.createPostAndNonTransactionalNews(param);
+        expect(post.id).toBeGreaterThan(0);
+
+        await takeDelay(100);
+
+        expect(servicePost.success).toEqual('true');
+        const dbPost = await servicePost.getPostByMessage(param.message);
+        console.log(`dbPost: ${dbPost}`);
+        expect(dbPost).toBeTruthy();
+
+        const dbNews = await serviceNews.getNewsByTopic(param.message);
+        console.log(`dbNews: ${dbNews}`);
+        expect(dbNews).toBeTruthy();
+    });
+
+    it('Fails at Post then not failing on News (still created)', async () => {
+        const repositoryPost = getConnection().getRepository(Post);
+        const repositoryNews = getConnection().getRepository(News);
+        const servicePost = new PostService(repositoryPost);
+        const serviceNews = new NewsService(repositoryNews);
+
+        const param: IGeneratePostAndNews = {
+            newsService: serviceNews,
+            message:
+                'Propagation.NOT_SUPPORTED => PostNews Fail on Post still created on News',
+            failOnPost: false,
+            failOnNews: true,
+        };
+        expect(
+            servicePost.createPostAndNonTransactionalNews(param),
+        ).rejects.toThrow();
+
+        await takeDelay(100);
+
+        expect(servicePost.success).toEqual('false');
+        const dbNews = await serviceNews.getNewsByTopic(param.message);
+        console.log(`dbNews: ${dbNews}`);
+        expect(dbNews).toBeTruthy();
     });
 });

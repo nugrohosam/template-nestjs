@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { Propagation, Transactional } from 'typeorm-transactional-cls-hooked';
 import { News } from './news.entity';
 
 export class NewsService {
@@ -13,7 +13,25 @@ export class NewsService {
         await this.repository.save(news);
 
         if (fail) {
-            throw Error('fail = true, so failing on the nested service');
+            throw Error('fail = true, so failing on this nested service');
+        }
+
+        return news;
+    }
+
+    // Will ignore any current transactional
+    @Transactional({ propagation: Propagation.NOT_SUPPORTED })
+    async createNonTransactionalNews(
+        topic: string,
+        fail = false,
+    ): Promise<News> {
+        const news = new News();
+        news.topic = topic;
+
+        await this.repository.save(news);
+
+        if (fail) {
+            throw Error('fail = true, still successful on this nested service');
         }
 
         return news;

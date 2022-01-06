@@ -57,6 +57,30 @@ export class PostService {
         return post;
     }
 
+    @Transactional()
+    async createPostAndNonTransactionalNews(
+        params: IGeneratePostAndNews,
+    ): Promise<Post> {
+        const post = new Post();
+        post.message = params.message;
+
+        await this.repository.save(post);
+
+        runOnTransactionCommit(() => (this.success = 'true'));
+        runOnTransactionRollback(() => (this.success = 'false'));
+
+        if (params.failOnPost) {
+            throw Error('fail = true, so failing');
+        }
+
+        await params.newsService.createNonTransactionalNews(
+            params.message,
+            params.failOnNews,
+        );
+
+        return post;
+    }
+
     async getPostByMessage(message: string): Promise<Post | undefined> {
         return this.repository.findOne({ message });
     }
