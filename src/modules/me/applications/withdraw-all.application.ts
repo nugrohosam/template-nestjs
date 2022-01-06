@@ -16,7 +16,11 @@ import { Utils } from 'src/common/utils/util';
 import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.response';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { config } from 'src/config';
-import { Transactional } from 'typeorm-transactional-cls-hooked';
+import {
+    runOnTransactionCommit,
+    runOnTransactionRollback,
+    Transactional,
+} from 'typeorm-transactional-cls-hooked';
 import { PartyMemberService } from 'src/modules/parties/services/members/party-member.service';
 import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
 import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
@@ -135,6 +139,12 @@ export class WithdrawAllApplication {
 
     @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
+        runOnTransactionCommit(() => {
+            Logger.debug('[withdraw-all] commit');
+        });
+        runOnTransactionRollback(() => {
+            Logger.debug('[withdraw-all] rollback');
+        });
         try {
             const { userAddress, partyAddress, amount, cut, penalty, weight } =
                 await this.meService.decodeLeaveEventData(
@@ -192,6 +202,7 @@ export class WithdrawAllApplication {
                 isSync: false,
             });
             Logger.error('[WITHDRAW-ALL-NOT-SYNC]', error);
+            throw error;
         }
     }
 
@@ -267,6 +278,7 @@ export class WithdrawAllApplication {
                 `[RETRY-WITHDRAW-ALL-NOT-SYNC] => ${transactionHash} || error =>`,
                 error,
             );
+            throw error;
         }
     }
 }

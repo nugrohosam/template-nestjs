@@ -137,6 +137,7 @@ export class ClosePartyApplication {
                 isSync: false,
             });
             Logger.error('[CLOSE-PARTY-NOT-SYNC]', error);
+            throw error;
         }
     }
 
@@ -165,6 +166,7 @@ export class ClosePartyApplication {
                 isSync: false,
             });
             Logger.error('[CLOSE-PARTY-NOT-SYNC]', error);
+            throw error;
         }
     }
 }
