@@ -177,14 +177,7 @@ export class GetTokenPriceService {
             // -----------------------------
             let totalFund = new BN(0);
             // iterate all coin from party which fetch before to calculate total value
-            Logger.debug(JSON.stringify(marketValue), 'MARKET VALUE');
-            Logger.debug(
-                JSON.stringify(partyTokens.map((x) => x.geckoTokenId)),
-                'PARTY TOKEN ID GECKO',
-            );
-
             partyTokens.forEach((item) => {
-                Logger.debug(item.geckoTokenId, 'EACH GECKO TOKEN');
                 const tokenValue = this.getTokenBalanceIn(
                     partyToken,
                     item.geckoTokenId,
