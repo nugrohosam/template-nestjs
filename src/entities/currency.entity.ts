@@ -1,6 +1,7 @@
 export interface ICurrency {
     id?: number;
     symbol: string;
+    geckoTokenId: string;
     address: string;
     description?: string | null;
     createdAt?: Date | null;

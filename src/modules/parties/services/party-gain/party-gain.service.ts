@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import BN from 'bn.js';
 import { PartyGainModel } from 'src/models/party-gain.model';
+import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
 import { PartyFundService } from '../party-fund/party-fund.service';
@@ -24,7 +25,7 @@ export class PartyGainService {
         const listPartiesQuery =
             this.partyRepository.createQueryBuilder('party');
 
-        const lastFund = listPartiesQuery
+        const lastFundQuery = listPartiesQuery
             .subQuery()
             .select('fund')
             .from(PartyGainModel, 'partyGainLastFund')
@@ -34,10 +35,26 @@ export class PartyGainService {
             .getSql();
 
         listPartiesQuery.addSelect(
-            `COALESCE(${lastFund},0)`,
-            'partyGain_lastFund',
+            `COALESCE(${lastFundQuery},0)`,
+            'party_lastFund',
         );
+
+        const initialFundQuery = listPartiesQuery
+            .subQuery()
+            .select('pm.initialFund')
+            .from(PartyMemberModel, 'pm')
+            .where('pm.party_id = party.id')
+            .andWhere('pm.member_id = party.creator_id')
+            .limit(1)
+            .getSql();
+
+        listPartiesQuery.addSelect(
+            `COALESCE(${initialFundQuery},0)`,
+            'party_initialFund',
+        );
+
         const listParties = await listPartiesQuery
+            .where(`${initialFundQuery} > 0`)
             .orderBy('party.createdAt', 'DESC')
             .getMany();
 
@@ -53,7 +70,7 @@ export class PartyGainService {
                 );
 
             // get party last gain
-            const lastFund = item?.lastFund ?? new BN(0);
+            const lastFund = this.getPartyLastFund(item);
             const gain = this.calculateGainPercentage(
                 new BN(partyTotalValue),
                 lastFund,
@@ -103,6 +120,12 @@ export class PartyGainService {
             .andWhere('date(created_at) = date(now()) + interval -1 year')
             .orderBy('created_at', 'DESC')
             .getOne();
+        const lastDayGain = await this.partyGainRepository
+            .createQueryBuilder('partyGain')
+            .where('party_id = :partyId', { partyId: party.id })
+            .andWhere('date(created_at) = date(now()) + interval -24 hour')
+            .orderBy('created_at', 'DESC')
+            .getOne();
         const veryFirstGain = await this.partyGainRepository
             .createQueryBuilder('partyGain')
             .where('party_id = :partyId', { partyId: party.id })
@@ -110,6 +133,10 @@ export class PartyGainService {
             .getOne();
 
         party.gain = {
+            per24Hours: this.calculateGainPercentage(
+                currentGain?.fund ?? new BN(0),
+                lastDayGain?.fund ?? new BN(0),
+            ),
             per7Days: this.calculateGainPercentage(
                 currentGain?.fund ?? new BN(0),
                 lastWeekGain?.fund ?? new BN(0),
@@ -131,13 +158,20 @@ export class PartyGainService {
         this.partyRepository.save(party);
     }
 
-    private calculateGainPercentage(currentFund: BN, lastFund: BN): number {
-        const diff = currentFund.sub(lastFund);
-
+    private getPartyLastFund(item: PartyModel): BN {
+        let lastFund = item.lastFund;
         if (lastFund.isZero()) {
-            return diff.isNeg() ? -1 : 1;
+            // get party creator
+            lastFund = item.initialFund;
         }
 
-        return +(diff.toNumber() / lastFund.toNumber()).toFixed(6);
+        return lastFund;
+    }
+
+    private calculateGainPercentage(currentFund: BN, lastFund: BN): number {
+        const currFundNumber = currentFund.toNumber();
+        const lastFundNumber = lastFund.toNumber();
+        const diff = currFundNumber - lastFundNumber;
+        return diff / lastFundNumber;
     }
 }

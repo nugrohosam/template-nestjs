@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CurrencyModel } from 'src/models/currency.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository } from 'typeorm';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { GetPartyMemberService } from '../members/get-party-member.service';
 import { PartyMemberService } from '../members/party-member.service';
 import { GetTokenPriceService } from '../token/get-token-price.service';
@@ -18,6 +19,7 @@ export class PartyFundService {
         private readonly partyMemberService: PartyMemberService,
     ) {}
 
+    @Transactional()
     async updatePartyFund(party: PartyModel): Promise<PartyModel> {
         const marketValue = await this.getTokenPriceService.getAllMarketValue();
         const partyTotalValue =
@@ -25,10 +27,26 @@ export class PartyFundService {
                 party,
                 marketValue,
             );
-        party = await this.partyRepository.save({
-            ...party,
-            totalFund: partyTotalValue,
-        });
+        // here we need to check
+        Logger.debug(
+            party.totalDeposit,
+            'log deposit party on party fund line 31.',
+        );
+
+        await this.partyRepository
+            .createQueryBuilder()
+            .update(PartyModel)
+            .set({
+                totalFund: partyTotalValue,
+            })
+            .where('id = :id', { id: party.id })
+            .execute();
+
+        Logger.debug(
+            party.totalDeposit,
+            'log deposit party on party fund line 43.',
+        );
+
         await this.updatePartyMembersFund(party);
         return party;
     }

@@ -2,6 +2,7 @@ import {
     BadRequestException,
     Body,
     Controller,
+    Delete,
     Get,
     Headers,
     Param,
@@ -12,6 +13,7 @@ import {
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { config } from 'src/config';
 import { GetSignerService } from 'src/modules/commons/providers/get-signer.service';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 import { CreatePartyApplication } from '../applications/create-party.application';
 import { IndexPartyApplication } from '../applications/index-party.application';
 import { UpdatePartyApplication } from '../applications/update-party.application';
@@ -35,6 +37,7 @@ export class PartyController {
         private readonly getSignerService: GetSignerService,
         private readonly getPartyService: GetPartyService,
         private readonly partyGainService: PartyGainService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
     @Post('/create')
@@ -76,6 +79,18 @@ export class PartyController {
         };
     }
 
+    @Delete('/:partyId')
+    async deleteCreateParty(
+        @Param('partyId') partyId: string,
+        @Body() request: RevertCreatePartyRequest,
+    ): Promise<IApiResponse<null>> {
+        await this.createPartyApplication.deletePartyCreation(request, partyId);
+        return {
+            message: 'Success delete party',
+            data: null,
+        };
+    }
+
     @Get('/')
     async index(
         @Query() query: IndexPartyRequest,
@@ -99,10 +114,28 @@ export class PartyController {
     ): Promise<IApiResponse<DetailPartyResponse>> {
         const signer = await this.getSignerService.get(signature);
         const party = await this.getPartyService.getById(partyId, signer?.id);
+        const partyVolume = await this.transactionVolumeService.get24Hours(
+            partyId,
+        );
 
         return {
             message: 'Success get party',
-            data: DetailPartyResponse.mapFromPartyModel(party),
+            data: DetailPartyResponse.mapFromPartyModel(party, partyVolume),
+        };
+    }
+
+    // TODO: endoint for testing volume
+    @Get('/:partyId/volume')
+    async volume(
+        @Param('partyId') partyId: string,
+    ): Promise<IApiResponse<{ partyId: string; sum: string }>> {
+        const sum = await this.transactionVolumeService.get24Hours(partyId);
+        return {
+            message: 'Success get party',
+            data: {
+                partyId: partyId,
+                sum,
+            },
         };
     }
 

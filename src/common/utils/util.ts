@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import BN from 'bn.js';
 import { config } from 'src/config';
+import BigNumber from 'bignumber.js';
 
 export class Utils {
     static md5(contents: string): string {
@@ -110,5 +111,9 @@ export class Utils {
         return bnAmount
             .muln(config.calculation.platformFee)
             .divn(config.calculation.maxPercentage);
+    }
+
+    static getFromWeiToUsd(amount: BN): string {
+        return new BigNumber(amount.toString()).dividedBy(10 ** 6).toFixed();
     }
 }

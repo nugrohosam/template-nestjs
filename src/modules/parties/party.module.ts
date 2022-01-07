@@ -63,6 +63,9 @@ import { PartyFundService } from './services/party-fund/party-fund.service';
 import { UpdatePartyApplication } from './applications/update-party.application';
 import { KickPartyMemberApplication } from './applications/kick-party-member.application';
 import { MeService } from '../me/services/me.service';
+import { GeckoCoinModel } from 'src/models/gecko-coin.model';
+import { GeckoTokenService } from './services/token/gecko-token.service';
+import { PartyFundsController } from './controllers/party-funds.controller';
 @Module({
     imports: [
         HttpModule,
@@ -82,6 +85,7 @@ import { MeService } from '../me/services/me.service';
             PartyGainModel,
             SwapTransactionModel,
             AnnouncementModel,
+            GeckoCoinModel,
         ]),
     ],
     controllers: [
@@ -93,6 +97,7 @@ import { MeService } from '../me/services/me.service';
         JoinRequestController,
         PartyTokenController,
         PartyGainController,
+        PartyFundsController,
         PartyAnnouncementController,
     ],
     providers: [
@@ -108,6 +113,7 @@ import { MeService } from '../me/services/me.service';
 
         // Party Tokens
         TokenService,
+        GeckoTokenService,
 
         // Join Request Providers
         RequestJoinPartyApplication,

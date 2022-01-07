@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { TransformBN } from 'src/common/utils/typeorm.util';
+import { TransformBigNumber, TransformBN } from 'src/common/utils/typeorm.util';
 import { ISwapTransaction } from 'src/entities/swap-transaction.entity';
 import {
     Column,
@@ -26,14 +26,14 @@ export class SwapTransactionModel implements ISwapTransaction {
     @Column('varchar', { name: 'token_target' })
     tokenTarget: string;
 
-    @Column('bigint', { name: 'buy_amount', transformer: TransformBN })
+    @Column('varchar', { name: 'buy_amount', transformer: TransformBN })
     buyAmount: BN;
 
-    @Column('bigint', { name: 'sell_amount', transformer: TransformBN })
+    @Column('varchar', { name: 'sell_amount', transformer: TransformBN })
     sellAmount: BN;
 
-    @Column('bigint', { name: 'usd', transformer: TransformBN })
-    usd: BN;
+    @Column('varchar', { name: 'usd', transformer: TransformBigNumber })
+    usd: string;
 
     @Column('varchar', { name: 'transaction_hash' })
     transactionHash: string;

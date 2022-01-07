@@ -9,3 +9,10 @@ export class WithdrawPreparationResponse {
     distributionPass: number;
     platformSignature: string;
 }
+
+export class WithdrawAllPreparationResponse {
+    weight: string;
+    swap: ISwap0xResponse[];
+    distributionPass: number;
+    platformSignature: string;
+}

@@ -73,8 +73,6 @@ export class PartyMemberController {
             request,
         );
 
-        console.log('PREPARATION => ', kickPreparation);
-
         WS.initWebSocketInstance(
             party.address,
             PartyContract.getEventSignature(PartyEvents.Qoute0xSwap),
@@ -127,6 +125,7 @@ export class PartyMemberController {
         const partyMember = await this.getPartyMemberService.getById(
             partyMemberId,
         );
+
         await this.joinPartyApplication.commit(partyMember, request);
         return {
             message: 'Success update join party data',
@@ -199,6 +198,7 @@ export class PartyMemberController {
         };
     }
 
+    // TODO: unused
     @Put('leave')
     async leave(
         @Param('partyId') partyId: string,
@@ -218,6 +218,7 @@ export class PartyMemberController {
         };
     }
 
+    // TODO: unused
     @Put('leave/revert')
     async revertLeave(
         @Param('partyId') partyId: string,

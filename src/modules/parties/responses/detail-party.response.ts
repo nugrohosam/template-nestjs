@@ -20,6 +20,7 @@ export class DetailPartyResponse
     imageUrl: string;
     bio: string;
     isPublic: boolean;
+    isClosed: boolean;
     minDeposit: string;
     maxDeposit: string;
     totalDeposit: string;
@@ -36,8 +37,12 @@ export class DetailPartyResponse
     updatedAt: Date;
     deletedAt: Date | null;
     joinRequestStatus?: string;
+    volume24Hours?: string;
 
-    static mapFromPartyModel(party: PartyModel): DetailPartyResponse {
+    static mapFromPartyModel(
+        party: PartyModel,
+        volume?: string,
+    ): DetailPartyResponse {
         const creator = party.creator;
         const owner = party.owner;
 
@@ -52,6 +57,7 @@ export class DetailPartyResponse
             imageUrl: party.imageUrl,
             bio: party.bio,
             isPublic: party.isPublic,
+            isClosed: party.isClosed,
             minDeposit: party.minDeposit.toString(),
             maxDeposit: party.maxDeposit.toString(),
             totalDeposit: party.totalDeposit.toString(),
@@ -85,6 +91,7 @@ export class DetailPartyResponse
             updatedAt: party.updatedAt,
             deletedAt: party.deletedAt,
             joinRequestStatus: party.joinRequestStatus,
+            volume24Hours: volume,
         };
     }
 }

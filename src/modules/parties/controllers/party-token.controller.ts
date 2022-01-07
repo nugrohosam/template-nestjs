@@ -23,6 +23,7 @@ export class PartyTokenController {
         const response = data.map((datum) => {
             return PartyTokenResponse.mapFromPartyTokenModel(datum);
         });
+
         return {
             message: 'Success get party tokens',
             data: response,

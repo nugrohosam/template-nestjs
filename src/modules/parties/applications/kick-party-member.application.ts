@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -13,16 +13,21 @@ import { ISwap0xResponse } from 'src/modules/parties/responses/swap-quote.respon
 import { SwapQuoteService } from 'src/modules/parties/services/swap/swap-quote.service';
 import { config } from 'src/config';
 import { ILogParams } from 'src/modules/parties/types/logData';
-import { MeService } from '../../me/services/me.service';
 import { Utils } from 'src/common/utils/util';
 import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { UserModel } from 'src/models/user.model';
 import { GetUserService } from 'src/modules/users/services/get-user.service';
+import BN from 'bn.js';
+import { PartyEvents } from 'src/contracts/Party';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class KickPartyMemberApplication {
+    private kickWithdrawPercentage = new BN(config.calculation.maxPercentage);
     constructor(
         @InjectRepository(PartyTokenModel)
         private readonly partyTokenRepository: Repository<PartyTokenModel>,
@@ -33,11 +38,11 @@ export class KickPartyMemberApplication {
         private readonly partyMemberService: PartyMemberService,
         private readonly tokenService: TokenService,
         private readonly swapQuoteService: SwapQuoteService,
-        private readonly meService: MeService,
         private readonly joinRequestService: JoinRequestService,
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly getUserService: GetUserService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
     async prepare(
@@ -66,25 +71,56 @@ export class KickPartyMemberApplication {
             .where('party_id = :partyId', { partyId: party.id })
             .getMany();
 
+        Logger.debug(JSON.stringify(tokens), 'tokens db');
+
         const defaultToken = await this.tokenService.getDefaultToken();
+
+        Logger.debug(JSON.stringify(defaultToken), 'default token');
         const results = await Promise.all(
             tokens.map(async (token) => {
                 const balance = await this.tokenService.getTokenBalance(
                     party.address,
                     token.address,
                 );
-                const withdrawAmount = balance
-                    .mul(weight)
-                    .divn(config.calculation.maxPercentage);
+                let withdrawAmount = new BN(0);
+                if (
+                    (typeof weight === 'number' && weight !== 0) ||
+                    (typeof weight === 'object' && !weight.isZero())
+                ) {
+                    withdrawAmount = balance
+                        .mul(weight)
+                        .divn(config.calculation.maxPercentage);
+                }
 
                 let swapResponse: ISwap0xResponse = null;
-                if (token.address !== defaultToken.address) {
+                if (
+                    token.address !== defaultToken.address &&
+                    !balance.isZero()
+                ) {
                     const { data, err } = await this.swapQuoteService.getQuote(
                         defaultToken.address,
                         token.address,
                         withdrawAmount.toString(),
                     );
+                    Logger.debug(
+                        {
+                            tokenAddress: token.address,
+                            withdrawAmount: withdrawAmount.toString(),
+                            weight,
+                            balance,
+                        },
+                        token.symbol,
+                    );
                     if (err) {
+                        Logger.debug(
+                            {
+                                tokenAddress: token.address,
+                                withdrawAmount: withdrawAmount.toString(),
+                                weight,
+                                balance,
+                            },
+                            err.response.data.validationErrors[0].reason,
+                        );
                         throw new BadRequestException(
                             err.response.data.validationErrors[0].reason,
                         );
@@ -109,6 +145,7 @@ export class KickPartyMemberApplication {
         const member = await this.getUserService.getUserById(memberId);
         const platformSignature =
             await this.partyMemberService.generateLeavePlatformSignature(
+                party.address,
                 member.address,
                 weight,
             );
@@ -121,16 +158,16 @@ export class KickPartyMemberApplication {
         };
     }
 
+    @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress, amount, cut, penalty } =
-            await this.meService.decodeLeaveEventData(logParams);
+        const { userAddress, partyAddress, amount, cut, penalty, weight } =
+            await this.decodeKickEventData(logParams);
 
         let partyMember =
             await this.getPartyMemberService.getByUserAndPartyAddress(
                 userAddress,
                 partyAddress,
             );
-
         await this.transactionService.storeWithdrawTransaction(
             userAddress,
             partyAddress,
@@ -141,17 +178,18 @@ export class KickPartyMemberApplication {
             logParams.result.transactionHash,
         );
 
-        await this.partyCalculationService.withdraw(
-            partyAddress,
-            userAddress,
-            amount,
-        );
+        if (!weight.isZero() && !amount.isZero()) {
+            await this.partyCalculationService.withdraw(
+                partyAddress,
+                userAddress,
+                amount,
+                this.kickWithdrawPercentage,
+            );
+        }
 
         partyMember = await this.partyMemberService.update(partyMember, {
             leaveTransactionHash: logParams.result.transactionHash,
         });
-
-        console.log('Partymember =>', partyMember);
 
         await Promise.all([
             this.partyMemberService.delete(partyMember),
@@ -159,8 +197,40 @@ export class KickPartyMemberApplication {
                 partyMember.memberId,
                 partyMember.partyId,
             ),
+            this.transactionVolumeService.store({
+                partyId: partyMember.partyId,
+                type: TransactionTypeEnum.Withdraw,
+                transactionHash: logParams.result.transactionHash,
+                amountUsd: Utils.getFromWeiToUsd(amount),
+            }),
         ]);
+        Logger.debug('', 'PassedSync');
+    }
 
-        console.log('KickPartyEvent => status done');
+    async decodeKickEventData({ result: log }: ILogParams): Promise<{
+        partyAddress: string;
+        userAddress: string;
+        amount: BN;
+        cut: BN;
+        penalty: BN;
+        weight: BN;
+    }> {
+        const decodedLog = await this.web3Service.getDecodedLog(
+            log.transactionHash,
+            PartyEvents.KickPartyEvent,
+        );
+
+        // TODO: need to test it direct through network. if fail then will change to the usual way like above.
+        const data = {
+            partyAddress: decodedLog.partyAddress,
+            userAddress: decodedLog.userAddress,
+            amount: new BN(decodedLog.sent),
+            cut: new BN(decodedLog.cut),
+            penalty: new BN(decodedLog.penalty),
+            weight: new BN(decodedLog.weight),
+        };
+
+        Logger.debug(data, 'KickEventData');
+        return data;
     }
 }

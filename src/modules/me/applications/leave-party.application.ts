@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { PartyTokenModel } from 'src/models/party-token.model';
@@ -19,9 +19,21 @@ import { Utils } from 'src/common/utils/util';
 import { JoinRequestService } from 'src/modules/parties/services/join-request/join-request.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
+import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
+import { PartyEvents } from 'src/contracts/Party';
+import BN from 'bn.js';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import {
+    runOnTransactionCommit,
+    runOnTransactionRollback,
+    Transactional,
+} from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class LeavePartyApplication {
+    private leaveWithdrawPercentage = new BN(config.calculation.maxPercentage);
+
     constructor(
         @InjectRepository(PartyTokenModel)
         private readonly partyTokenRepository: Repository<PartyTokenModel>,
@@ -36,6 +48,8 @@ export class LeavePartyApplication {
         private readonly joinRequestService: JoinRequestService,
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
+        private readonly transactionSyncService: TransactionSyncService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
     async prepare(
@@ -67,12 +81,21 @@ export class LeavePartyApplication {
                     party.address,
                     token.address,
                 );
-                const withdrawAmount = balance
-                    .mul(weight)
-                    .divn(config.calculation.maxPercentage);
+                let withdrawAmount = new BN(0);
+                if (
+                    (typeof weight === 'number' && weight !== 0) ||
+                    (typeof weight === 'object' && !weight.isZero())
+                ) {
+                    withdrawAmount = balance
+                        .mul(weight)
+                        .divn(config.calculation.maxPercentage);
+                }
 
                 let swapResponse: ISwap0xResponse = null;
-                if (token.address !== defaultToken.address) {
+                if (
+                    token.address !== defaultToken.address &&
+                    !balance.isZero()
+                ) {
                     const { data, err } = await this.swapQuoteService.getQuote(
                         defaultToken.address,
                         token.address,
@@ -102,6 +125,7 @@ export class LeavePartyApplication {
 
         const platformSignature =
             await this.partyMemberService.generateLeavePlatformSignature(
+                party.address,
                 user.address,
                 weight,
             );
@@ -114,42 +138,137 @@ export class LeavePartyApplication {
         };
     }
 
+    @Transactional()
     async sync(logParams: ILogParams): Promise<void> {
-        const { userAddress, partyAddress, amount, cut, penalty } =
-            await this.meService.decodeLeaveEventData(logParams);
+        runOnTransactionCommit(() => {
+            Logger.debug('[leave] commit');
+        });
+        runOnTransactionRollback(() => {
+            Logger.debug('[leave] rollback');
+        });
+        try {
+            const { userAddress, partyAddress, amount, cut, penalty, weight } =
+                await this.meService.decodeLeaveEventData(
+                    logParams.result.transactionHash,
+                );
 
-        let partyMember =
-            await this.getPartyMemberService.getByUserAndPartyAddress(
+            let partyMember =
+                await this.getPartyMemberService.getByUserAndPartyAddress(
+                    userAddress,
+                    partyAddress,
+                );
+
+            await this.transactionService.storeWithdrawTransaction(
                 userAddress,
                 partyAddress,
+                amount,
+                cut,
+                penalty,
+                null,
+                logParams.result.transactionHash,
             );
 
-        await this.transactionService.storeWithdrawTransaction(
-            userAddress,
-            partyAddress,
-            amount,
-            cut,
-            penalty,
-            null,
-            logParams.result.transactionHash,
-        );
+            if (!weight.isZero() && !amount.isZero()) {
+                await this.partyCalculationService.withdraw(
+                    partyAddress,
+                    userAddress,
+                    amount,
+                    this.leaveWithdrawPercentage,
+                );
+            }
 
-        await this.partyCalculationService.withdraw(
-            partyAddress,
-            userAddress,
-            amount,
-        );
+            partyMember = await this.partyMemberService.update(partyMember, {
+                leaveTransactionHash: logParams.result.transactionHash,
+            });
 
-        partyMember = await this.partyMemberService.update(partyMember, {
-            leaveTransactionHash: logParams.result.transactionHash,
-        });
+            await Promise.all([
+                this.partyMemberService.delete(partyMember),
+                this.joinRequestService.deleteJoinRequest(
+                    partyMember.memberId,
+                    partyMember.partyId,
+                ),
+                this.transactionVolumeService.store({
+                    partyId: partyMember.partyId,
+                    type: TransactionTypeEnum.Withdraw,
+                    transactionHash: logParams.result.transactionHash,
+                    amountUsd: Utils.getFromWeiToUsd(amount),
+                }),
+            ]);
+            Logger.debug('<= Leave Party End sync ');
+        } catch (error) {
+            // save to log for retrial
+            await this.transactionSyncService.store({
+                transactionHash: logParams.result.transactionHash,
+                eventName: PartyEvents.LeavePartyEvent,
+                isSync: false,
+            });
+            Logger.error('[LEAVE-PARTY-NOT-SYNC]', error);
+            throw error;
+        }
+    }
 
-        await Promise.all([
-            this.partyMemberService.delete(partyMember),
-            this.joinRequestService.deleteJoinRequest(
-                partyMember.memberId,
-                partyMember.partyId,
-            ),
-        ]);
+    @Transactional()
+    async retrySync(transactionHash: string): Promise<void> {
+        try {
+            const { userAddress, partyAddress, amount, cut, penalty, weight } =
+                await this.meService.decodeLeaveEventData(transactionHash);
+
+            let partyMember =
+                await this.getPartyMemberService.getByUserAndPartyAddress(
+                    userAddress,
+                    partyAddress,
+                );
+
+            await this.transactionService.storeWithdrawTransaction(
+                userAddress,
+                partyAddress,
+                amount,
+                cut,
+                penalty,
+                null,
+                transactionHash,
+            );
+
+            if (!weight.isZero() && !amount.isZero()) {
+                await this.partyCalculationService.withdraw(
+                    partyAddress,
+                    userAddress,
+                    amount,
+                    this.leaveWithdrawPercentage,
+                );
+            }
+
+            partyMember = await this.partyMemberService.update(partyMember, {
+                leaveTransactionHash: transactionHash,
+            });
+
+            await Promise.all([
+                this.partyMemberService.delete(partyMember),
+                this.joinRequestService.deleteJoinRequest(
+                    partyMember.memberId,
+                    partyMember.partyId,
+                ),
+                this.transactionVolumeService.store({
+                    partyId: partyMember.partyId,
+                    type: TransactionTypeEnum.Withdraw,
+                    transactionHash: transactionHash,
+                    amountUsd: Utils.getFromWeiToUsd(amount),
+                }),
+            ]);
+
+            await this.transactionSyncService.updateStatusSync(
+                transactionHash,
+                true,
+            );
+
+            Logger.debug('<= Retry Leave Party End sync ');
+        } catch (error) {
+            // save to log for retrial
+            Logger.error(
+                `[RETRY-LEAVE-PARTY-NOT-SYNC]  => ${transactionHash} || error =>`,
+                error,
+            );
+            throw error;
+        }
     }
 }

@@ -24,7 +24,7 @@ export class TransactionModel implements ITransaction {
     @Column('varchar', { name: 'address_to' })
     addressTo: string;
 
-    @Column('bigint', { transformer: TransformBN })
+    @Column('varchar', { transformer: TransformBN })
     amount: BN;
 
     @Column('int', { name: 'currency_id' })
@@ -44,6 +44,9 @@ export class TransactionModel implements ITransaction {
 
     @Column('boolean', { name: 'transaction_hash_status' })
     transactionHashStatus: boolean;
+
+    @Column('boolean', { name: 'is_deposite_done' })
+    isDepositeDone: boolean;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt?: Date;

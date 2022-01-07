@@ -1,5 +1,11 @@
 import { Expose } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+    IsBoolean,
+    IsNumber,
+    IsOptional,
+    IsString,
+    IsUUID,
+} from 'class-validator';
 import { IndexRequest } from 'src/common/request/index.request';
 
 export class IndexPartyRequest extends IndexRequest {
@@ -16,6 +22,16 @@ export class IndexPartyRequest extends IndexRequest {
     @IsBoolean()
     @Expose({ name: 'is_featured' })
     isFeatured?: boolean;
+
+    @IsOptional()
+    @IsNumber()
+    @Expose({ name: 'is_closed' })
+    isClosed?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Expose({ name: 'is_active' })
+    isActive?: number;
 
     @IsOptional()
     name?: string;

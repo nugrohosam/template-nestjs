@@ -1,4 +1,6 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { Utils } from 'src/common/utils/util';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import { OffchainApplication } from 'src/infrastructure/applications/offchain.application';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
@@ -7,6 +9,7 @@ import { TransactionModel } from 'src/models/transaction.model';
 import { UserModel } from 'src/models/user.model';
 import { GetPartyMemberService } from 'src/modules/parties/services/members/get-party-member.service';
 import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { DepositRequest } from '../requests/deposit.request';
@@ -20,6 +23,7 @@ export class DepositApplication extends OffchainApplication {
         private readonly transactionService: TransactionService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly getPartyMemberService: GetPartyMemberService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {
         super();
     }
@@ -62,9 +66,17 @@ export class DepositApplication extends OffchainApplication {
                 request.transactionHash,
             );
 
+        await this.transactionVolumeService.store({
+            partyId: partyMember.partyId,
+            type: TransactionTypeEnum.Deposit,
+            transactionHash: request.transactionHash,
+            amountUsd: Utils.getFromWeiToUsd(request.amount),
+        });
+
         await this.partyCalculationService.deposit(
             partyMember,
             transaction.amount,
+            request.transactionHash,
         );
 
         return transaction;

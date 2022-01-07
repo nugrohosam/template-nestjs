@@ -24,7 +24,7 @@ export class SwapTransactionResponse
             tokenTarget: transaction.tokenTarget,
             buyAmount: transaction.buyAmount.toString(),
             sellAmount: transaction.sellAmount.toString(),
-            usd: transaction.usd.toString(),
+            usd: transaction.usd,
             createdAt: transaction.createdAt,
             userAddress,
         };

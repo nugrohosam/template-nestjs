@@ -1,12 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import {
+    HttpService,
+    Injectable,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { config } from 'src/config';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { CurrencyModel } from 'src/models/currency.model';
 import { Repository } from 'typeorm';
-import { ContractSendMethod } from 'web3-eth-contract';
 import BN from 'bn.js';
 import { Erc20AbiItem } from 'src/contracts/ERC20';
+import { IFetchMarketsResp } from './get-token-price.service';
+import { AxiosResponse, AxiosError } from 'axios';
 
 @Injectable()
 export class TokenService {
@@ -14,7 +19,20 @@ export class TokenService {
         @InjectRepository(CurrencyModel)
         private readonly repository: Repository<CurrencyModel>,
         private readonly web3Service: Web3Service,
+        private readonly httpService: HttpService,
     ) {}
+
+    async fetchTokenContractInfo(
+        tokenAddress: string,
+    ): Promise<AxiosResponse<IFetchMarketsResp>> {
+        return this.httpService
+            .get<IFetchMarketsResp>(
+                `${
+                    config.api.gecko
+                }/coins/polygon-pos/contract/${tokenAddress.toLowerCase()}`,
+            )
+            .toPromise();
+    }
 
     async getDefaultToken(): Promise<CurrencyModel> {
         const defaultToken = config.defaultToken;
@@ -47,17 +65,31 @@ export class TokenService {
     }
 
     async registerToken(tokenAddress: string): Promise<CurrencyModel> {
-        const tokenInstance = this.web3Service.getContractInstance(
+        // TODO: temporarily replaced by geckoCoin checker
+        /*         const tokenInstance = this.web3Service.getContractInstance(
             Erc20AbiItem,
             tokenAddress,
         );
         const contractMethod =
             tokenInstance.methods.symbol() as ContractSendMethod;
-        const symbol: string = await contractMethod.call();
-        console.log('name token', symbol);
+        const symbol: string = await contractMethod.call(); */
+        const geckoNet: AxiosResponse<IFetchMarketsResp> =
+            await this.fetchTokenContractInfo(tokenAddress).catch(
+                (error: AxiosError) => {
+                    console.log('gecko coin contract', error.response.data);
+                    throw new UnprocessableEntityException(
+                        'Token Not Supported',
+                        error.response.data.error,
+                    );
+                },
+            );
+        console.log('name token', geckoNet.data.symbol);
+        console.log('id token', geckoNet.data.id);
+
         const currency = this.repository.create({
             address: tokenAddress,
-            symbol: symbol,
+            symbol: geckoNet.data.symbol,
+            geckoTokenId: geckoNet.data.id,
         });
         return this.repository.save(currency);
     }
@@ -84,7 +116,7 @@ export class TokenService {
             tokenAddress,
         );
 
-        const decimal = await erc20Contract.methods.decimal().call();
+        const decimal = await erc20Contract.methods.decimals().call();
 
         return decimal;
     }

@@ -6,6 +6,10 @@ import { PartyMemberModel } from 'src/models/party-member.model';
 import { PartyTokenModel } from 'src/models/party-token.model';
 import { PartyModel } from 'src/models/party.model';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { TokenService } from './token/token.service';
+import { GetTokenPriceService } from './token/get-token-price.service';
+import BigNumber from 'bignumber.js';
+import { GetTokenBalanceService } from '../utils/get-token-balance.util';
 
 @Injectable()
 export class GetPartyService {
@@ -16,6 +20,9 @@ export class GetPartyService {
         private readonly partyTokenRepository: Repository<PartyTokenModel>,
         @InjectRepository(PartyGainModel)
         private readonly partyGainRepository: Repository<PartyGainModel>,
+        private readonly tokenService: TokenService,
+        private readonly tokenPrice: GetTokenPriceService,
+        private readonly tokenBalanceService: GetTokenBalanceService,
     ) {}
 
     getBaseQuery(userId?: string): SelectQueryBuilder<PartyModel> {
@@ -132,5 +139,44 @@ export class GetPartyService {
             .where('party_id = :partyId', { partyId })
             .orderBy('date', 'DESC')
             .getOne();
+    }
+
+    async getPartyFunds(
+        partyId: string,
+        partyTokens: PartyTokenModel[],
+    ): Promise<string> {
+        const party = await this.getById(partyId);
+        const ownerAddress = party.address;
+
+        let balance = new BigNumber(0);
+        for (let i = 0; i < partyTokens.length; i++) {
+            const balanceCount = await this.tokenService.getTokenBalance(
+                ownerAddress,
+                partyTokens[i].address,
+            );
+
+            const decimal = await this.tokenService.getTokenDecimal(
+                partyTokens[i].address,
+            );
+
+            const marketValue = await this.tokenPrice.getMarketValue([
+                partyTokens[i].geckoTokenId,
+            ]);
+
+            const bigNumber = new BigNumber(
+                marketValue[partyTokens[i].geckoTokenId].current_price,
+            );
+
+            const usd = bigNumber.times(
+                this.tokenBalanceService.formatFromWeiToken(
+                    balanceCount.toString(),
+                    Number(decimal),
+                ),
+            );
+
+            balance = balance.plus(usd);
+        }
+
+        return balance.toFixed();
     }
 }

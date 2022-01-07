@@ -4,7 +4,6 @@ import { ITransaction } from 'src/entities/transaction.entity';
 import { PartyMemberModel } from 'src/models/party-member.model';
 import { TransactionModel } from 'src/models/transaction.model';
 import BN from 'bn.js';
-import { PartyCalculationService } from 'src/modules/parties/services/party-calculation.service';
 import { TokenService } from 'src/modules/parties/services/token/token.service';
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { config } from 'src/config';
@@ -17,7 +16,6 @@ export class TransactionService {
         @InjectRepository(TransactionModel)
         private readonly repository: Repository<TransactionModel>,
 
-        private readonly partyCalculationService: PartyCalculationService,
         private readonly tokenService: TokenService,
     ) {}
 
@@ -137,6 +135,20 @@ export class TransactionService {
             .createQueryBuilder()
             .update(TransactionModel)
             .set({ transactionHashStatus: status })
+            .where('transaction_hash = :transaction_hash', {
+                transaction_hash: txhash,
+            })
+            .execute();
+    }
+
+    async updateDepositeStatus(
+        txhash: string,
+        status: boolean,
+    ): Promise<UpdateResult> {
+        return this.repository
+            .createQueryBuilder()
+            .update(TransactionModel)
+            .set({ isDepositeDone: status })
             .where('transaction_hash = :transaction_hash', {
                 transaction_hash: txhash,
             })

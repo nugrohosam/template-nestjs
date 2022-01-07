@@ -19,6 +19,16 @@ export const config = {
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
+        databaseTest: process.env.DB_DATABASE_TEST,
+    },
+
+    databaseTest: {
+        dialect: 'mysql',
+        host: process.env.DB_HOSTNAME_TEST,
+        port: process.env.DB_PORT_TEST,
+        username: process.env.DB_USERNAME_TEST,
+        password: process.env.DB_PASSWORD_TEST,
+        database: process.env.DB_DATABASE_TEST,
     },
 
     /**
@@ -64,6 +74,7 @@ export const config = {
     defaultToken: {
         symbol: process.env.DEFAULT_TOKEN_SYMBOL ?? 'usdc',
         address: process.env.DEFAULT_TOKEN_ADDRESS,
+        geckoTokenId: process.env.DEFAULT_TOKEN_ID,
     },
 
     /**
@@ -103,5 +114,7 @@ export const config = {
 
     scheduler: {
         partyGain: process.env.PARTY_GAIN_SCHEDULER === 'true' || true,
+        transactionSyncRetrial:
+            process.env.TRANSACTION_SYNC_RETRIAL_SCHEDULER === 'true' || true,
     },
 };

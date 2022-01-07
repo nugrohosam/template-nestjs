@@ -7,15 +7,15 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class GetTokenBalanceService {
     constructor(private readonly web3Service: Web3Service) {}
+    // TODO: change symbol to id => tokenName to tokenId
     getTokenBalance = async (
         addressToken: string,
-        tokenName: string,
         address: string,
     ): Promise<{
         balance: string;
         decimal: string;
-        name: string;
     }> => {
+        // TODO: for log
         const erc20Token = this.web3Service.getContractInstance(
             Erc20AbiItem,
             addressToken,
@@ -31,7 +31,6 @@ export class GetTokenBalanceService {
         return {
             balance: result[0],
             decimal: result[1],
-            name: tokenName,
         };
     };
 

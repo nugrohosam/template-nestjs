@@ -40,7 +40,12 @@ export class IndexPartyApplication extends IndexApplication {
             .take(1)
             .getQuery();
         query.addSelect(`${isActiveQuery} is not null`, 'party_isActive');
-        query.where(`${isActiveQuery} is not null`);
+
+        if (request.isActive) {
+            query.where(`${isActiveQuery} is not null`);
+        } else if (request.isActive === 0) {
+            query.where(`${isActiveQuery} is null`);
+        }
 
         if (request.search) {
             query.andWhere('party.name like :search', {
@@ -52,6 +57,14 @@ export class IndexPartyApplication extends IndexApplication {
             query.andWhere('party.is_featured = :isFeatured', {
                 isFeatured: request.isFeatured,
             });
+        }
+
+        if (request.isClosed) {
+            query.andWhere('party.is_closed = :isClosed', {
+                isClosed: request.isClosed,
+            });
+        } else {
+            query.andWhere('party.is_closed = 0');
         }
 
         if (request.name) {

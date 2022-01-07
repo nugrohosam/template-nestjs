@@ -5,7 +5,13 @@ import { SwapSignatureSerivce } from '../services/swap/swap-signature.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
 import { SwapQuoteResponse } from '../responses/swap-quote.response';
 import { SwapQuoteService } from '../services/swap/swap-quote.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    InternalServerErrorException,
+    Logger,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import { TransactionService } from 'src/modules/transactions/services/transaction.service';
 import { ILogParams } from '../types/logData';
 import { PartyService } from '../services/party.service';
@@ -22,8 +28,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PartyGainService } from '../services/party-gain/party-gain.service';
 import { PartyFundService } from '../services/party-fund/party-fund.service';
 import { GetTokenPriceService } from '../services/token/get-token-price.service';
-import { config } from 'src/config';
-import { BN } from 'bn.js';
+import { GetTokenBalanceService } from '../utils/get-token-balance.util';
+import { TransactionSyncService } from 'src/modules/transactions/services/transaction-sync.service';
+import { GeckoTokenService } from '../services/token/gecko-token.service';
+import BigNumber from 'bignumber.js';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 
 @Injectable()
 export class SwapQuoteApplication {
@@ -41,8 +50,13 @@ export class SwapQuoteApplication {
         private readonly partyGainService: PartyGainService,
         private readonly partyFundService: PartyFundService,
         private readonly tokenPrice: GetTokenPriceService,
+        private readonly tokenBalanceService: GetTokenBalanceService,
+        private readonly transactionSyncService: TransactionSyncService,
+        private readonly geckoTokenService: GeckoTokenService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {}
 
+    // this transaction is handling swap request as well. ref=withdraw-transaction
     @Transactional()
     async transaction(
         request: SwapQuoteTransactionRequest,
@@ -121,6 +135,14 @@ export class SwapQuoteApplication {
             ),
         );
 
+        // check token and register
+        const checkToken = await this.geckoTokenService.checkAndRegisterCoin(
+            request.buyToken,
+        );
+
+        if (!checkToken)
+            throw new UnprocessableEntityException('Error checking token');
+
         const { data: quoteResponse, err } =
             await this.swapQuoteService.getQuote(
                 request.buyToken,
@@ -159,6 +181,17 @@ export class SwapQuoteApplication {
             log.transactionHash,
         );
 
+        if (!receipt) {
+            // save to log for retrial
+            await this.transactionSyncService.store({
+                transactionHash: data.result.transactionHash,
+                eventName: PartyEvents.Qoute0xSwap,
+                isSync: false,
+            });
+            Logger.error('[SWAPQUOTE-NOT-SYNC]');
+            throw new InternalServerErrorException('SwapQuote Null Receipt');
+        }
+
         let decodedLog;
         receipt.logs.some((log) => {
             if (
@@ -194,34 +227,28 @@ export class SwapQuoteApplication {
         }
         await this.partyService.storeToken(party, token);
 
-        let usd = new BN(0);
-        if (swapEventData.sellTokenAddress != config.defaultToken.address) {
-            // get symbol by address at party token
-            const partyToken = await this.partyService.getPartyTokenByAddress(
-                swapEventData.sellTokenAddress,
-            );
-            console.log('party token => ', partyToken); // TODO for debugging
+        // get symbol by address at party token
+        const partyToken = await this.partyService.getPartyTokenByAddress(
+            swapEventData.sellTokenAddress,
+        );
+        const decimal = await this.tokenService.getTokenDecimal(
+            swapEventData.sellTokenAddress,
+        );
+        const marketValue = await this.tokenPrice.getMarketValue([
+            partyToken.geckoTokenId,
+        ]);
 
-            const decimal = await this.tokenService.getTokenDecimal(
-                swapEventData.sellTokenAddress,
-            );
-            console.log('decimal => ', decimal); // TODO for debugging
-
-            const marketValue = await this.tokenPrice.getMarketValue([
-                partyToken.symbol,
-            ]);
-            console.log('marketvalue => ', marketValue); // TODO for debugging
-
-            usd = usd.addn(
-                marketValue[partyToken.symbol].current_price /
-                    10 ** Number(decimal),
-            );
-        } else {
-            usd = usd.addn(
-                swapEventData.sellAmount / 10 ** config.calculation.usdDecimal,
-            );
-        }
-        console.log('usd => ', usd); // TODO for debugging
+        const bigNumber = new BigNumber(
+            marketValue[partyToken.geckoTokenId].current_price,
+        );
+        const usd = bigNumber
+            .times(
+                this.tokenBalanceService.formatFromWeiToken(
+                    swapEventData.sellAmount,
+                    Number(decimal),
+                ),
+            )
+            .toFixed();
 
         const swapTransaction = this.swapTransactionRepository.create({
             partyId: party.id,
@@ -233,6 +260,7 @@ export class SwapQuoteApplication {
             usd: usd,
         });
 
+        Logger.debug('will call updatePartyFund on buySync() swapQuote');
         await Promise.all([
             this.transactionService.updateTxHashStatus(
                 log.transactionHash,
@@ -241,8 +269,12 @@ export class SwapQuoteApplication {
             this.swapTransactionRepository.save(swapTransaction),
             this.partyGainService.updatePartyGain(party),
             this.partyFundService.updatePartyFund(party),
+            this.transactionVolumeService.store({
+                partyId: party.id,
+                type: TransactionTypeEnum.Swap,
+                transactionHash: log.transactionHash,
+                amountUsd: usd,
+            }),
         ]);
-
-        console.log('Qoute0xSwap => status done');
     }
 }

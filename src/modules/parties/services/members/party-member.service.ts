@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import BN from 'bn.js';
 import { config } from 'src/config';
@@ -69,7 +70,7 @@ export class PartyMemberService {
         ]);
 
         // TODO: need to removed after testing
-        console.log('message[platform-join-party]: ' + message);
+        console.log('message[platform-join-party]=: ' + message);
         return await this.web3Service.sign(message);
     }
 
@@ -91,10 +92,12 @@ export class PartyMemberService {
     }
 
     async generateLeavePlatformSignature(
+        partyAddress: string,
         userAddress: string,
         weight: BN,
     ): Promise<string> {
         const message = this.web3Service.soliditySha3([
+            { t: 'address', v: partyAddress },
             { t: 'address', v: userAddress },
             { t: 'uint256', v: weight.toString() },
         ]);
@@ -108,25 +111,53 @@ export class PartyMemberService {
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
 
-        partyMember.weight = partyMember.totalDeposit
-            .muln(config.calculation.maxPercentage)
-            .div(party.totalDeposit);
+        if (partyMember.totalDeposit.isZero() && party.totalDeposit.isZero())
+            return partyMember;
 
-        return this.partyMemberRepository.save(partyMember);
+        try {
+            const weight = partyMember.totalDeposit
+                .muln(config.calculation.maxPercentage)
+                .div(party.totalDeposit);
+            await this.partyMemberRepository
+                .createQueryBuilder('partyMember')
+                .update(PartyMemberModel)
+                .set({ weight })
+                .where('id = :id', { id: partyMember.id })
+                .execute();
+
+            return partyMember;
+        } catch (error) {
+            Logger.debug({
+                partyMemberDeposit: partyMember.totalDeposit,
+                partyTotalDeposit: party.totalDeposit,
+                partyMemberId: partyMember.id,
+            });
+            Logger.error(
+                `ERROR CALCULATION WEIGHT on updatePartyMemberWeight`,
+                error,
+            );
+            throw error;
+        }
     }
 
     async updatePartyMemberFund(
         partyMember: PartyMemberModel,
     ): Promise<PartyMemberModel> {
         const party = partyMember.party ?? (await partyMember.getParty);
-        if (!partyMember.weight || partyMember.weight.isZero()) {
-            partyMember.totalFund = new BN(0);
-        } else {
-            partyMember.totalFund = party.totalFund
-                .mul(partyMember.weight)
-                .divn(1000000);
+
+        let totalFund = new BN(0);
+
+        if (partyMember.weight && !partyMember.weight.isZero()) {
+            totalFund = party.totalFund.mul(partyMember.weight).divn(1000000);
         }
 
-        return this.partyMemberRepository.save(partyMember);
+        await this.partyMemberRepository
+            .createQueryBuilder('partyMember')
+            .update(PartyMemberModel)
+            .set({ totalFund })
+            .where('id = :id', { id: partyMember.id })
+            .execute();
+
+        return partyMember;
     }
 }

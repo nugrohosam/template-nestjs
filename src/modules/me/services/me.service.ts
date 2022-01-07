@@ -1,10 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+    Injectable,
+    Logger,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import BN from 'bn.js';
 import { PartyEvents } from 'src/contracts/Party';
 import { Web3Service } from 'src/infrastructure/web3/web3.service';
 import { GetPartyService } from 'src/modules/parties/services/get-party.service';
-import { ILogParams } from 'src/modules/parties/types/logData';
 
+export interface IDecodeResult {
+    userAddress: string;
+    partyAddress: string;
+    amount: BN;
+    cut: BN;
+    penalty: BN;
+    percentage: BN;
+}
 @Injectable()
 export class MeService {
     constructor(
@@ -24,59 +35,76 @@ export class MeService {
         return message;
     }
 
+    generateWithdrawAllSignature(partyName: string): string {
+        const message = `I want to withdraw all my money at ${partyName}`;
+        console.log(`message[withdraw-all]: ${message}`);
+        return message;
+    }
+
     async generateWithdrawPlatformSignature(
         partyAddress: string,
+        userAddress: string,
         amount: BN,
         distributionPass: number,
+        nonce: string,
     ): Promise<string> {
         const message = this.web3Service.soliditySha3([
             { t: 'address', v: partyAddress },
+            { t: 'address', v: userAddress },
             { t: 'uint256', v: amount.toString() },
             { t: 'uint256', v: distributionPass },
+            { t: 'uint256', v: nonce },
         ]);
         // TODO: need to removed after testing
         console.log('message[platform-withdraw]: ' + message);
         return await this.web3Service.sign(message);
     }
 
-    async decodeWithdrawEventData({ result: log }: ILogParams): Promise<{
+    async decodeWithdrawEventData(transactionHash: string): Promise<{
         userAddress: string;
         partyAddress: string;
         amount: BN;
         cut: BN;
         penalty: BN;
+        percentage: BN;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
-            log.transactionHash,
+            transactionHash,
             PartyEvents.WithdrawEvent,
         );
-        if (Object.keys(decodedLog).length <= 0) return;
+
+        if (!decodedLog)
+            throw new UnprocessableEntityException('Receipt is null');
 
         // TODO: this the usual way to get the docoded log. will try to access the input name directly in leave party event.
         const data = {
             userAddress: decodedLog[0],
-            partyAddress: decodedLog[1],
-            amount: new BN(decodedLog[2]),
-            cut: new BN(decodedLog[3]),
-            penalty: new BN(decodedLog[4]),
+            percentage: new BN(decodedLog[1]),
+            partyAddress: decodedLog[2],
+            amount: new BN(decodedLog[3]),
+            cut: new BN(decodedLog[4]),
+            penalty: new BN(decodedLog[5]),
         };
 
         Logger.debug(data, 'WithdrawEventData');
         return data;
     }
 
-    async decodeLeaveEventData({ result: log }: ILogParams): Promise<{
+    async decodeLeaveEventData(transactionHash: string): Promise<{
         partyAddress: string;
         userAddress: string;
         amount: BN;
         cut: BN;
         penalty: BN;
+        weight: BN;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
-            log.transactionHash,
+            transactionHash,
             PartyEvents.LeavePartyEvent,
         );
 
+        if (!decodedLog)
+            throw new UnprocessableEntityException('Receipt is null');
         // TODO: need to test it direct through network. if fail then will change to the usual way like above.
         const data = {
             partyAddress: decodedLog.partyAddress,
@@ -84,20 +112,24 @@ export class MeService {
             amount: new BN(decodedLog.sent),
             cut: new BN(decodedLog.cut),
             penalty: new BN(decodedLog.penalty),
+            weight: new BN(decodedLog.weight),
         };
 
         Logger.debug(data, 'LeaveEventData');
         return data;
     }
 
-    async decodeCloseEventData({ result: log }: ILogParams): Promise<{
+    async decodeCloseEventData(transactionHash: string): Promise<{
         partyAddress: string;
         ownerAddress: string;
     }> {
         const decodedLog = await this.web3Service.getDecodedLog(
-            log.transactionHash,
+            transactionHash,
             PartyEvents.ClosePartyEvent,
         );
+
+        if (!decodedLog)
+            throw new UnprocessableEntityException('Receipt is null');
 
         // TODO: need to test it direct through network. if fail then will change to the usual way like above.
         const data = {

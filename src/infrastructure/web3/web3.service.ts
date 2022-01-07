@@ -1,8 +1,10 @@
 import {
     Injectable,
+    Logger,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
+import { Utils } from 'src/common/utils/util';
 import { config } from 'src/config';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
 import Web3 from 'web3';
@@ -72,7 +74,21 @@ export class Web3Service {
     async getTransactionReceipt(
         transactionHash: string,
     ): Promise<TransactionReceipt> {
-        return await this.web3.eth.getTransactionReceipt(transactionHash);
+        let receipt;
+        let trialGetReceipt = 0;
+        do {
+            await Utils.takeDelay(2000);
+            receipt = await this.web3.eth.getTransactionReceipt(
+                transactionHash,
+            );
+            trialGetReceipt++;
+        } while (!receipt && trialGetReceipt <= 2);
+
+        if (!receipt) {
+            Logger.debug(transactionHash, '[WEB3SERVICE]Receipt not found');
+            return;
+        }
+        return receipt;
     }
 
     soliditySha3(data: Mixed[]): string {
@@ -168,6 +184,10 @@ export class Web3Service {
         eventName: PartyEvents,
     ): Promise<{ [key: string]: string } | undefined> {
         const receipt = await this.getTransactionReceipt(transactionHash);
+
+        if (!receipt) {
+            return;
+        }
 
         let decodedLog: { [key: string]: string };
         receipt.logs.some((receiptLog) => {

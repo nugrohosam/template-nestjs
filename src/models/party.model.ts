@@ -69,6 +69,9 @@ export class PartyModel implements IParty {
     @Column('boolean', { name: 'is_featured', nullable: true })
     isFeatured?: boolean;
 
+    @Column('boolean', { name: 'is_closed' })
+    isClosed?: boolean;
+
     @Column('bigint', {
         name: 'min_deposit',
         nullable: true,
@@ -203,4 +206,15 @@ export class PartyModel implements IParty {
         transformer: TransformBN,
     })
     lastFund?: BN;
+
+    @Column({
+        type: 'bigint',
+        select: false,
+        update: false,
+        insert: false,
+        transformer: TransformBN,
+    })
+    initialFund?: BN;
+
+    volume?: string;
 }

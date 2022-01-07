@@ -1,5 +1,6 @@
 import {
     Injectable,
+    Logger,
     UnauthorizedException,
     UnprocessableEntityException,
 } from '@nestjs/common';
@@ -21,6 +22,10 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { PartyCalculationService } from '../services/party-calculation.service';
 import BN from 'bn.js';
 import { PartyContract, PartyEvents } from 'src/contracts/Party';
+import { GetTransactionService } from 'src/modules/transactions/services/get-transaction.service';
+import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
+import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
+import { Utils } from 'src/common/utils/util';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
@@ -29,7 +34,9 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         private readonly partyMemberValidation: PartyMemberValidation,
         private readonly partyMemberService: PartyMemberService,
         private readonly transactionService: TransactionService,
+        private readonly getTransactionService: GetTransactionService,
         private readonly partyCalculationService: PartyCalculationService,
+        private readonly transactionVolumeService: TransactionVolumeService,
     ) {
         super();
     }
@@ -83,10 +90,12 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
     ): Promise<PartyMemberModel> {
         const member = partyMember.member ?? (await partyMember.getMember);
 
-        if (request.joinPartySignature !== partyMember.signature)
+        if (request.joinPartySignature !== partyMember.signature) {
             throw new UnauthorizedException('Signature not valid');
+        }
 
         if (partyMember.transactionHash) {
+            Logger.debug('partyMember.transactionHash');
             const existingTransactionHash =
                 await this.web3Service.getTransactionReceipt(
                     partyMember.transactionHash,
@@ -94,25 +103,43 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             if (existingTransactionHash.status) return;
         }
 
-        const txh = this.web3Service.getTransaction(request.transactionHash);
+        const txh = await this.web3Service.getTransaction(
+            request.transactionHash,
+        );
         if (!txh) return partyMember;
 
-        const transaction =
-            await this.transactionService.storeDepositTransaction(
+        // need to check if transactionHash exists
+        let transaction = await this.getTransactionService.getByTx(
+            request.transactionHash,
+            TransactionTypeEnum.Deposit,
+            false,
+        );
+
+        if (!transaction) {
+            transaction = await this.transactionService.storeDepositTransaction(
                 partyMember,
                 partyMember.initialFund,
                 request.joinPartySignature,
                 request.transactionHash,
             );
 
-        partyMember = await this.partyMemberService.update(partyMember, {
-            transactionHash: request.transactionHash,
-            depositTransactionId: transaction.id,
-        });
+            partyMember = await this.partyMemberService.update(partyMember, {
+                transactionHash: request.transactionHash,
+                depositTransactionId: transaction.id,
+            });
+
+            await this.transactionVolumeService.store({
+                partyId: partyMember.partyId,
+                type: TransactionTypeEnum.Deposit,
+                transactionHash: request.transactionHash,
+                amountUsd: Utils.getFromWeiToUsd(partyMember.initialFund),
+            });
+        }
 
         const receipt = this.web3Service.getTransactionReceipt(
             request.transactionHash,
         );
+
         if (!receipt) return partyMember;
 
         await this.web3Service.validateTransaction(
@@ -125,6 +152,7 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         await this.partyCalculationService.deposit(
             partyMember,
             transaction.amount,
+            request.transactionHash,
         );
         return partyMember;
     }
