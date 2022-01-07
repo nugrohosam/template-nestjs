@@ -2,32 +2,34 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { IApiResponse } from 'src/common/interface/response.interface';
 import { IndexRequest } from 'src/common/request/index.request';
 import { IndexPartyTokenApplication } from '../applications/index-party-token.application';
-import { PartyTokenResponse } from '../responses/token/party-token.response';
+import { BalanceResponse } from '../responses/balance/balance.response';
+import { GetPartyService } from '../services/get-party.service';
 
-@Controller('parties/:partyId/tokens')
-export class PartyTokenController {
+@Controller('parties/:partyId/funds')
+export class PartyFundsController {
     constructor(
         private readonly indexPartyTokenApplication: IndexPartyTokenApplication,
+        private readonly getPartyService: GetPartyService,
     ) {}
 
     @Get()
     async index(
         @Param('partyId') partyId: string,
         @Query() request: IndexRequest,
-    ): Promise<IApiResponse<PartyTokenResponse[]>> {
-        const { data, meta } = await this.indexPartyTokenApplication.fetch(
+    ): Promise<IApiResponse<BalanceResponse>> {
+        const { data } = await this.indexPartyTokenApplication.fetch(
             partyId,
             request,
         );
 
-        const response = data.map((datum) => {
-            return PartyTokenResponse.mapFromPartyTokenModel(datum);
-        });
+        const total = await this.getPartyService.getPartyFunds(partyId, data);
+
+        const response = new BalanceResponse();
+        response.total = total;
 
         return {
-            message: 'Success get party tokens',
+            message: 'Success get balance of parties tokens',
             data: response,
-            meta,
         };
     }
 }
