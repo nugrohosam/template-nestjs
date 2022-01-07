@@ -24,7 +24,7 @@ export class MeService {
     ) {}
 
     generateDepositSignature(partyName: string, amount: BN): string {
-        const message = `I want to deposit money at ${partyName} with amount of ${amount.toString()} mwei`;
+        const message = `I want to deposit money at ${partyName} with amount of ${amount.toString()} wei`;
         console.log(`message[deposit]: ${message}`);
         return message;
     }
