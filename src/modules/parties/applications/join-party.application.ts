@@ -1,4 +1,5 @@
 import {
+    Inject,
     Injectable,
     Logger,
     UnauthorizedException,
@@ -26,6 +27,8 @@ import { GetTransactionService } from 'src/modules/transactions/services/get-tra
 import { TransactionTypeEnum } from 'src/common/enums/transaction.enum';
 import { TransactionVolumeService } from 'src/modules/transactions/services/transaction-volume.service';
 import { Utils } from 'src/common/utils/util';
+import { ILogParams } from '../types/logData';
+import { GetPartyMemberService } from '../services/members/get-party-member.service';
 
 @Injectable()
 export class JoinPartyApplication extends OnchainSeriesApplication {
@@ -37,6 +40,8 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         private readonly getTransactionService: GetTransactionService,
         private readonly partyCalculationService: PartyCalculationService,
         private readonly transactionVolumeService: TransactionVolumeService,
+        @Inject(GetPartyMemberService)
+        private readonly getPartyMemberService: GetPartyMemberService,
     ) {
         super();
     }
@@ -157,6 +162,53 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
         return partyMember;
     }
 
+    @Transactional()
+    async joinSync(logParams: ILogParams): Promise<void> {
+        Logger.debug('start call joinSync');
+        const { partyMemberId } = await this.decodeJoinEventData(
+            logParams.result.transactionHash,
+        );
+
+        let partyMember = await this.getPartyMemberService.getById(
+            partyMemberId,
+        );
+
+        // need to check if transactionHash exists
+        let transaction = await this.getTransactionService.getByTx(
+            logParams.result.transactionHash,
+            TransactionTypeEnum.Deposit,
+            false,
+        );
+
+        if (!transaction) {
+            transaction = await this.transactionService.storeDepositTransaction(
+                partyMember,
+                partyMember.initialFund,
+                partyMember.signature,
+                logParams.result.transactionHash,
+            );
+
+            partyMember = await this.partyMemberService.update(partyMember, {
+                transactionHash: logParams.result.transactionHash,
+                depositTransactionId: transaction.id,
+            });
+        }
+
+        await this.partyCalculationService.deposit(
+            partyMember,
+            transaction.amount,
+            logParams.result.transactionHash,
+        );
+
+        await this.transactionVolumeService.store({
+            partyId: partyMember.partyId,
+            type: TransactionTypeEnum.Deposit,
+            transactionHash: logParams.result.transactionHash,
+            amountUsd: Utils.getFromWeiToUsd(partyMember.initialFund),
+        });
+        Logger.debug('finish call joinSync');
+    }
+
     async revert(
         partyMember: PartyMemberModel,
         request: DeleteIncompleteDataRequest,
@@ -170,5 +222,35 @@ export class JoinPartyApplication extends OnchainSeriesApplication {
             );
 
         await this.partyMemberService.delete(partyMember);
+    }
+
+    async decodeJoinEventData(transactionHash: string): Promise<{
+        partyAddress: string;
+        userAddress: string;
+        partyMemberId: string;
+        userId: string;
+        amount: BN;
+        cut: BN;
+    }> {
+        const decodedLog = await this.web3Service.getDecodedLog(
+            transactionHash,
+            PartyEvents.JoinEvent,
+        );
+
+        if (!decodedLog)
+            throw new UnprocessableEntityException('Receipt is null');
+
+        // TODO: need to test it direct through network. if fail then will change to the usual way like above.
+        const data = {
+            partyAddress: decodedLog.partyAddress,
+            userAddress: decodedLog.caller,
+            partyMemberId: decodedLog.joinPartyId, // partyMemberId
+            userId: decodedLog.userId,
+            amount: new BN(decodedLog.sent),
+            cut: new BN(decodedLog.cut),
+        };
+
+        Logger.debug(data, 'JoinEventData');
+        return data;
     }
 }
