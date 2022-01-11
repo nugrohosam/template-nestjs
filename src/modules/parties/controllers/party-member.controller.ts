@@ -108,6 +108,13 @@ export class PartyMemberController {
         const { data, platformSignature } =
             await this.joinPartyApplication.prepare(party, user, request);
 
+        WS.initWebSocketInstance(
+            party.address,
+            PartyContract.getEventSignature(PartyEvents.JoinEvent),
+            async (logParams: ILogParams) => {
+                await this.joinPartyApplication.joinSync(logParams);
+            },
+        );
         return {
             message: 'Success add user to party',
             data: JoinPartyResponse.mapFromPartyMemberModel(

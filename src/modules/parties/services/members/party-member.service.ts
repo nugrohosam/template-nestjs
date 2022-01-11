@@ -48,7 +48,7 @@ export class PartyMemberService {
     generateJoinSignature(party: PartyModel, deposit: BN): string {
         const message = `I want to join ${
             party.name
-        } party with initial deposit of ${deposit.toString()} mwei`;
+        } party with initial deposit of ${deposit.toString()} wei`;
 
         // TODO: need to removed after testing
         console.log('message[request-join]: ' + message);
