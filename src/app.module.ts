@@ -6,23 +6,16 @@ import { HttpExceptionFilter } from './common/filters/http-exeception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { ValidationPipe } from './common/pipes/validation.pipe';
 import { connectionOption } from './infrastructure/databases';
-import { CommonModule } from './modules/commons/common.module';
 import { MeModule } from './modules/me/me.module';
-import { PartyModule } from './modules/parties/party.module';
-import { TransactionModule } from './modules/transactions/transaction.module';
-import { UserModule } from './modules/users/user.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { LandingPageModule } from './modules/landing-page/landing-page.module';
 @Module({
     imports: [
         TypeOrmModule.forRoot(connectionOption),
         RavenModule,
-        UserModule,
-        PartyModule,
-        TransactionModule,
-        CommonModule,
-        MeModule,
-        LandingPageModule,
+
+        // write your module here
+
+        MeModule, // example like this
         ScheduleModule.forRoot(),
     ],
     providers: [
