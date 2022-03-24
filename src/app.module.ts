@@ -6,7 +6,7 @@ import { HttpExceptionFilter } from './common/filters/http-exeception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { ValidationPipe } from './common/pipes/validation.pipe';
 import { connectionOption } from './infrastructure/databases';
-import { MeModule } from './modules/me/me.module';
+import { BookModule } from './modules/book/book.module';
 import { ScheduleModule } from '@nestjs/schedule';
 @Module({
     imports: [
@@ -15,7 +15,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
         // write your module here
 
-        MeModule, // example like this
+        BookModule, // example like this
         ScheduleModule.forRoot(),
     ],
     providers: [
