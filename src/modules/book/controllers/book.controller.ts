@@ -65,7 +65,7 @@ export class BookController {
 
     @Post()
     async store(
-        bookRequest: BookCreateRequest,
+        @Body() bookRequest: BookCreateRequest,
     ): Promise<IApiResponse<BookResponse>> {
         await this.bookCRUDApplication.create(bookRequest);
 

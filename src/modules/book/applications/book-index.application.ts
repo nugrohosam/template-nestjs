@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginateResponse } from 'src/common/interface/index.interface';
 import { IndexApplication } from 'src/infrastructure/applications/index.application';
@@ -5,6 +6,7 @@ import { Book } from 'src/models/book.model';
 import { Repository } from 'typeorm';
 import { BookIndexRequest } from '../requests/book-index.request';
 
+@Injectable()
 export class BookIndexApplication extends IndexApplication {
     constructor(
         @InjectRepository(Book)

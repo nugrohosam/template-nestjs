@@ -2,7 +2,9 @@ import { BookResponse } from '../responses/book.response';
 import { BookCreateRequest } from '../requests/book-create.request';
 import { BookService } from '../services/book.service';
 import { Book } from 'src/models/book.model';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class BookCRUDApplication {
     constructor(private readonly bookService: BookService) {}
 
@@ -16,7 +18,9 @@ export class BookCRUDApplication {
 
     async create(bookRequest: BookCreateRequest): Promise<BookResponse> {
         const newBook = new Book();
+        console.log(newBook, bookRequest);
         Object.assign(newBook, bookRequest);
+        console.log(newBook, bookRequest);
 
         const createdBook = await this.bookService.create(newBook);
 
