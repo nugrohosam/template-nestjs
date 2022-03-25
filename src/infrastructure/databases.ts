@@ -1,4 +1,5 @@
 import { config } from 'src/config';
+import { Book } from 'src/models/book.model';
 import { ConnectionOptions, createConnection } from 'typeorm';
 
 export const connectionOption: ConnectionOptions = {
@@ -8,8 +9,7 @@ export const connectionOption: ConnectionOptions = {
     username: config.database.username,
     password: config.database.password,
     database: config.database.database,
-    entities: [
-    ],
+    entities: [Book],
     synchronize: false,
     logging: config.nodeEnv === 'local',
     charset: 'utf8mb4_unicode_ci',
